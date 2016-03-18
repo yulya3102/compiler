@@ -39,41 +39,31 @@ struct Type;
 struct ConstType
 {
     ConstType(Type type);
+
+    bool operator==(const ConstType & rhs) const;
+
     std::shared_ptr<Type> type;
 };
 
 struct PointerType
 {
     PointerType(Type type);
+
+    bool operator==(const PointerType & rhs) const;
+
     std::shared_ptr<Type> type;
 };
 
 struct Type
 {
-    Type(AtomType type)
-        : type(type)
-    {}
+    Type(AtomType type);
+    Type(ConstType type);
+    Type(PointerType type);
 
-    Type(ConstType type)
-        : type(type)
-    {}
-
-    Type(PointerType type)
-        : type(type)
-    {}
+    bool operator==(const Type & rhs) const;
 
     boost::variant<AtomType, ConstType, PointerType> type;
 };
-
-inline
-ConstType::ConstType(Type type)
-    : type(new Type(type))
-{}
-
-inline
-PointerType::PointerType(Type type)
-    : type(new Type(type))
-{}
 
 struct Const
 {

@@ -57,4 +57,19 @@ integer     -?[1-9][0-9]*
 [ \t]*      {}
 [\n]        { yylineno++; }
 
+%%
 
+// fuck you, yyFlexLexer interface
+#ifdef yylex
+#undef yylex
+#endif
+int yyFlexLexer::yylex()
+{
+    std::cerr << "error: yyFlexLexer::yylex()" << std::endl;
+    return 0;
+}
+
+int yyFlexLexer::yywrap()
+{
+    return 1;
+}

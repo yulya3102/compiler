@@ -38,19 +38,11 @@ struct Type;
 
 struct ConstType
 {
-    ConstType(Type type);
-
-    bool operator==(const ConstType & rhs) const;
-
     std::shared_ptr<Type> type;
 };
 
 struct PointerType
 {
-    PointerType(Type type);
-
-    bool operator==(const PointerType & rhs) const;
-
     std::shared_ptr<Type> type;
 };
 
@@ -60,9 +52,6 @@ struct Type
     Type(const T & t)
         : type(t)
     {}
-
-
-    bool operator==(const Type & rhs) const;
 
     boost::variant<AtomType, ConstType, PointerType> type;
 };
@@ -92,17 +81,12 @@ struct Value
 
 struct VarDeclaration
 {
-    VarDeclaration(const Type & type, const std::string & name);
-
     Type type;
     std::string name;
 };
 
 struct FuncDeclaration
 {
-    FuncDeclaration(const Type & type, const std::string & name,
-                    std::list<VarDeclaration> arguments);
-
     Type type;
     std::string name;
     std::list<VarDeclaration> arguments;
@@ -197,8 +181,6 @@ struct Statement
 
 struct FuncDefinition
 {
-    FuncDefinition(const FuncDeclaration & declaration, const Statement & statement);
-
     FuncDeclaration declaration;
     Statement statement;
 };

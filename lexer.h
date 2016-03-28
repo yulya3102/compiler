@@ -1,5 +1,6 @@
 #pragma once
 
+#undef yyFlexLexer
 #include <FlexLexer.h>
 
 struct lexer_t;
@@ -8,7 +9,8 @@ struct lexer_t;
 
 struct lexer_t : yyFlexLexer
 {
-    yy::parser::token_type lex(
-            yy::parser::semantic_type * yylval,
-            yy::parser::location_type * yylloc);
+    typedef yy::parser::token_type token;
+
+    token lex(yy::parser::semantic_type * yylval,
+              yy::parser::location_type * yylloc);
 };

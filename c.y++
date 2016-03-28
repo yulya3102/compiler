@@ -15,6 +15,7 @@
     std::string* string;
 }
 
+%token              END         0   "end of file"
 %token              SEMICOLON
 %token              LPAREN
 %token              RPAREN

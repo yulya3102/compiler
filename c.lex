@@ -8,6 +8,10 @@ int yylineno = 1;
         lexer_t::lex( \
             yy::parser::semantic_type * yylval, \
             yy::parser::location_type * yylloc)
+
+#include "lexer.h"
+
+#define yyterminate()   return token::END
 %}
 
 %option c++

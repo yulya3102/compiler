@@ -110,7 +110,7 @@ struct Call
     std::list<Expression> arguments;
 };
 
-enum BinOperator
+enum Oper
 {
     PLUS,
     MINUS,
@@ -127,6 +127,12 @@ enum BinOperator
     OR
 };
 
+struct BinOperator
+{
+    std::shared_ptr<Expression> lhs, rhs;
+    Oper oper;
+};
+
 struct Expression
 {
     template <typename T>
@@ -134,7 +140,7 @@ struct Expression
         : expression(t)
     {}
 
-    boost::variant<Call, BinOperator, Value> expression;
+    boost::variant<Value, BinOperator> expression;
 };
 
 struct VarDefinition
@@ -151,22 +157,34 @@ struct Assignment
 
 struct Statement;
 
-struct FuncBody
-{
-    std::list<Statement> statements;
-};
-
 struct If
 {
     Expression condition;
-    FuncBody thenBody;
-    boost::optional<FuncBody> elseBody;
+    std::shared_ptr<Statement> thenBody, elseBody;
 };
 
 struct While
 {
     Expression condition;
-    FuncBody body;
+    std::shared_ptr<Statement> body;
+};
+
+struct Skip
+{};
+
+struct Seq
+{
+    std::shared_ptr<Statement> first, second;
+};
+
+struct Read
+{
+    std::string varname;
+};
+
+struct Write
+{
+    std::shared_ptr<Expression> expr;
 };
 
 struct Statement
@@ -176,7 +194,16 @@ struct Statement
         : statement(t)
     {}
 
-    boost::variant<VarDeclaration, VarDefinition, Assignment, If, While, Expression> statement;
+    boost::variant<
+        Skip,
+        VarDeclaration,
+        Assignment,
+        Seq,
+        If,
+        While,
+        Read,
+        Write>
+        statement;
 };
 
 struct FuncDefinition

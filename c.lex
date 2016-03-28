@@ -4,10 +4,10 @@
 int yylineno = 1;
 
 #define YY_DECL \
-    yy::parser::token_type \
+    ast::parser::token_type \
         lexer_t::lex( \
-            yy::parser::semantic_type * yylval, \
-            yy::parser::location_type * yylloc)
+            ast::parser::semantic_type * yylval, \
+            ast::parser::location_type * yylloc)
 
 #include "lexer.h"
 

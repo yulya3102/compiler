@@ -9,8 +9,8 @@ struct lexer_t;
 
 struct lexer_t : yyFlexLexer
 {
-    typedef yy::parser::token_type token;
+    typedef ast::parser::token_type token;
 
-    token lex(yy::parser::semantic_type * yylval,
-              yy::parser::location_type * yylloc);
+    token lex(ast::parser::semantic_type * yylval,
+              ast::parser::location_type * yylloc);
 };

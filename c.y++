@@ -4,11 +4,17 @@
 
 #include "lexer.h"
 
+#ifdef yylex
+#undef yylex
+#endif
 #define yylex lexer.lex
+
 %}
 
 %parse-param { struct lexer_t & lexer }
 %locations
+
+%name-prefix "ast"
 
 %union {
     int integer;

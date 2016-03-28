@@ -198,3 +198,11 @@ bool:
 int     :
           INTEGER       { $$ = $1; }
         ;
+
+%%
+
+void ast::parser::error(const ast::parser::location_type & l,
+                        const std::string & m)
+{
+    std::cerr << l << ": " << m << std::endl;
+}

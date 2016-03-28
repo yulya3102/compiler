@@ -203,7 +203,7 @@ struct Definition
         : definition(t)
     {}
 
-    boost::variant<VarDefinition, FuncDefinition> definition;
+    boost::variant<VarDeclaration, FuncDefinition> definition;
 };
 
 struct CodeEntry

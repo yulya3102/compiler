@@ -56,9 +56,11 @@ struct PointerType
 
 struct Type
 {
-    Type(AtomType type);
-    Type(ConstType type);
-    Type(PointerType type);
+    template <typename T>
+    Type(const T & t)
+        : type(t)
+    {}
+
 
     bool operator==(const Type & rhs) const;
 
@@ -67,11 +69,21 @@ struct Type
 
 struct Const
 {
+    template <typename T>
+    Const(const T & t)
+        : constant(t)
+    {}
+
     boost::variant<bool, int> constant;
 };
 
 struct Value
 {
+    template <typename T>
+    Value(const T & t)
+        : value(t)
+    {}
+
     boost::variant<
         Const,          // bool or int
         std::string     // variable name
@@ -93,6 +105,11 @@ struct FuncDeclaration
 
 struct Declaration
 {
+    template <typename T>
+    Declaration(const T & t)
+        : declaration(t)
+    {}
+
     boost::variant<VarDeclaration, FuncDeclaration> declaration;
 };
 
@@ -123,6 +140,11 @@ enum BinOperator
 
 struct Expression
 {
+    template <typename T>
+    Expression(const T & t)
+        : expression(t)
+    {}
+
     boost::variant<Call, BinOperator, Value> expression;
 };
 
@@ -160,6 +182,11 @@ struct While
 
 struct Statement
 {
+    template <typename T>
+    Statement(const T & t)
+        : statement(t)
+    {}
+
     boost::variant<VarDeclaration, VarDefinition, Assignment, If, While, Expression> statement;
 };
 
@@ -171,11 +198,21 @@ struct FuncDefinition
 
 struct Definition
 {
+    template <typename T>
+    Definition(const T & t)
+        : definition(t)
+    {}
+
     boost::variant<VarDefinition, FuncDefinition> definition;
 };
 
 struct CodeEntry
 {
+    template <typename T>
+    CodeEntry(const T & t)
+        : entry(t)
+    {}
+
     boost::variant<Declaration, Definition> entry;
 };
 

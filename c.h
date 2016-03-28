@@ -92,12 +92,17 @@ struct Value
 
 struct VarDeclaration
 {
+    VarDeclaration(const Type & type, const std::string & name);
+
     Type type;
     std::string name;
 };
 
 struct FuncDeclaration
 {
+    FuncDeclaration(const Type & type, const std::string & name,
+                    std::list<VarDeclaration> arguments);
+
     Type type;
     std::string name;
     std::list<VarDeclaration> arguments;
@@ -192,6 +197,8 @@ struct Statement
 
 struct FuncDefinition
 {
+    FuncDefinition(const FuncDeclaration & declaration, const Statement & statement);
+
     FuncDeclaration declaration;
     Statement statement;
 };

@@ -1,0 +1,155 @@
+%{
+#include <string>
+#include <iostream>
+
+#include "lexer.h"
+
+#define yylex lexer.lex
+%}
+
+%parse-param { struct lexer_t & lexer }
+%locations
+
+%union {
+    int integer;
+    std::string* string;
+}
+
+%token              SEMICOLON
+%token              LPAREN
+%token              RPAREN
+%token              COMMA
+%token              CLPAREN
+%token              CRPAREN
+%token              ASSIGN
+%token              EXTERN
+%token              IF
+%token              ELSE
+%token              WHILE
+%token              READ
+%token              WRITE
+%token              PLUS
+%token              MINUS
+%token              MULT
+%token              DIV
+%token              MOD
+%token              LT
+%token              GT
+%token              EQ
+%token              LE
+%token              GE
+%token              NE
+%token              AND
+%token              OR
+%token              INTEGER_TYPE
+%token              BOOLEAN_TYPE
+%token              TRUE
+%token              FALSE
+%token  <integer>   INTEGER
+%token  <string>    NAME
+
+
+%%
+
+prog:
+          /* empty */       { std::cout << "empty program" << std::endl; }
+        | prog_item prog    { std::cout << "item" << std::endl; }
+        ;
+
+prog_item:
+          declaration       { std::cout << "declaration" << std::endl; }
+        | definition        { std::cout << "definition" << std::endl; }
+        ;
+
+declaration:
+          var_declaration   { std::cout << "var declaration" << std::endl; }
+        | fun_declaration   { std::cout << "fun declaration" << std::endl; }
+        ;
+
+definition:
+          var_def SEMICOLON { std::cout << "var definition" << std::endl; }
+        | fun_def           { std::cout << "fun definition" << std::endl; }
+        ;
+
+var_declaration:
+          EXTERN type name SEMICOLON { std::cout << "extern type name;"; }
+        ;
+
+fun_declaration:
+          fun_signature SEMICOLON { std::cout << "fun signature;" << std::endl; }
+        ;
+
+fun_signature:
+          type name LPAREN args RPAREN { std::cout << "type name(args);" << std::endl; }
+        ;
+          
+args:
+          /* empty */           { std::cout << "empty args" << std::endl; }
+        | type name args_tail   { std::cout << "type name args_tail" << std::endl; }
+        ;
+
+args_tail:
+          /* empty */               { std::cout << "empty args tail" << std::endl; }
+        | COMMA type name args_tail { std::cout << ", type name args tail" << std::endl; }
+        ;
+
+var_def:
+          type name { std::cout << "type name;" << std::endl; }
+        ;
+
+fun_def:
+          fun_signature CLPAREN statement CRPAREN { std:: cout << "fun signature { statement }" << std::endl; }
+        ;
+
+statement:
+          /* empty */   { std::cout << "skip" << std::endl; }
+        | var_def       { std::cout << "var def" << std::endl; }
+        | name ASSIGN expr  { std::cout << "name = expr" << std::endl; }
+        | statement SEMICOLON statement
+        | IF LPAREN expr RPAREN statement ELSE statement
+        | CLPAREN statement CRPAREN
+        | WHILE LPAREN expr RPAREN statement
+        | READ LPAREN name RPAREN
+        | WRITE LPAREN expr RPAREN
+        ;
+
+expr:
+          bool
+        | int
+        | name
+        | expr operator expr
+        ;
+
+operator:
+          PLUS
+        | MINUS
+        | MULT
+        | DIV
+        | MOD
+        | LT
+        | GT
+        | EQ
+        | LE
+        | GE
+        | NE
+        | AND
+        | OR
+        ;
+
+type:
+          INTEGER_TYPE  { std::cout << "int" << std::endl; }
+        | BOOLEAN_TYPE  { std::cout << "_Bool" << std::endl; }
+        ;
+
+name:
+          NAME          { std::cout << "name" << std::endl; }
+        ; 
+
+bool:
+          TRUE
+        | FALSE
+        ;
+
+int     :
+          INTEGER
+        ;

@@ -18,7 +18,19 @@
 
 %union {
     int integer;
-    std::string* string;
+    bool boolean;
+    std::string * string;
+    Code * code;
+    CodeEntry * code_entry;
+    Declaration * declaration;
+    Definition * definition;
+    VarDeclaration * var_declaration;
+    FuncDeclaration * fun_declaration;
+    VarDefinition * var_definition;
+    FuncDefinition * fun_definition;
+    Type * type;
+    std::list<VarDeclaration> * args;
+    Statement * statement;
 }
 
 %token              END         0   "end of file"
@@ -55,69 +67,82 @@
 %token  <integer>   INTEGER
 %token  <string>    NAME
 
+%type   <code>              prog
+%type   <code_entry>        prog_item
+%type   <declaration>       declaration
+%type   <var_declaration>   var_declaration var_def
+%type   <fun_declaration>   fun_declaration fun_signature
+%type   <args>              args args_tail
+%type   <definition>        definition
+%type   <fun_definition>    fun_def
+%type   <type>              type
+%type   <string>            name
+%type   <statement>         statement
+%type   <boolean>           bool
+%type   <integer>           int
 
 %%
 
 prog:
-          /* empty */       { std::cout << "empty program" << std::endl; }
-        | prog_item prog    { std::cout << "item" << std::endl; }
+          /* empty */       { $$ = new Code(); }
+        | prog_item prog    { $2->entries.push_back(*$1); $$ = $2; }
         ;
 
 prog_item:
-          declaration       { std::cout << "declaration" << std::endl; }
-        | definition        { std::cout << "definition" << std::endl; }
+          declaration       { $$ = new CodeEntry(*$1); }
+        | definition        { $$ = new CodeEntry(*$1); }
         ;
 
 declaration:
-          var_declaration   { std::cout << "var declaration" << std::endl; }
-        | fun_declaration   { std::cout << "fun declaration" << std::endl; }
+          var_declaration   { $$ = new Declaration(*$1); }
+        | fun_declaration   { $$ = new Declaration(*$1); }
         ;
 
 definition:
-          var_def SEMICOLON { std::cout << "var definition" << std::endl; }
-        | fun_def           { std::cout << "fun definition" << std::endl; }
+          var_def SEMICOLON { $$ = new Definition(*$1); }
+        | fun_def           { $$ = new Definition(*$1); }
         ;
 
 var_declaration:
-          EXTERN type name SEMICOLON { std::cout << "extern type name;"; }
+          EXTERN type name SEMICOLON { $$ = new VarDeclaration{*$2, *$3}; }
         ;
 
 fun_declaration:
-          fun_signature SEMICOLON { std::cout << "fun signature;" << std::endl; }
+          fun_signature SEMICOLON { $$ = $1; }
         ;
 
 fun_signature:
-          type name LPAREN args RPAREN { std::cout << "type name(args);" << std::endl; }
+          type name LPAREN args RPAREN { $$ = new FuncDeclaration{*$1, *$2, *$4}; }
         ;
           
 args:
-          /* empty */           { std::cout << "empty args" << std::endl; }
-        | type name args_tail   { std::cout << "type name args_tail" << std::endl; }
+          /* empty */           { $$ = new std::list<VarDeclaration>; }
+        | type name args_tail   { $3->push_front({*$1, *$2}); $$ = $3; }
         ;
 
 args_tail:
-          /* empty */               { std::cout << "empty args tail" << std::endl; }
-        | COMMA type name args_tail { std::cout << ", type name args tail" << std::endl; }
+          /* empty */               { $$ = new std::list<VarDeclaration>; }
+        | COMMA type name args_tail { $4->push_front({*$2, *$3}); $$ = $4; }
         ;
 
 var_def:
-          type name { std::cout << "type name;" << std::endl; }
+          type name { $$ = new VarDeclaration{*$1, *$2}; }
         ;
 
 fun_def:
-          fun_signature CLPAREN statement CRPAREN { std:: cout << "fun signature { statement }" << std::endl; }
+          fun_signature CLPAREN statement CRPAREN { $$ = new FuncDefinition{*$1, *$3}; }
         ;
 
 statement:
           /* empty */   { std::cout << "skip" << std::endl; }
         | var_def       { std::cout << "var def" << std::endl; }
         | name ASSIGN expr  { std::cout << "name = expr" << std::endl; }
-        | statement SEMICOLON statement
-        | IF LPAREN expr RPAREN statement ELSE statement
-        | CLPAREN statement CRPAREN
-        | WHILE LPAREN expr RPAREN statement
-        | READ LPAREN name RPAREN
-        | WRITE LPAREN expr RPAREN
+        | statement SEMICOLON statement {}
+        | IF LPAREN expr RPAREN statement ELSE statement {}
+        | CLPAREN statement CRPAREN {}
+        | WHILE LPAREN expr RPAREN statement {}
+        | READ LPAREN name RPAREN {}
+        | WRITE LPAREN expr RPAREN {}
         ;
 
 expr:
@@ -149,14 +174,14 @@ type:
         ;
 
 name:
-          NAME          { std::cout << "name" << std::endl; }
+          NAME          { $$ = $1; }
         ; 
 
 bool:
-          TRUE
-        | FALSE
+          TRUE          { $$ = true; }
+        | FALSE         { $$ = false; }
         ;
 
 int     :
-          INTEGER
+          INTEGER       { $$ = $1; }
         ;

@@ -193,7 +193,7 @@ struct Statement
 struct FuncDefinition
 {
     FuncDeclaration declaration;
-    FuncBody body;
+    Statement statement;
 };
 
 struct Definition

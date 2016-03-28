@@ -53,7 +53,7 @@ struct Type
         : type(t)
     {}
 
-    boost::variant<AtomType, ConstType, PointerType> type;
+    boost::variant<AtomType, PointerType> type;
 };
 
 struct Const

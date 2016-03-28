@@ -169,8 +169,10 @@ operator:
         ;
 
 type:
-          INTEGER_TYPE  { std::cout << "int" << std::endl; }
-        | BOOLEAN_TYPE  { std::cout << "_Bool" << std::endl; }
+          INTEGER_TYPE          { $$ = new Type(AtomType::INT); }
+        | BOOLEAN_TYPE          { $$ = new Type(AtomType::BOOL); }
+        | type MULT             { $$ = new Type(PointerType({ std::shared_ptr<Type>($1) })); }
+        | LPAREN type RPAREN    { $$ = $2; }
         ;
 
 name:

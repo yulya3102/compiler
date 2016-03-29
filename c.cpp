@@ -157,6 +157,11 @@ std::string to_string(const Write & write)
     return "write(" + to_string(*write.expr) + ")";
 }
 
+std::string to_string(const Return & ret)
+{
+    return "return " + to_string(*ret.expr);
+}
+
 std::string to_string(const FuncDefinition & def)
 {
     return to_string(def.declaration)

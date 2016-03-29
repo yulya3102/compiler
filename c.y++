@@ -56,6 +56,7 @@ std::shared_ptr<T> shared(T * ptr)
 %token              WHILE
 %token              READ
 %token              WRITE
+%token              RETURN
 %token              PLUS
 %token              MINUS
 %token              MULT
@@ -153,6 +154,7 @@ statement:
         | WHILE LPAREN expr RPAREN statement { $$ = new Statement(While{*$3, shared($5)}); }
         | READ LPAREN name RPAREN { $$ = new Statement(Read{ *$3 }); }
         | WRITE LPAREN expr RPAREN { $$ = new Statement(Write{ shared($3) }); }
+        | RETURN expr   { $$ = new Statement(Return{ shared($2) }); }
         ;
 
 expr:

@@ -188,6 +188,11 @@ struct Write
     std::shared_ptr<Expression> expr;
 };
 
+struct Return
+{
+    std::shared_ptr<Expression> expr;
+};
+
 struct Statement
 {
     template <typename T>
@@ -203,8 +208,9 @@ struct Statement
         If,
         While,
         Read,
-        Write>
-        statement;
+        Write,
+        Return
+        > statement;
 };
 
 struct FuncDefinition
@@ -257,6 +263,7 @@ std::string to_string(const Skip &);
 std::string to_string(const Seq &);
 std::string to_string(const Read &);
 std::string to_string(const Write &);
+std::string to_string(const Return &);
 std::string to_string(const FuncDefinition &);
 std::string to_string(const Definition &);
 std::string to_string(const CodeEntry &);

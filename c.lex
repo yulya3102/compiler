@@ -34,6 +34,7 @@ integer     -?[1-9][0-9]*
 "while"     { return token::WHILE; }
 "read"      { return token::READ; }
 "write"     { return token::WRITE; }
+"return"    { return token::RETURN; }
 "+"         { return token::PLUS; }
 "-"         { return token::MINUS; }
 "*"         { return token::MULT; }

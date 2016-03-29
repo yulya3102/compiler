@@ -6,7 +6,7 @@
 
 int main()
 {
-    ast::ast_parser p;
+    ast::parser p;
     ast::Code code = p.parse();
     codegen::generate(code)->dump();
 }

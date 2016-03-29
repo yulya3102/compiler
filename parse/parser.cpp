@@ -4,7 +4,7 @@
 
 namespace ast
 {
-Code ast_parser::parse()
+Code parser::parse()
 {
     lexer_t lexer;
     this->lexer = &lexer;

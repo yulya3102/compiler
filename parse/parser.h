@@ -7,7 +7,7 @@ struct lexer_t;
 namespace ast
 {
 
-struct ast_parser
+struct parser
 {
     Code parse();
 

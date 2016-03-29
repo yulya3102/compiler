@@ -17,7 +17,7 @@ int yylineno = 1;
 %option c++
 
 string      [a-zA-Z]+
-integer     -?[1-9][0-9]*
+integer     -?[0-9]+
 
 %%
 

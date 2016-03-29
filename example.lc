@@ -7,7 +7,7 @@ int a;
 
 _Bool f(int b)
 {
-    a = 1;
+    a = 0;
     write(b);
 }
 

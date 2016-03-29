@@ -110,6 +110,11 @@ std::string to_string(const BinOperator & op)
     return to_string(*op.lhs) + to_string(op.oper) + to_string(*op.rhs);
 }
 
+std::string to_string(const Dereference & d)
+{
+    return "*(" + to_string(*d.expr) + ")";
+}
+
 std::string to_string(const Assignment & as)
 {
     return as.varname + " = " + to_string(as.value);

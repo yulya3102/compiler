@@ -134,6 +134,11 @@ struct BinOperator
     Oper oper;
 };
 
+struct Dereference
+{
+    std::shared_ptr<Expression> expr;
+};
+
 struct Expression
 {
     template <typename T>
@@ -141,7 +146,7 @@ struct Expression
         : expression(t)
     {}
 
-    boost::variant<Value, BinOperator> expression;
+    boost::variant<Value, BinOperator, Dereference> expression;
 };
 
 struct VarDefinition
@@ -255,6 +260,7 @@ std::string to_string(const Declaration &);
 std::string to_string(const Expression &);
 std::string to_string(Oper);
 std::string to_string(const BinOperator &);
+std::string to_string(const Dereference & d);
 std::string to_string(const Assignment &);
 std::string to_string(const Statement &);
 std::string to_string(const If &);

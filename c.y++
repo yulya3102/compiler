@@ -162,6 +162,7 @@ expr:
         | int                { $$ = new Expression(Value($1)); }
         | name               { $$ = new Expression(Value(*$1)); }
         | expr operator expr { $$ = new Expression(BinOperator{shared($1), shared($3), $2}); }
+        | MULT expr          { $$ = new Expression(Dereference{shared($2)}); }
         ;
 
 operator:

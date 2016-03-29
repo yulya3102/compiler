@@ -100,7 +100,7 @@ struct Declaration
         : declaration(t)
     {}
 
-    boost::variant<VarDeclaration, FuncDeclaration> declaration;
+    boost::variant<FuncDeclaration> declaration;
 };
 
 struct Expression;

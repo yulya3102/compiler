@@ -28,7 +28,6 @@ integer     -?[0-9]+
 "{"         { return token::CLPAREN; }
 "}"         { return token::CRPAREN; }
 "="         { return token::ASSIGN; }
-"extern"    { return token::EXTERN; }
 "if"        { return token::IF; }
 "else"      { return token::ELSE; }
 "while"     { return token::WHILE; }

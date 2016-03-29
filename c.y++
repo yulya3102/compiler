@@ -51,7 +51,6 @@ std::shared_ptr<T> shared(T * ptr)
 %token              CLPAREN
 %token              CRPAREN
 %token              ASSIGN
-%token              EXTERN
 %token              IF
 %token              ELSE
 %token              WHILE
@@ -80,7 +79,7 @@ std::shared_ptr<T> shared(T * ptr)
 
 %type   <code_entry>        prog_item
 %type   <declaration>       declaration
-%type   <var_declaration>   var_declaration var_def
+%type   <var_declaration>   var_def
 %type   <fun_declaration>   fun_declaration fun_signature
 %type   <args>              args args_tail
 %type   <definition>        definition
@@ -107,17 +106,12 @@ prog_item:
         ;
 
 declaration:
-          var_declaration   { $$ = new Declaration(*$1); }
-        | fun_declaration   { $$ = new Declaration(*$1); }
+          fun_declaration   { $$ = new Declaration(*$1); }
         ;
 
 definition:
           var_def SEMICOLON { $$ = new Definition(*$1); }
         | fun_def           { $$ = new Definition(*$1); }
-        ;
-
-var_declaration:
-          EXTERN type name SEMICOLON { $$ = new VarDeclaration{*$2, *$3}; }
         ;
 
 fun_declaration:

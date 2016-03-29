@@ -6,6 +6,9 @@ libparser.so: parser.o lexer.o l.o
 %.o: %.cpp
 	g++ -fPIC -c -std=c++1y -I.. -o $@ $^
 
+parser.cpp: l.h
+l.h: l.cpp
+
 l.cpp: l.y++
 	bison --language=C++ --defines=l.h --output=$@ $<
 

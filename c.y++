@@ -2,12 +2,13 @@
 #include <string>
 #include <iostream>
 
+#include "ast_parser.h"
 #include "lexer.h"
 
 #ifdef yylex
 #undef yylex
 #endif
-#define yylex lexer.lex
+#define yylex p.lexer->lex
 
 #include <memory>
 
@@ -18,7 +19,7 @@ std::shared_ptr<T> shared(T * ptr)
 }
 %}
 
-%parse-param { struct lexer_t & lexer }
+%parse-param { ast_parser & p }
 %locations
 
 %name-prefix "ast"
@@ -27,7 +28,6 @@ std::shared_ptr<T> shared(T * ptr)
     int integer;
     bool boolean;
     std::string * string;
-    Code * code;
     CodeEntry * code_entry;
     Declaration * declaration;
     Definition * definition;
@@ -76,7 +76,6 @@ std::shared_ptr<T> shared(T * ptr)
 %token  <integer>   INTEGER
 %token  <string>    NAME
 
-%type   <code>              prog
 %type   <code_entry>        prog_item
 %type   <declaration>       declaration
 %type   <var_declaration>   var_declaration var_def
@@ -94,9 +93,9 @@ std::shared_ptr<T> shared(T * ptr)
 
 %%
 
-prog:
-          /* empty */       { $$ = new Code(); }
-        | prog_item prog    { $2->entries.push_back(*$1); $$ = $2; }
+start:
+          /* empty */       { }
+        | prog_item start   { p.code.entries.push_front(*$1); }
         ;
 
 prog_item:

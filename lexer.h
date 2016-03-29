@@ -5,6 +5,7 @@
 
 struct lexer_t;
 
+#include "ast_parser.h"
 #include "c.h"
 #include "parser.h"
 

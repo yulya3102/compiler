@@ -146,7 +146,7 @@ struct Expression
         : expression(t)
     {}
 
-    boost::variant<Value, BinOperator, Dereference> expression;
+    boost::variant<Value, BinOperator, Dereference, Call> expression;
 };
 
 struct VarDefinition
@@ -258,6 +258,7 @@ std::string to_string(const VarDeclaration &);
 std::string to_string(const FuncDeclaration &);
 std::string to_string(const Declaration &);
 std::string to_string(const Expression &);
+std::string to_string(const Call &);
 std::string to_string(Oper);
 std::string to_string(const BinOperator &);
 std::string to_string(const Dereference & d);

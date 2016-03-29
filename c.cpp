@@ -72,6 +72,14 @@ std::string to_string(const Expression & expr)
     return boost::apply_visitor([] (auto & x) { return to_string(x); }, expr.expression);
 }
 
+std::string to_string(const Call & call)
+{
+    return call.function
+        + "("
+        + to_string(call.arguments.begin(), call.arguments.end(), ",")
+        + ")";
+}
+
 std::string to_string(Oper oper)
 {
     switch (oper)

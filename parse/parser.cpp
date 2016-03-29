@@ -9,7 +9,7 @@ Code ast_parser::parse()
     lexer_t lexer;
     this->lexer = &lexer;
 
-    parser p(*this);
+    generated_parser p(*this);
 
     code.entries.clear();
     if (p.parse())

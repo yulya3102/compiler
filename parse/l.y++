@@ -22,6 +22,7 @@ std::shared_ptr<T> shared(T * ptr)
 %}
 
 %parse-param { ast_parser & p }
+%define "parser_class_name" "generated_parser"
 %locations
 
 %name-prefix "ast"
@@ -212,7 +213,7 @@ int     :
 
 %%
 
-void ast::parser::error(const ast::parser::location_type & l,
+void ast::generated_parser::error(const ast::generated_parser::location_type & l,
                         const std::string & m)
 {
     std::cerr << l << ": " << m << std::endl;

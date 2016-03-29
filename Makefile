@@ -1,5 +1,5 @@
-parser: parser.cpp lexer.cpp c.cpp main.cpp ast_parser.cpp
-	g++ -std=c++1y -o $@ $^
+parser: parser.cpp lexer.cpp ast/l.cpp main.cpp ast_parser.cpp
+	g++ -I. -std=c++1y -o $@ $^
 
 lexer.cpp: c.lex
 	flex --outfile $@ --c++ $<

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "c.h"
+#include <ast/l.h>
 
 struct lexer_t;
 

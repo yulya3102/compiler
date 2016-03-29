@@ -5,9 +5,9 @@
 
 struct lexer_t;
 
-#include "ast_parser.h"
-#include <ast/l.h>
 #include "parser.h"
+#include <ast/l.h>
+#include "l.h"
 
 struct lexer_t : yyFlexLexer
 {

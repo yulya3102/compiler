@@ -1,4 +1,4 @@
-#include "ast_parser.h"
+#include <parse/parser.h>
 #include <ast/l.h>
 #include "codegen.h"
 

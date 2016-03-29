@@ -2,8 +2,10 @@
 #include <string>
 #include <iostream>
 
-#include "ast_parser.h"
+#include "parser.h"
 #include "lexer.h"
+
+#include <ast/l.h>
 
 #ifdef yylex
 #undef yylex

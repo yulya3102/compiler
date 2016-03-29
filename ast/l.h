@@ -10,25 +10,7 @@
 namespace ast
 {
 
-/*
- * Code = [CodeEntry]
- * CodeEntry = Declaration | Definition
- * Declaration = FuncDeclaration | VarDeclaration
- * Definition = FuncDefinition | VarDefinition
- * FuncDeclaration = FuncSignature
- * VarDeclaration = VarSignature
- * FuncDefinition = FuncSignature * FuncBody
- * VarDefinition = VarSignature * Value
- * FuncSignature = Type * Name * ArgList
- * VarSignature = Type * Name
- * FuncBody = Empty | Statement * FuncBody
- * Value = Number | BoolConst
- * Type = Int | Bool | Pointer Type
- * ArgList = Empty | VarSignature
- * Statement = VarDeclaration | VarDefinition | Assignment | Call
- * Assignment = Name Value
- */
-
+/* Types */
 enum AtomType
 {
     BOOL,
@@ -36,11 +18,6 @@ enum AtomType
 };
 
 struct Type;
-
-struct ConstType
-{
-    std::shared_ptr<Type> type;
-};
 
 struct PointerType
 {
@@ -57,28 +34,7 @@ struct Type
     boost::variant<AtomType, PointerType> type;
 };
 
-struct Const
-{
-    template <typename T>
-    Const(const T & t)
-        : constant(t)
-    {}
-
-    boost::variant<bool, int> constant;
-};
-
-struct Value
-{
-    template <typename T>
-    Value(const T & t)
-        : value(t)
-    {}
-
-    boost::variant<
-        Const,          // bool or int
-        std::string     // variable name
-    > value;
-};
+/* Declarations */
 
 struct VarDeclaration
 {
@@ -103,7 +59,32 @@ struct Declaration
     boost::variant<FuncDeclaration> declaration;
 };
 
+/* Expressions */
+
 struct Expression;
+
+struct Const
+{
+    template <typename T>
+    Const(const T & t)
+        : constant(t)
+    {}
+
+    boost::variant<bool, int> constant;
+};
+
+struct Value
+{
+    template <typename T>
+    Value(const T & t)
+        : value(t)
+    {}
+
+    boost::variant<
+        Const,          // bool or int
+        std::string     // variable name
+    > value;
+};
 
 struct Call
 {
@@ -148,6 +129,8 @@ struct Expression
 
     boost::variant<Value, BinOperator, Dereference, Call> expression;
 };
+
+/* Statements */
 
 struct VarDefinition
 {
@@ -217,6 +200,8 @@ struct Statement
         Return
         > statement;
 };
+
+/* Definitions */
 
 struct FuncDefinition
 {

@@ -3,10 +3,6 @@
 #undef yyFlexLexer
 #include <FlexLexer.h>
 
-struct lexer_t;
-
-#include "parser.h"
-#include <ast/l.h>
 #include "l.h"
 
 struct lexer_t : yyFlexLexer

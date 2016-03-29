@@ -1,0 +1,20 @@
+extern int a;
+
+_Bool f(int a);
+_Bool g(int a, int b);
+_Bool h();
+int z(int a, int b, _Bool c);
+
+int a;
+
+_Bool f(int b)
+{
+    a = 1;
+    write(b);
+}
+
+int main()
+{
+    a = 5;
+    return 1;
+}

@@ -87,7 +87,7 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
     llvm::Value * var = new llvm::GlobalVariable(
             *ctx.module, gen_type(entry.type), false,
             llvm::GlobalVariable::ExternalLinkage, nullptr, entry.name);
-    ctx.declare_var(var, entry.name);
+    ctx.declare(var, entry.name);
 }
 
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
@@ -103,7 +103,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++name_it)
         {
             arg_it->setName(name_it->name);
-            inner_scope.add_arg(&*arg_it, name_it->name);
+            inner_scope.declare(&*arg_it, name_it->name);
         }
     }
     gen_statement(inner_scope, entry.statement);
@@ -118,8 +118,15 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
 
 llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry)
 {
-    if (ctx.is_declared_func(entry.name))
-        return ctx.get_function(entry.name);
+    if (ctx.is_declared(entry.name))
+    {
+        llvm::Value * found = ctx.get(entry.name);
+
+        if (found->getType()->isFunctionTy())
+            return llvm::cast<llvm::Function>(found);
+
+        throw std::runtime_error(entry.name + " redeclared as a different kind of symbol");
+    }
 
     std::vector <llvm::Type *> args;
     for (const auto & x : entry.arguments)
@@ -130,7 +137,7 @@ llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & 
 
     llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, ctx.module);
 
-    ctx.declare_func(f, entry.name);
+    ctx.declare(f, entry.name);
     return f;
 }
 
@@ -156,7 +163,7 @@ llvm::Value * gen_expr(const frame & ctx, const ast::Const & v)
 
 llvm::Value * gen_expr(const frame & ctx, const std::string & v)
 {
-    return ctx.get_var(v);
+    return ctx.get(v);
 }
 
 llvm::Value * gen_expr(const frame & ctx, const ast::Value & v)
@@ -209,7 +216,7 @@ llvm::Value * gen_expr(const frame & ctx, const ast::Dereference & deref)
 
 llvm::Value * gen_expr(const frame & ctx, const ast::Call & call)
 {
-    llvm::Function * f = ctx.get_function(call.function);
+    llvm::Value * f = ctx.get(call.function);
 
     std::vector<llvm::Value *> args;
     for (const auto & arg : call.arguments)
@@ -234,13 +241,13 @@ void gen_statement(frame & ctx, const ast::Skip &)
 void gen_statement(frame & ctx, const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
-    ctx.declare_var(val, v.name);
+    ctx.declare(val, v.name);
 }
 
 void gen_statement(frame & ctx, const ast::Assignment & st)
 {
     llvm::Value * val = gen_expr(ctx, st.value);
-    get_builder().CreateStore(val, ctx.get_var(st.varname));
+    get_builder().CreateStore(val, ctx.get(st.varname));
 }
 
 void gen_statement(frame & ctx, const ast::Seq & st)
@@ -306,58 +313,31 @@ void gen_statement(frame & ctx, const ast::Statement & st)
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_statement(ctx, x); }, st.statement);
 }
 
-void frame::declare_var(llvm::Value * v, const std::string & name)
+void frame::declare(llvm::Value * v, const std::string & name)
 {
     locals[name] = v;
 }
 
-void frame::add_arg(llvm::Value * v, const std::string & name)
+bool frame::is_declared(const std::string & name)
 {
-    args[name] = v;
-}
+    auto it = locals.find(name);
 
-void frame::declare_func(llvm::Function * f, const std::string & name)
-{
-    functions[name] = f;
-}
-
-bool frame::is_declared_func(const std::string & name)
-{
-    auto it = functions.find(name);
-
-    if (it == functions.end())
+    if (it == locals.end())
         return false;
 
     return true;
 }
 
-llvm::Value * frame::get_var(const std::string & name) const
+llvm::Value * frame::get(const std::string & name) const
 {
     auto it = locals.find(name);
     if (it != locals.end())
-        return get_builder().CreateLoad(const_cast<llvm::Value *>(it->second));
-
-    it = args.find(name);
-    if (it != args.end())
-        return const_cast<llvm::Value * &>(it->second);
+        return const_cast<llvm::Value *>(it->second);
 
     if (outer_scope)
-        return outer_scope->get_var(name);
+        return outer_scope->get(name);
 
-    throw std::runtime_error("undefined variable: " + name);
-}
-
-llvm::Function * frame::get_function(const std::string & name) const
-{
-    auto it = functions.find(name);
-
-    if (it != functions.end())
-        return const_cast<llvm::Function *>(it->second);
-
-    if (outer_scope)
-        return outer_scope->get_function(name);
-
-    throw std::runtime_error("undefined function: " + name);
+    throw std::runtime_error("undefined symbol: " + name);
 }
 
 }

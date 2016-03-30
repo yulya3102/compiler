@@ -19,20 +19,15 @@ struct frame
         , module(module)
     {}
 
-    void declare_var(llvm::Value * v, const std::string & name);
-    void add_arg(llvm::Value * v, const std::string & name);
-    void declare_func(llvm::Function * f, const std::string & name);
+    void declare(llvm::Value * v, const std::string & name);
+    bool is_declared(const std::string & name);
 
-    bool is_declared_func(const std::string & name);
-
-    llvm::Value * get_var(const std::string & name) const;
-    llvm::Function * get_function(const std::string & name) const;
+    llvm::Value * get(const std::string & name) const;
 
     template <typename T>
     using map = std::unordered_map<std::string, T>;
 
-    map<llvm::Value *> locals, args;
-    map<llvm::Function *> functions;
+    map<llvm::Value *> locals;
     frame * outer_scope;
     llvm::Module * module;
 };

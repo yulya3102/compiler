@@ -76,7 +76,10 @@ void gen_entry(frame & ctx, const ast::Definition & entry)
 
 void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
 {
-    ctx.declare_var(entry);
+    llvm::Value * var = new llvm::GlobalVariable(
+            *ctx.module, gen_type(entry.type), false,
+            llvm::GlobalVariable::InternalLinkage, nullptr, entry.name);
+    ctx.declare_var(var, entry.name);
 }
 
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
@@ -207,7 +210,8 @@ void gen_statement(frame & ctx, const ast::Skip &)
 
 void gen_statement(frame & ctx, const ast::VarDeclaration & v)
 {
-    ctx.declare_var(v);
+    llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
+    ctx.declare_var(val, v.name);
 }
 
 void gen_statement(frame & ctx, const ast::Assignment & st)
@@ -252,12 +256,9 @@ void gen_statement(frame & ctx, const ast::Statement & st)
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_statement(ctx, x); }, st.statement);
 }
 
-void frame::declare_var(const ast::VarDeclaration & v)
+void frame::declare_var(llvm::Value * v, const std::string & name)
 {
-    llvm::Value * var = new llvm::GlobalVariable(
-            *module, gen_type(v.type), false,
-            llvm::GlobalVariable::InternalLinkage, nullptr, v.name);
-    locals[v.name] = var;
+    locals[name] = v;
 }
 
 void frame::declare_func(llvm::Function * f, const std::string & name)

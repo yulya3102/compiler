@@ -19,9 +19,7 @@ struct frame
         , module(module)
     {}
 
-    void declare_int(const std::string & name);
-    void declare_bool(const std::string & name);
-    void declare_var(const ast::VarDeclaration & v);
+    void declare_var(llvm::Value * v, const std::string & name);
     void declare_func(llvm::Function * f, const std::string & name);
 
     bool is_declared_func(const std::string & name);

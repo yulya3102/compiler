@@ -70,7 +70,7 @@ struct Const
         : constant(t)
     {}
 
-    boost::variant<bool, int> constant;
+    boost::variant<bool, int64_t> constant;
 };
 
 struct Value

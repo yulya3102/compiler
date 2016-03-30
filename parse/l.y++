@@ -97,6 +97,19 @@ std::shared_ptr<T> shared(T * ptr)
 %type   <expr>              expr
 %type   <call_args>         call_args call_args_tail
 
+%destructor { delete $$; } NAME
+%destructor { delete $$; } prog_item
+%destructor { delete $$; } declaration
+%destructor { delete $$; } definition
+%destructor { delete $$; } var_def
+%destructor { delete $$; } fun_declaration fun_signature
+%destructor { delete $$; } fun_def
+%destructor { delete $$; } type
+%destructor { delete $$; } args args_tail
+%destructor { delete $$; } statement
+%destructor { delete $$; } expr
+%destructor { delete $$; } call_args call_args_tail
+
 %%
 
 start:

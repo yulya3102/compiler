@@ -218,12 +218,16 @@ context gen_statement(const context & ctx, const ast::VarDeclaration & v)
 
 context gen_statement(const context & ctx, const ast::Assignment & st)
 {
-    undefined;
+    llvm::Value * val = gen_expr(ctx, st.value);
+    context new_ctx(ctx);
+    new_ctx.variables[st.varname] = val;
+    return new_ctx;
 }
 
 context gen_statement(const context & ctx, const ast::Seq & st)
 {
-    undefined;
+    context new_ctx = gen_statement(ctx, *st.first);
+    return gen_statement(new_ctx, *st.second);
 }
 
 context gen_statement(const context & ctx, const ast::If & st)

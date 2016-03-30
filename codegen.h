@@ -18,11 +18,15 @@ struct context
     std::unordered_map<std::string, llvm::Function *> functions;
 };
 
-void gen_entry(const ast::Declaration & entry);
-void gen_entry(const ast::Definition & entry);
-void gen_entry(const ast::VarDeclaration & entry);
-void gen_entry(const ast::FuncDefinition & entry);
-void gen_entry(const ast::FuncDeclaration & entry);
+llvm::Type * gen_type(const ast::AtomType & type);
+llvm::Type * gen_type(const ast::PointerType & type);
+llvm::Type * gen_type(const ast::Type & type);
+
+void gen_entry(llvm::Module * module, context & ctx, const ast::Declaration & entry);
+void gen_entry(llvm::Module * module, context & ctx, const ast::Definition & entry);
+void gen_entry(llvm::Module * module, context & ctx, const ast::VarDeclaration & entry);
+void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDefinition & entry);
+void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry);
 
 llvm::Value * gen_expr(const context & ctx, int64_t i);
 llvm::Value * gen_expr(const context & ctx, bool b);

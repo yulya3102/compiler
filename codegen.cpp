@@ -3,6 +3,8 @@
 #include <llvm/IR/Module.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
 
 #include <boost/variant.hpp>
 
@@ -30,35 +32,68 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code)
 {
     std::unique_ptr<llvm::Module> result(new llvm::Module("abc", llvm::getGlobalContext()));
 
+    context ctx;
     for (const auto & entry : code.entries)
-        boost::apply_visitor([] (const auto & x) { return gen_entry(x); }, entry.entry);
+        boost::apply_visitor([&result, &ctx] (const auto & x) { return gen_entry(result.get(), ctx, x); }, entry.entry);
 
     return std::move(result);
 }
 
-void gen_entry(const ast::Declaration & entry)
+llvm::Type * gen_type(const ast::AtomType & type)
+{
+    switch (type)
+    {
+        case ast::BOOL:
+            return llvm::Type::getInt1Ty(llvm::getGlobalContext());
+        case ast::INT:
+            return llvm::Type::getInt64Ty(llvm::getGlobalContext());
+    }
+
+    throw std::runtime_error("unknown type");
+}
+
+llvm::Type * gen_type(const ast::PointerType & type)
 {
     undefined;
 }
 
-void gen_entry(const ast::Definition & entry)
+llvm::Type * gen_type(const ast::Type & type)
+{
+    return boost::apply_visitor([] (const auto & x) { return gen_type(x); }, type.type);
+}
+
+void gen_entry(llvm::Module * module, context & ctx, const ast::Declaration & entry)
+{
+    return boost::apply_visitor([module, &ctx] (const auto & x) { return gen_entry(module, ctx, x); }, entry.declaration);
+}
+
+void gen_entry(llvm::Module * module, context & ctx, const ast::Definition & entry)
+{
+    return boost::apply_visitor([module, &ctx] (const auto & x) { return gen_entry(module, ctx, x); }, entry.definition);
+}
+
+void gen_entry(llvm::Module * module, context & ctx, const ast::VarDeclaration & entry)
 {
     undefined;
 }
 
-void gen_entry(const ast::VarDeclaration & entry)
+void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDefinition & entry)
 {
     undefined;
 }
 
-void gen_entry(const ast::FuncDefinition & entry)
+void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry)
 {
-    undefined;
-}
+    std::vector <llvm::Type *> args;
+    for (const auto & x : entry.arguments)
+        args.push_back(gen_type(x.type));
 
-void gen_entry(const ast::FuncDeclaration & entry)
-{
-    undefined;
+    llvm::FunctionType * type = llvm::FunctionType::get(
+            gen_type(entry.type), args, false);
+
+    llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, module);
+
+    ctx.functions[entry.name] = f;
 }
 
 llvm::Value * gen_expr(const context & ctx, int64_t i)

@@ -12,6 +12,8 @@ int yylineno = 1;
 #include "lexer.h"
 
 #define yyterminate()   return token::END
+
+#define YY_USER_ACTION  yylloc->columns(yyleng);
 %}
 
 %option c++
@@ -20,6 +22,11 @@ string      [a-zA-Z]+
 integer     -?[0-9]+
 
 %%
+
+%{
+    // reset location
+    yylloc->step();
+%}
 
 ";"         { return token::SEMICOLON; }
 "("         { return token::LPAREN; }
@@ -54,8 +61,8 @@ integer     -?[0-9]+
 {string}    { yylval->string = new std::string(yytext, yyleng); return token::NAME; }
 {integer}   { yylval->integer = std::stoi(std::string(yytext, yyleng)); return token::INTEGER; }
 
-[ \t]*      {}
-[\n]        { yylineno++; }
+[ \t]*      { yylloc->step(); }
+[\n]        { yylloc->lines(yyleng); yylloc->step(); }
 
 %%
 

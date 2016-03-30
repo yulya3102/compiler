@@ -23,6 +23,7 @@ std::shared_ptr<T> shared(T * ptr)
 
 %parse-param { parser & p }
 %define "parser_class_name" "generated_parser"
+%error-verbose
 %locations
 
 %name-prefix "ast"

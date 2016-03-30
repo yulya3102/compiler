@@ -86,7 +86,7 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
 {
     llvm::Value * var = new llvm::GlobalVariable(
             *ctx.module, gen_type(entry.type), false,
-            llvm::GlobalVariable::InternalLinkage, nullptr, entry.name);
+            llvm::GlobalVariable::ExternalLinkage, nullptr, entry.name);
     ctx.declare_var(var, entry.name);
 }
 
@@ -107,6 +107,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
         }
     }
     gen_statement(inner_scope, entry.statement);
+    get_builder().CreateUnreachable();
 
     if (llvm::verifyFunction(*f, &llvm::errs()))
     {
@@ -155,7 +156,8 @@ llvm::Value * gen_expr(const frame & ctx, const ast::Const & v)
 
 llvm::Value * gen_expr(const frame & ctx, const std::string & v)
 {
-    return ctx.get_var(v);
+    llvm::Value * val = ctx.get_var(v);
+    return get_builder().CreateLoad(val, v);
 }
 
 llvm::Value * gen_expr(const frame & ctx, const ast::Value & v)
@@ -294,6 +296,10 @@ void gen_statement(frame & ctx, const ast::Write & st)
 void gen_statement(frame & ctx, const ast::Return & ret)
 {
     get_builder().CreateRet(gen_expr(ctx, *ret.expr));
+
+    llvm::Function * f = get_builder().GetInsertBlock()->getParent();
+    llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);
+    get_builder().SetInsertPoint(unreachable);
 }
 
 void gen_statement(frame & ctx, const ast::Statement & st)

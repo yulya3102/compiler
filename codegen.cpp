@@ -86,7 +86,8 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
     llvm::BasicBlock * bb = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", f);
     get_builder().SetInsertPoint(bb);
 
-    gen_statement(ctx, entry.statement);
+    frame inner_scope(ctx.module, &ctx);
+    gen_statement(inner_scope, entry.statement);
 }
 
 llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry)

@@ -184,7 +184,7 @@ struct Return
 struct Statement
 {
     template <typename T>
-    Statement(const T & t)
+    explicit Statement(const T & t)
         : statement(t)
     {}
 

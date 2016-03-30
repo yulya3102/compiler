@@ -197,7 +197,7 @@ llvm::Value * gen_expr(const frame & ctx, const ast::Call & call)
     llvm::Function * f = ctx.get_function(call.function);
 
     std::vector<llvm::Value *> args;
-    for (const auto & arg : args)
+    for (const auto & arg : call.arguments)
         args.push_back(gen_expr(ctx, arg));
 
     return get_builder().CreateCall(f, args);

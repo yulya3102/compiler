@@ -228,7 +228,30 @@ void gen_statement(frame & ctx, const ast::Seq & st)
 
 void gen_statement(frame & ctx, const ast::If & st)
 {
-    undefined;
+    /* Generate condition */
+    llvm::Value * cond = gen_expr(ctx, st.condition);
+    llvm::Function * f = get_builder().GetInsertBlock()->getParent();
+    llvm::BasicBlock * then_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "then", f);
+    llvm::BasicBlock * else_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "else");
+    llvm::BasicBlock * cont_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "cont");
+    get_builder().CreateCondBr(cond, then_block, else_block);
+
+    /* Generate 'then' branch */
+    get_builder().SetInsertPoint(then_block);
+    gen_statement(ctx, *st.thenBody);
+    get_builder().CreateBr(cont_block);
+    then_block = get_builder().GetInsertBlock();
+
+    /* Generate 'else' branch */
+    f->getBasicBlockList().push_back(else_block);
+    get_builder().SetInsertPoint(else_block);
+    gen_statement(ctx, *st.elseBody);
+    get_builder().CreateBr(cont_block);
+    else_block = get_builder().GetInsertBlock();
+
+    /* Continue */
+    f->getBasicBlockList().push_back(cont_block);
+    get_builder().SetInsertPoint(cont_block);
 }
 
 void gen_statement(frame & ctx, const ast::While & st)

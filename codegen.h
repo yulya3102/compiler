@@ -10,7 +10,7 @@
 
 namespace codegen
 {
-std::unique_ptr<llvm::Module> generate(const ast::Code & code);
+std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name);
 
 struct context
 {

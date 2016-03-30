@@ -30,9 +30,9 @@ llvm::IRBuilder<> & get_builder()
 
 namespace codegen
 {
-std::unique_ptr<llvm::Module> generate(const ast::Code & code)
+std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name)
 {
-    std::unique_ptr<llvm::Module> result(new llvm::Module("abc", llvm::getGlobalContext()));
+    std::unique_ptr<llvm::Module> result(new llvm::Module(name, llvm::getGlobalContext()));
 
     context ctx;
     for (const auto & entry : code.entries)

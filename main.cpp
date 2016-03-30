@@ -15,5 +15,6 @@ int main(int argc, char ** argv)
     ast::Code code = p.parse(
                 in.is_open() ? in : std::cin,
                 std::cout);
-    codegen::generate(code)->dump();
+    codegen::generate(code, (argc == 2) ? argv[1] : "stdin")
+            ->dump();
 }

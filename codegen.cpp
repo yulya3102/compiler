@@ -91,7 +91,8 @@ void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDefinition & e
 
 llvm::Function * gen_func_declaration(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry)
 {
-    // TODO: do not create new entry if it was already declared
+    if (ctx.is_declared_func(entry.name))
+        return ctx.get_function(entry.name);
 
     std::vector <llvm::Type *> args;
     for (const auto & x : entry.arguments)
@@ -263,6 +264,16 @@ void frame::declare_func(llvm::Function * f, const std::string & name)
     functions[name] = f;
 }
 
+bool frame::is_declared_func(const std::string & name)
+{
+    auto it = functions.find(name);
+
+    if (it == functions.end())
+        return false;
+
+    return true;
+}
+
 llvm::Value * & frame::get_var(const std::string & name) const
 {
     auto it = locals.find(name);
@@ -273,6 +284,15 @@ llvm::Value * & frame::get_var(const std::string & name) const
         return outer_scope->get_var(name);
 
     throw std::runtime_error("undefined variable: " + name);
+}
+
+llvm::Function * frame::get_function(const std::string & name) const
+{
+    auto it = functions.find(name);
+    if (it != functions.end())
+        return const_cast<llvm::Function *>(it->second);
+
+    throw std::runtime_error("undefined function: " + name);
 }
 
 }

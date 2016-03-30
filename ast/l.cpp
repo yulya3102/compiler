@@ -16,6 +16,7 @@ std::string to_string(AtomType atom_type)
         case INT:
             return "int";
     }
+    throw std::runtime_error("unknown type");
 }
 
 std::string to_string(const Type & type)
@@ -111,6 +112,7 @@ std::string to_string(Oper oper)
         case OR:
             return "||";
     }
+    throw std::runtime_error("unknown operator");
 }
 
 std::string to_string(const BinOperator & op)
@@ -137,16 +139,16 @@ std::string to_string(const If & st)
 {
     return "if (" + to_string(st.condition) + ")\n"
         + "{\n"
-        + to_string(*st.thenBody);
+        + to_string(*st.thenBody)
         + "\n}\nelse {\n"
-        + to_string(*st.elseBody);
+        + to_string(*st.elseBody)
         + "\n}\n";
 }
 std::string to_string(const While & st)
 {
     return "while (" + to_string(st.condition) + ")\n"
         + "{\n"
-        + to_string(*st.body);
+        + to_string(*st.body)
         + "\n}\n";
 }
 

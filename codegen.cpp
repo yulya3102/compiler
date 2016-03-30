@@ -106,6 +106,7 @@ llvm::Function * gen_func_declaration(llvm::Module * module, context & ctx, cons
     llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, module);
 
     ctx.functions[entry.name] = f;
+    return f;
 }
 
 void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry)

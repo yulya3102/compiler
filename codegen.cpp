@@ -242,7 +242,7 @@ void gen_statement(frame & ctx, const ast::Write & st)
 
 void gen_statement(frame & ctx, const ast::Return & ret)
 {
-    undefined;
+    get_builder().CreateRet(gen_expr(ctx, *ret.expr));
 }
 
 void gen_statement(frame & ctx, const ast::Statement & st)

@@ -105,7 +105,7 @@ llvm::Function * gen_func_declaration(llvm::Module * module, frame & ctx, const 
 
     llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, module);
 
-    ctx.get_var(entry.name) = f;
+    ctx.declare_func(f, entry.name);
     return f;
 }
 
@@ -255,6 +255,11 @@ void gen_statement(frame & ctx, const ast::Statement & st)
 }
 
 void frame::declare(const ast::VarDeclaration & v)
+{
+    undefined;
+}
+
+void frame::declare_func(llvm::Function * f, const std::string & name)
 {
     undefined;
 }

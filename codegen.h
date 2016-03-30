@@ -25,6 +25,7 @@ struct frame
     void declare_int(const std::string & name);
     void declare_bool(const std::string & name);
     void declare(const ast::VarDeclaration & v);
+    void declare_func(llvm::Function * f, const std::string & name);
 
     llvm::Value * & get_var(const std::string & name) const;
     llvm::Function * get_function(const std::string & name) const;

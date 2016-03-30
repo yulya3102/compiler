@@ -213,7 +213,7 @@ void gen_statement(frame & ctx, const ast::VarDeclaration & v)
 void gen_statement(frame & ctx, const ast::Assignment & st)
 {
     llvm::Value * val = gen_expr(ctx, st.value);
-    ctx.get_var(st.varname) = val;
+    get_builder().CreateStore(val, ctx.get_var(st.varname));
 }
 
 void gen_statement(frame & ctx, const ast::Seq & st)

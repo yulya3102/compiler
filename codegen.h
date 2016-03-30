@@ -22,6 +22,8 @@ llvm::Type * gen_type(const ast::AtomType & type);
 llvm::Type * gen_type(const ast::PointerType & type);
 llvm::Type * gen_type(const ast::Type & type);
 
+llvm::Function * gen_func_declaration(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry);
+
 void gen_entry(llvm::Module * module, context & ctx, const ast::Declaration & entry);
 void gen_entry(llvm::Module * module, context & ctx, const ast::Definition & entry);
 void gen_entry(llvm::Module * module, context & ctx, const ast::VarDeclaration & entry);

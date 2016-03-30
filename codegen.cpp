@@ -5,6 +5,8 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Type.h>
+#include <llvm/IR/GlobalVariable.h>
+#include <llvm/IR/BasicBlock.h>
 
 #include <boost/variant.hpp>
 
@@ -34,7 +36,7 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code)
 
     context ctx;
     for (const auto & entry : code.entries)
-        boost::apply_visitor([&result, &ctx] (const auto & x) { return gen_entry(result.get(), ctx, x); }, entry.entry);
+        boost::apply_visitor([&result, &ctx] (const auto & x) { gen_entry(result.get(), ctx, x); }, entry.entry);
 
     return std::move(result);
 }
@@ -64,26 +66,35 @@ llvm::Type * gen_type(const ast::Type & type)
 
 void gen_entry(llvm::Module * module, context & ctx, const ast::Declaration & entry)
 {
-    return boost::apply_visitor([module, &ctx] (const auto & x) { return gen_entry(module, ctx, x); }, entry.declaration);
+    boost::apply_visitor([module, &ctx] (const auto & x) { gen_entry(module, ctx, x); }, entry.declaration);
 }
 
 void gen_entry(llvm::Module * module, context & ctx, const ast::Definition & entry)
 {
-    return boost::apply_visitor([module, &ctx] (const auto & x) { return gen_entry(module, ctx, x); }, entry.definition);
+    boost::apply_visitor([module, &ctx] (const auto & x) { gen_entry(module, ctx, x); }, entry.definition);
 }
 
 void gen_entry(llvm::Module * module, context & ctx, const ast::VarDeclaration & entry)
 {
-    undefined;
+    llvm::Value * var = new llvm::GlobalVariable(
+            gen_type(entry.type), false, llvm::GlobalVariable::InternalLinkage);
+    ctx.variables[entry.name] = var;
 }
 
 void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDefinition & entry)
 {
-    undefined;
+    llvm::Function * f = gen_func_declaration(module, ctx, entry.declaration);
+
+    llvm::BasicBlock * bb = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", f);
+    get_builder().SetInsertPoint(bb);
+
+    gen_statement(ctx, entry.statement);
 }
 
-void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry)
+llvm::Function * gen_func_declaration(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry)
 {
+    // TODO: do not create new entry if it was already declared
+
     std::vector <llvm::Type *> args;
     for (const auto & x : entry.arguments)
         args.push_back(gen_type(x.type));
@@ -94,6 +105,11 @@ void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration 
     llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, module);
 
     ctx.functions[entry.name] = f;
+}
+
+void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry)
+{
+    gen_func_declaration(module, ctx, entry);
 }
 
 llvm::Value * gen_expr(const context & ctx, int64_t i)

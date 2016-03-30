@@ -36,7 +36,7 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
 
     frame ctx(result.get());
     for (const auto & entry : code.entries)
-        boost::apply_visitor([&result, &ctx] (const auto & x) { gen_entry(result.get(), ctx, x); }, entry.entry);
+        boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.entry);
 
     return std::move(result);
 }
@@ -64,24 +64,24 @@ llvm::Type * gen_type(const ast::Type & type)
     return boost::apply_visitor([] (const auto & x) { return gen_type(x); }, type.type);
 }
 
-void gen_entry(llvm::Module * module, frame & ctx, const ast::Declaration & entry)
+void gen_entry(frame & ctx, const ast::Declaration & entry)
 {
-    boost::apply_visitor([module, &ctx] (const auto & x) { gen_entry(module, ctx, x); }, entry.declaration);
+    boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.declaration);
 }
 
-void gen_entry(llvm::Module * module, frame & ctx, const ast::Definition & entry)
+void gen_entry(frame & ctx, const ast::Definition & entry)
 {
-    boost::apply_visitor([module, &ctx] (const auto & x) { gen_entry(module, ctx, x); }, entry.definition);
+    boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.definition);
 }
 
-void gen_entry(llvm::Module * module, frame & ctx, const ast::VarDeclaration & entry)
+void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
 {
     ctx.declare_var(entry);
 }
 
-void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDefinition & entry)
+void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
 {
-    llvm::Function * f = gen_func_declaration(module, ctx, entry.declaration);
+    llvm::Function * f = gen_func_declaration(ctx, entry.declaration);
 
     llvm::BasicBlock * bb = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", f);
     get_builder().SetInsertPoint(bb);
@@ -89,7 +89,7 @@ void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDefinition & e
     gen_statement(ctx, entry.statement);
 }
 
-llvm::Function * gen_func_declaration(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry)
+llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry)
 {
     if (ctx.is_declared_func(entry.name))
         return ctx.get_function(entry.name);
@@ -101,15 +101,15 @@ llvm::Function * gen_func_declaration(llvm::Module * module, frame & ctx, const 
     llvm::FunctionType * type = llvm::FunctionType::get(
             gen_type(entry.type), args, false);
 
-    llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, module);
+    llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, ctx.module);
 
     ctx.declare_func(f, entry.name);
     return f;
 }
 
-void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry)
+void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
 {
-    gen_func_declaration(module, ctx, entry);
+    gen_func_declaration(ctx, entry);
 }
 
 llvm::Value * gen_expr(const frame & ctx, int64_t i)

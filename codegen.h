@@ -42,13 +42,13 @@ llvm::Type * gen_type(const ast::AtomType & type);
 llvm::Type * gen_type(const ast::PointerType & type);
 llvm::Type * gen_type(const ast::Type & type);
 
-llvm::Function * gen_func_declaration(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry);
+llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry);
 
-void gen_entry(llvm::Module * module, frame & ctx, const ast::Declaration & entry);
-void gen_entry(llvm::Module * module, frame & ctx, const ast::Definition & entry);
-void gen_entry(llvm::Module * module, frame & ctx, const ast::VarDeclaration & entry);
-void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDefinition & entry);
-void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry);
+void gen_entry(frame & ctx, const ast::Declaration & entry);
+void gen_entry(frame & ctx, const ast::Definition & entry);
+void gen_entry(frame & ctx, const ast::VarDeclaration & entry);
+void gen_entry(frame & ctx, const ast::FuncDefinition & entry);
+void gen_entry(frame & ctx, const ast::FuncDeclaration & entry);
 
 llvm::Value * gen_expr(const frame & ctx, int64_t i);
 llvm::Value * gen_expr(const frame & ctx, bool b);

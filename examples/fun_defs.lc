@@ -8,7 +8,7 @@ int a;
 _Bool f(int b)
 {
     a = 0;
-    write(b);
+    return false;
 }
 
 int main()

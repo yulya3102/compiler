@@ -14,17 +14,14 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
 
 struct frame
 {
-    frame()
-        : outer_scope(nullptr)
-    {}
-
-    frame(frame * outer_scope)
+    frame(llvm::Module * module, frame * outer_scope = nullptr)
         : outer_scope(outer_scope)
+        , module(module)
     {}
 
     void declare_int(const std::string & name);
     void declare_bool(const std::string & name);
-    void declare(const ast::VarDeclaration & v);
+    void declare_var(const ast::VarDeclaration & v);
     void declare_func(llvm::Function * f, const std::string & name);
 
     llvm::Value * & get_var(const std::string & name) const;
@@ -36,6 +33,7 @@ struct frame
     map<llvm::Value *> locals;
     map<llvm::Function *> functions;
     frame * outer_scope;
+    llvm::Module * module;
 };
 
 llvm::Type * gen_type(const ast::AtomType & type);

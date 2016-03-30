@@ -34,7 +34,7 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
 {
     std::unique_ptr<llvm::Module> result(new llvm::Module(name, llvm::getGlobalContext()));
 
-    frame ctx;
+    frame ctx(result.get());
     for (const auto & entry : code.entries)
         boost::apply_visitor([&result, &ctx] (const auto & x) { gen_entry(result.get(), ctx, x); }, entry.entry);
 
@@ -76,10 +76,7 @@ void gen_entry(llvm::Module * module, frame & ctx, const ast::Definition & entry
 
 void gen_entry(llvm::Module * module, frame & ctx, const ast::VarDeclaration & entry)
 {
-    llvm::Value * var = new llvm::GlobalVariable(
-            *module, gen_type(entry.type), false,
-            llvm::GlobalVariable::InternalLinkage, nullptr, entry.name);
-    ctx.get_var(entry.name) = var;
+    ctx.declare_var(entry);
 }
 
 void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDefinition & entry)
@@ -208,7 +205,7 @@ void gen_statement(frame & ctx, const ast::Skip &)
 
 void gen_statement(frame & ctx, const ast::VarDeclaration & v)
 {
-    ctx.declare(v);
+    ctx.declare_var(v);
 }
 
 void gen_statement(frame & ctx, const ast::Assignment & st)
@@ -243,7 +240,6 @@ void gen_statement(frame & ctx, const ast::Write & st)
     undefined;
 }
 
-
 void gen_statement(frame & ctx, const ast::Return & ret)
 {
     undefined;
@@ -254,14 +250,17 @@ void gen_statement(frame & ctx, const ast::Statement & st)
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_statement(ctx, x); }, st.statement);
 }
 
-void frame::declare(const ast::VarDeclaration & v)
+void frame::declare_var(const ast::VarDeclaration & v)
 {
-    undefined;
+    llvm::Value * var = new llvm::GlobalVariable(
+            *module, gen_type(v.type), false,
+            llvm::GlobalVariable::InternalLinkage, nullptr, v.name);
+    locals[v.name] = var;
 }
 
 void frame::declare_func(llvm::Function * f, const std::string & name)
 {
-    undefined;
+    functions[name] = f;
 }
 
 llvm::Value * & frame::get_var(const std::string & name) const

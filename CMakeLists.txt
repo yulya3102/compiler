@@ -8,4 +8,4 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(parse)
 
 add_executable(parser ast/l.cpp main.cpp codegen.cpp)
-target_link_libraries(parser libparser)
+target_link_libraries(parser libparser LLVMCore LLVMSupport)

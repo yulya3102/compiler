@@ -4,9 +4,9 @@
 
 namespace ast
 {
-Code parser::parse()
+Code parser::parse(std::istream & in, std::ostream & out)
 {
-    lexer_t lexer;
+    lexer_t lexer(in, out);
     this->lexer = &lexer;
 
     generated_parser p(*this);

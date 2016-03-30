@@ -7,6 +7,6 @@
 int main()
 {
     ast::parser p;
-    ast::Code code = p.parse();
+    ast::Code code = p.parse(std::cin, std::cout);
     codegen::generate(code)->dump();
 }

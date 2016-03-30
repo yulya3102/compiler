@@ -12,42 +12,61 @@ namespace codegen
 {
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name);
 
-struct context
+struct frame
 {
-    std::unordered_map<std::string, llvm::Value *> variables;
-    std::unordered_map<std::string, llvm::Function *> functions;
+    frame()
+        : outer_scope(nullptr)
+    {}
+
+    frame(frame * outer_scope)
+        : outer_scope(outer_scope)
+    {}
+
+    void declare_int(const std::string & name);
+    void declare_bool(const std::string & name);
+    void declare(const ast::VarDeclaration & v);
+
+    llvm::Value * & get_var(const std::string & name) const;
+    llvm::Function * get_function(const std::string & name) const;
+
+    template <typename T>
+    using map = std::unordered_map<std::string, T>;
+
+    map<llvm::Value *> locals;
+    map<llvm::Function *> functions;
+    frame * outer_scope;
 };
 
 llvm::Type * gen_type(const ast::AtomType & type);
 llvm::Type * gen_type(const ast::PointerType & type);
 llvm::Type * gen_type(const ast::Type & type);
 
-llvm::Function * gen_func_declaration(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry);
+llvm::Function * gen_func_declaration(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry);
 
-void gen_entry(llvm::Module * module, context & ctx, const ast::Declaration & entry);
-void gen_entry(llvm::Module * module, context & ctx, const ast::Definition & entry);
-void gen_entry(llvm::Module * module, context & ctx, const ast::VarDeclaration & entry);
-void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDefinition & entry);
-void gen_entry(llvm::Module * module, context & ctx, const ast::FuncDeclaration & entry);
+void gen_entry(llvm::Module * module, frame & ctx, const ast::Declaration & entry);
+void gen_entry(llvm::Module * module, frame & ctx, const ast::Definition & entry);
+void gen_entry(llvm::Module * module, frame & ctx, const ast::VarDeclaration & entry);
+void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDefinition & entry);
+void gen_entry(llvm::Module * module, frame & ctx, const ast::FuncDeclaration & entry);
 
-llvm::Value * gen_expr(const context & ctx, int64_t i);
-llvm::Value * gen_expr(const context & ctx, bool b);
-llvm::Value * gen_expr(const context & ctx, const ast::Const & v);
-llvm::Value * gen_expr(const context & ctx, const std::string & v);
-llvm::Value * gen_expr(const context & ctx, const ast::Value & v);
-llvm::Value * gen_expr(const context & ctx, const ast::BinOperator & op);
-llvm::Value * gen_expr(const context & ctx, const ast::Dereference & deref);
-llvm::Value * gen_expr(const context & ctx, const ast::Call & call);
-llvm::Value * gen_expr(const context & ctx, const ast::Expression & expr);
+llvm::Value * gen_expr(const frame & ctx, int64_t i);
+llvm::Value * gen_expr(const frame & ctx, bool b);
+llvm::Value * gen_expr(const frame & ctx, const ast::Const & v);
+llvm::Value * gen_expr(const frame & ctx, const std::string & v);
+llvm::Value * gen_expr(const frame & ctx, const ast::Value & v);
+llvm::Value * gen_expr(const frame & ctx, const ast::BinOperator & op);
+llvm::Value * gen_expr(const frame & ctx, const ast::Dereference & deref);
+llvm::Value * gen_expr(const frame & ctx, const ast::Call & call);
+llvm::Value * gen_expr(const frame & ctx, const ast::Expression & expr);
 
-context gen_statement(const context & ctx, const ast::Skip & st);
-context gen_statement(const context & ctx, const ast::VarDeclaration & st);
-context gen_statement(const context & ctx, const ast::Assignment & st);
-context gen_statement(const context & ctx, const ast::Seq & st);
-context gen_statement(const context & ctx, const ast::If & st);
-context gen_statement(const context & ctx, const ast::While & st);
-context gen_statement(const context & ctx, const ast::Read & st);
-context gen_statement(const context & ctx, const ast::Write & st);
-context gen_statement(const context & ctx, const ast::Return & ret);
-context gen_statement(const context & ctx, const ast::Statement & st);
+void gen_statement(frame & ctx, const ast::Skip & st);
+void gen_statement(frame & ctx, const ast::VarDeclaration & st);
+void gen_statement(frame & ctx, const ast::Assignment & st);
+void gen_statement(frame & ctx, const ast::Seq & st);
+void gen_statement(frame & ctx, const ast::If & st);
+void gen_statement(frame & ctx, const ast::While & st);
+void gen_statement(frame & ctx, const ast::Read & st);
+void gen_statement(frame & ctx, const ast::Write & st);
+void gen_statement(frame & ctx, const ast::Return & ret);
+void gen_statement(frame & ctx, const ast::Statement & st);
 }

@@ -77,7 +77,8 @@ void gen_entry(llvm::Module * module, context & ctx, const ast::Definition & ent
 void gen_entry(llvm::Module * module, context & ctx, const ast::VarDeclaration & entry)
 {
     llvm::Value * var = new llvm::GlobalVariable(
-            gen_type(entry.type), false, llvm::GlobalVariable::InternalLinkage);
+            *module, gen_type(entry.type), false,
+            llvm::GlobalVariable::InternalLinkage, nullptr, entry.name);
     ctx.variables[entry.name] = var;
 }
 

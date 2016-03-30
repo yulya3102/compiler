@@ -11,3 +11,8 @@ int c; int e;
     int f;
 _Bool g;
 
+int f(int a)
+{
+c = a;
+return 1;
+}

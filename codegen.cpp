@@ -103,7 +103,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++name_it)
         {
             arg_it->setName(name_it->name);
-            inner_scope.declare_var(&*arg_it, name_it->name);
+            inner_scope.add_arg(&*arg_it, name_it->name);
         }
     }
     gen_statement(inner_scope, entry.statement);
@@ -156,8 +156,7 @@ llvm::Value * gen_expr(const frame & ctx, const ast::Const & v)
 
 llvm::Value * gen_expr(const frame & ctx, const std::string & v)
 {
-    llvm::Value * val = ctx.get_var(v);
-    return get_builder().CreateLoad(val, v);
+    return ctx.get_var(v);
 }
 
 llvm::Value * gen_expr(const frame & ctx, const ast::Value & v)
@@ -312,6 +311,11 @@ void frame::declare_var(llvm::Value * v, const std::string & name)
     locals[name] = v;
 }
 
+void frame::add_arg(llvm::Value * v, const std::string & name)
+{
+    args[name] = v;
+}
+
 void frame::declare_func(llvm::Function * f, const std::string & name)
 {
     functions[name] = f;
@@ -327,10 +331,14 @@ bool frame::is_declared_func(const std::string & name)
     return true;
 }
 
-llvm::Value * & frame::get_var(const std::string & name) const
+llvm::Value * frame::get_var(const std::string & name) const
 {
     auto it = locals.find(name);
     if (it != locals.end())
+        return get_builder().CreateLoad(const_cast<llvm::Value *>(it->second));
+
+    it = args.find(name);
+    if (it != args.end())
         return const_cast<llvm::Value * &>(it->second);
 
     if (outer_scope)

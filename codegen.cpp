@@ -186,7 +186,7 @@ llvm::Value * gen_expr(const frame & ctx, const ast::Dereference & deref)
 
 llvm::Value * gen_expr(const frame & ctx, const ast::Call & call)
 {
-    llvm::Function * f = ctx.functions.at(call.function);
+    llvm::Function * f = ctx.get_function(call.function);
 
     std::vector<llvm::Value *> args;
     for (const auto & arg : args)
@@ -291,8 +291,12 @@ llvm::Value * & frame::get_var(const std::string & name) const
 llvm::Function * frame::get_function(const std::string & name) const
 {
     auto it = functions.find(name);
+
     if (it != functions.end())
         return const_cast<llvm::Function *>(it->second);
+
+    if (outer_scope)
+        return outer_scope->get_function(name);
 
     throw std::runtime_error("undefined function: " + name);
 }

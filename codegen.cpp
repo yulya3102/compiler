@@ -216,6 +216,42 @@ context gen_statement(const context & ctx, const ast::VarDeclaration & v)
     return res;
 }
 
+context gen_statement(const context & ctx, const ast::Assignment & st)
+{
+    undefined;
+}
+
+context gen_statement(const context & ctx, const ast::Seq & st)
+{
+    undefined;
+}
+
+context gen_statement(const context & ctx, const ast::If & st)
+{
+    undefined;
+}
+
+context gen_statement(const context & ctx, const ast::While & st)
+{
+    undefined;
+}
+
+context gen_statement(const context & ctx, const ast::Read & st)
+{
+    undefined;
+}
+
+context gen_statement(const context & ctx, const ast::Write & st)
+{
+    undefined;
+}
+
+
+context gen_statement(const context & ctx, const ast::Return & ret)
+{
+    undefined;
+}
+
 context gen_statement(const context & ctx, const ast::Statement & st)
 {
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_statement(ctx, x); }, st.statement);

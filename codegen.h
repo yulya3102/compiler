@@ -42,5 +42,12 @@ llvm::Value * gen_expr(const context & ctx, const ast::Expression & expr);
 
 context gen_statement(const context & ctx, const ast::Skip & st);
 context gen_statement(const context & ctx, const ast::VarDeclaration & st);
+context gen_statement(const context & ctx, const ast::Assignment & st);
+context gen_statement(const context & ctx, const ast::Seq & st);
+context gen_statement(const context & ctx, const ast::If & st);
+context gen_statement(const context & ctx, const ast::While & st);
+context gen_statement(const context & ctx, const ast::Read & st);
+context gen_statement(const context & ctx, const ast::Write & st);
+context gen_statement(const context & ctx, const ast::Return & ret);
 context gen_statement(const context & ctx, const ast::Statement & st);
 }

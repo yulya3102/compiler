@@ -29,7 +29,7 @@ std::shared_ptr<T> shared(T * ptr)
 %name-prefix "ast"
 
 %union {
-    int integer;
+    int64_t integer;
     bool boolean;
     std::string * string;
     CodeEntry * code_entry;

@@ -9,6 +9,12 @@
 #include <memory>
 #include <map>
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define __AT__ __FILE__ ":" TOSTRING(__LINE__)
+
+#define undefined throw std::runtime_error(__AT__ ": not implemented")
+
 namespace
 {
 llvm::IRBuilder<> & get_builder()
@@ -32,27 +38,27 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code)
 
 void gen_entry(const ast::Declaration & entry)
 {
-    throw std::runtime_error("not implemented");
+    undefined;
 }
 
 void gen_entry(const ast::Definition & entry)
 {
-    throw std::runtime_error("not implemented");
+    undefined;
 }
 
 void gen_entry(const ast::VarDeclaration & entry)
 {
-    throw std::runtime_error("not implemented");
+    undefined;
 }
 
 void gen_entry(const ast::FuncDefinition & entry)
 {
-    throw std::runtime_error("not implemented");
+    undefined;
 }
 
 void gen_entry(const ast::FuncDeclaration & entry)
 {
-    throw std::runtime_error("not implemented");
+    undefined;
 }
 
 llvm::Value * gen_expr(const context & ctx, int64_t i)
@@ -141,7 +147,7 @@ llvm::Value * gen_expr(const context & ctx, const ast::Expression & expr)
 
 llvm::Value * gen_init_value(const ast::Type & type)
 {
-    throw std::runtime_error("not implemented");
+    undefined;
 }
 
 context gen_statement(const context & ctx, const ast::Skip &)

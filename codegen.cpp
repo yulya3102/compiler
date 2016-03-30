@@ -41,7 +41,10 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
         boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.entry);
 
     if (llvm::verifyModule(*result, &llvm::errs()))
+    {
+        result->dump();
         throw std::runtime_error("internal compiler error: module verification failed");
+    }
 
     return std::move(result);
 }
@@ -106,7 +109,10 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
     gen_statement(inner_scope, entry.statement);
 
     if (llvm::verifyFunction(*f, &llvm::errs()))
+    {
+        ctx.module->dump();
         throw std::runtime_error("internal compiler error: function verification failed");
+    }
 }
 
 llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry)

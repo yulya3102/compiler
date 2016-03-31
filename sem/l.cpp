@@ -14,14 +14,39 @@ namespace
 {
 struct context
 {
-    void declare(const std::string & name, const ast::Type & type)
+    bool declare(const std::string & name, const ast::Type & type,
+                 const ast::location & loc)
     {
-        undefined;
+        if (declared.find(name) == declared.end())
+        {
+            declared.emplace(name, type);
+            return true;
+        }
+
+        if (declared.at(name) == type)
+            return true;
+
+        std::cerr << "error at " << loc
+                  << ": symbol '" << name
+                  << "' redeclared with different type"
+                  << std::endl;
+        return false;
     }
 
-    void define(const std::string & name, const ast::Type & type)
+    bool define(const std::string & name, const ast::Type & type,
+                const ast::location & loc)
     {
-        undefined;
+        if (!declare(name, type, loc))
+            return false;
+
+        if (defined.find(name) == defined.end())
+            return true;
+
+        std::cerr << "error at " << loc
+                  << ": symbol '" << name
+                  << "' was already defined"
+                  << std::endl;
+        return false;
     }
 
     std::unordered_map<std::string, ast::Type> declared;
@@ -140,7 +165,7 @@ bool verify(const context & ctx, const ast::FuncDefinition & entry)
 {
     context inner_scope(ctx);
     for (auto & arg : entry.declaration.arguments)
-        inner_scope.define(arg.name, arg.type);
+        inner_scope.define(arg.name, arg.type, arg.loc);
     return verify(inner_scope, entry.statement);
 }
 
@@ -159,35 +184,16 @@ bool verify(const ast::Code & code)
     context ctx;
     for (auto entry : code.entries)
     {
-        std::string n = name(entry);
-        if (ctx.declared.find(n) != ctx.declared.end())
-        {
-            if (ctx.declared.at(n) != type(entry))
-            {
-                std::cerr << "error at " << location(entry)
-                          << ": symbol '" << n
-                          << "' redeclared with different type"
-                          << std::endl;
-                return false;
-            }
-
-            if (ctx.defined.find(n) != ctx.defined.end() && is_definition(entry))
-            {
-                std::cerr << "error at " << location(entry)
-                          << ": symbol '" << n
-                          << "' was already defined"
-                          << std::endl;
-                return false;
-            }
-        }
-        else
-            ctx.declared.emplace(name(entry), type(entry));
+        auto n = name(entry);
+        auto t = type(entry);
+        auto l = location(entry);
+        if (!(is_definition(entry)
+            ? ctx.define(n, t, l)
+            : ctx.declare(n, t, l)))
+            return false;
 
         if (!verify(ctx, entry))
             return false;
-
-        if (is_definition(entry))
-            ctx.defined.insert(name(entry));
     }
     return true;
 }

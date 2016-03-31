@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
+#include <sstream>
 
 #define fmap(closure, x, expr, variant) boost::apply_visitor(closure (const auto & x) { return expr; }, variant)
 
@@ -14,39 +15,38 @@ namespace
 {
 struct context
 {
-    bool declare(const std::string & name, const ast::Type & type,
+    void declare(const std::string & name, const ast::Type & type,
                  const ast::location & loc)
     {
         if (declared.find(name) == declared.end())
         {
             declared.emplace(name, type);
-            return true;
+            return;
         }
 
         if (declared.at(name) == type)
-            return true;
+            return;
 
-        std::cerr << "error at " << loc
-                  << ": symbol '" << name
-                  << "' redeclared with different type"
-                  << std::endl;
-        return false;
+        std::stringstream descss;
+        descss << "error at " << loc
+               << ": symbol '" << name
+               << "' redeclared with different type";
+        throw std::runtime_error(descss.str());
     }
 
-    bool define(const std::string & name, const ast::Type & type,
+    void define(const std::string & name, const ast::Type & type,
                 const ast::location & loc)
     {
-        if (!declare(name, type, loc))
-            return false;
+        declare(name, type, loc);
 
         if (defined.find(name) == defined.end())
-            return true;
+            return;
 
-        std::cerr << "error at " << loc
-                  << ": symbol '" << name
-                  << "' was already defined"
-                  << std::endl;
-        return false;
+        std::stringstream descss;
+        descss << "error at " << loc
+               << ": symbol '" << name
+               << "' was already defined";
+        throw std::runtime_error(descss.str());
     }
 
     std::unordered_map<std::string, ast::Type> declared;
@@ -141,67 +141,65 @@ bool is_definition(const ast::CodeEntry & entry)
     return fmap([], x, is_definition(x), entry.entry);
 }
 
-bool verify(const context & ctx, const ast::Declaration & entry)
-{
-    return true;
-}
-
-bool verify(const context & ctx, const ast::VarDeclaration & entry)
-{
-    return true;
-}
-
-bool verify(const context & ctx, const ast::Statement & entry);
-
-bool verify(const context & ctx, const ast::Skip & entry)
+void verify(const context & ctx, const ast::Declaration & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::Assignment & entry)
+void verify(const context & ctx, const ast::VarDeclaration & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::Seq & entry)
-{
-    if (!verify(ctx, *entry.first))
-        return false;
+void verify(const context & ctx, const ast::Statement & entry);
 
-    return verify(ctx, *entry.second);
-}
-
-bool verify(const context & ctx, const ast::If & entry)
+void verify(const context & ctx, const ast::Skip & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::While & entry)
+void verify(const context & ctx, const ast::Assignment & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::Read & entry)
+void verify(const context & ctx, const ast::Seq & entry)
+{
+    verify(ctx, *entry.first);
+    verify(ctx, *entry.second);
+}
+
+void verify(const context & ctx, const ast::If & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::Write & entry)
+void verify(const context & ctx, const ast::While & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::Return & entry)
+void verify(const context & ctx, const ast::Read & entry)
 {
     undefined;
 }
 
-bool verify(const context & ctx, const ast::Statement & entry)
+void verify(const context & ctx, const ast::Write & entry)
+{
+    undefined;
+}
+
+void verify(const context & ctx, const ast::Return & entry)
+{
+    undefined;
+}
+
+void verify(const context & ctx, const ast::Statement & entry)
 {
     return fmap([&ctx], x, verify(ctx, x), entry.statement);
 }
 
-bool verify(const context & ctx, const ast::FuncDefinition & entry)
+void verify(const context & ctx, const ast::FuncDefinition & entry)
 {
     context inner_scope(ctx);
     for (auto & arg : entry.declaration.arguments)
@@ -209,32 +207,30 @@ bool verify(const context & ctx, const ast::FuncDefinition & entry)
     return verify(inner_scope, entry.statement);
 }
 
-bool verify(const context & ctx, const ast::Definition & entry)
+void verify(const context & ctx, const ast::Definition & entry)
 {
     return fmap([&ctx], x, verify(ctx, x), entry.definition);
 }
 
-bool verify(const context & ctx, const ast::CodeEntry & entry)
+void verify(const context & ctx, const ast::CodeEntry & entry)
 {
     return fmap([&ctx], x, verify(ctx, x), entry.entry);
 }
 
-bool verify(const ast::Code & code)
+void verify(const ast::Code & code)
 {
     context ctx;
     for (auto entry : code.entries)
     {
         auto n = name(entry);
         auto t = type(entry);
-        if (!(is_definition(entry)
-            ? ctx.define(n, t, entry.loc)
-            : ctx.declare(n, t, entry.loc)))
-            return false;
 
-        if (!verify(ctx, entry))
-            return false;
+        ctx.declare(n, t, entry.loc);
+        if (is_definition(entry))
+            ctx.define(n, t, entry.loc);
+
+        verify(ctx, entry);
     }
-    return true;
 }
 
 }

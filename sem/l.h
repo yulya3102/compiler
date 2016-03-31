@@ -2,5 +2,5 @@
 
 namespace sem
 {
-bool verify(const ast::Code & code);
+void verify(const ast::Code & code);
 }

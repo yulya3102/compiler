@@ -2,7 +2,5 @@
 
 namespace sem
 {
-ast::Type type(const ast::Expression & expr);
-
-void verify(const ast::Code & code);
+bool verify(const ast::Code & code);
 }

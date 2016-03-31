@@ -20,7 +20,7 @@ int main(int argc, char ** argv)
 
         ast::parser p;
         ast::Code code = p.parse(in, std::cout);
-        sem::verify(code);
+        // sem::verify(code);
         codegen::generate(code, argv[i])->dump();
     }
 }

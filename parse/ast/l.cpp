@@ -41,6 +41,11 @@ std::string to_string(const PointerType & type)
     return "(" + to_string(*type.type) + ") *";
 }
 
+std::string to_string(const FuncType & type)
+{
+    undefined;
+}
+
 std::string to_string(const Const & constant)
 {
     return boost::apply_visitor([] (const auto & x) { using std::to_string; return to_string(x); }, constant.constant);

@@ -33,6 +33,12 @@ struct PointerType
     std::shared_ptr<Type> type;
 };
 
+struct FuncType
+{
+    std::shared_ptr<Type> rettype;
+    std::list<Type> argtypes;
+};
+
 struct Type
 {
     template <typename T>
@@ -41,7 +47,7 @@ struct Type
     {}
 
     location loc;
-    boost::variant<AtomType, PointerType> type;
+    boost::variant<AtomType, PointerType, FuncType> type;
 };
 
 /* Declarations */
@@ -279,6 +285,7 @@ bool operator!=(const Type &, const Type &);
 std::string to_string(AtomType);
 std::string to_string(const Type &);
 std::string to_string(const PointerType &);
+std::string to_string(const FuncType &);
 std::string to_string(const Const &);
 std::string to_string(const Value &);
 std::string to_string(const VarDeclaration &);

@@ -111,7 +111,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++proto_it)
         {
             arg_it->setName(proto_it->name);
-            inner_scope.declare(value_type::LOAD, &*arg_it, proto_it->name);
+            inner_scope.declare(value_type::NO_LOAD, &*arg_it, proto_it->name);
         }
     }
     gen_statement(inner_scope, entry.statement);

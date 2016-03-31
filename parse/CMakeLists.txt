@@ -15,6 +15,8 @@ add_custom_command(
 )
 
 add_library(libparser SHARED
-    parser.cpp lexer.cpp
-    l.h l.cpp
+    parser.h parser.cpp
+    lexer.h lexer.cpp
+    l.h
+    gen_l.h l.cpp
 )

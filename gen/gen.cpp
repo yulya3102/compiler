@@ -30,6 +30,16 @@ llvm::IRBuilder<> & get_builder()
 
 namespace codegen
 {
+
+template <typename T>
+llvm::Value * gen_rvalue(const frame & ctx, T expr)
+{
+    frame::value v = gen_expr(ctx, expr);
+    if (v.first == value_type::LOAD)
+        return get_builder().CreateLoad(v.second);
+    return v.second;
+}
+
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name)
 {
     std::unique_ptr<llvm::Module> result(new llvm::Module(name, llvm::getGlobalContext()));
@@ -167,8 +177,8 @@ frame::value gen_expr(const frame & ctx, const ast::Value & v)
 
 frame::value gen_expr(const frame & ctx, const ast::BinOperator & op)
 {
-    llvm::Value * lhs = gen_expr(ctx, *op.lhs).second;
-    llvm::Value * rhs = gen_expr(ctx, *op.rhs).second;
+    llvm::Value * lhs = gen_rvalue(ctx, *op.lhs);
+    llvm::Value * rhs = gen_rvalue(ctx, *op.rhs);
 
     switch (op.oper.oper)
     {
@@ -214,7 +224,7 @@ frame::value gen_expr(const frame & ctx, const ast::Call & call)
 
     std::vector<llvm::Value *> args;
     for (const auto & arg : call.arguments)
-        args.push_back(gen_expr(ctx, arg).second);
+        args.push_back(gen_rvalue(ctx, arg));
 
     return {value_type::NO_LOAD, get_builder().CreateCall(f, args)};
 }
@@ -240,7 +250,7 @@ void gen_statement(frame & ctx, const ast::VarDeclaration & v)
 
 void gen_statement(frame & ctx, const ast::Assignment & st)
 {
-    llvm::Value * val = gen_expr(ctx, st.value).second;
+    llvm::Value * val = gen_rvalue(ctx, st.value);
     get_builder().CreateStore(val, ctx.get(st.varname).second);
 }
 
@@ -253,7 +263,7 @@ void gen_statement(frame & ctx, const ast::Seq & st)
 void gen_statement(frame & ctx, const ast::If & st)
 {
     /* Generate condition */
-    llvm::Value * cond = gen_expr(ctx, st.condition).second;
+    llvm::Value * cond = gen_rvalue(ctx, st.condition);
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * then_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "then", f);
     llvm::BasicBlock * else_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "else");
@@ -295,8 +305,7 @@ void gen_statement(frame & ctx, const ast::Write & st)
 
 void gen_statement(frame & ctx, const ast::Return & ret)
 {
-    frame::value v = gen_expr(ctx, *ret.expr);
-    get_builder().CreateRet(v.second);
+    get_builder().CreateRet(gen_rvalue(ctx, *ret.expr));
 
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);

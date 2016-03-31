@@ -12,6 +12,12 @@ namespace codegen
 {
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name);
 
+enum value_type
+{
+    LOAD,
+    NO_LOAD,
+};
+
 struct frame
 {
     frame(llvm::Module * module, frame * outer_scope = nullptr)
@@ -19,15 +25,16 @@ struct frame
         , module(module)
     {}
 
-    void declare(llvm::Value * v, const std::string & name);
+    void declare(value_type type, llvm::Value * v, const std::string & name);
     bool is_declared(const std::string & name);
 
-    llvm::Value * get(const std::string & name) const;
+    using value = std::pair<value_type, llvm::Value *>;
+    value get(const std::string & name) const;
 
     template <typename T>
     using map = std::unordered_map<std::string, T>;
 
-    map<llvm::Value *> locals;
+    map<value> locals;
     frame * outer_scope;
     llvm::Module * module;
 };
@@ -44,15 +51,15 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry);
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry);
 void gen_entry(frame & ctx, const ast::FuncDeclaration & entry);
 
-llvm::Value * gen_expr(const frame & ctx, int64_t i);
-llvm::Value * gen_expr(const frame & ctx, bool b);
-llvm::Value * gen_expr(const frame & ctx, const ast::Const & v);
-llvm::Value * gen_expr(const frame & ctx, const std::string & v);
-llvm::Value * gen_expr(const frame & ctx, const ast::Value & v);
-llvm::Value * gen_expr(const frame & ctx, const ast::BinOperator & op);
-llvm::Value * gen_expr(const frame & ctx, const ast::Dereference & deref);
-llvm::Value * gen_expr(const frame & ctx, const ast::Call & call);
-llvm::Value * gen_expr(const frame & ctx, const ast::Expression & expr);
+frame::value gen_expr(const frame & ctx, int64_t i);
+frame::value gen_expr(const frame & ctx, bool b);
+frame::value gen_expr(const frame & ctx, const ast::Const & v);
+frame::value gen_expr(const frame & ctx, const std::string & v);
+frame::value gen_expr(const frame & ctx, const ast::Value & v);
+frame::value gen_expr(const frame & ctx, const ast::BinOperator & op);
+frame::value gen_expr(const frame & ctx, const ast::Dereference & deref);
+frame::value gen_expr(const frame & ctx, const ast::Call & call);
+frame::value gen_expr(const frame & ctx, const ast::Expression & expr);
 
 void gen_statement(frame & ctx, const ast::Skip & st);
 void gen_statement(frame & ctx, const ast::VarDeclaration & st);

@@ -1,5 +1,7 @@
 #include "gen.h"
 
+#include <utils/undefined.h>
+
 #include <llvm/IR/Module.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
@@ -14,12 +16,6 @@
 
 #include <memory>
 #include <map>
-
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-#define __AT__ __FILE__ ":" TOSTRING(__LINE__)
-
-#define undefined throw std::runtime_error(__AT__ ": not implemented")
 
 namespace
 {

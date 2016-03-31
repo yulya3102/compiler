@@ -9,11 +9,11 @@ std::string to_string(const std::string & str)
 
 std::string to_string(AtomType atom_type)
 {
-    switch (atom_type)
+    switch (atom_type.type)
     {
-        case BOOL:
+        case AtomType::BOOL:
             return "_Bool";
-        case INT:
+        case AtomType::INT:
             return "int";
     }
     throw std::runtime_error("unknown type");
@@ -83,33 +83,33 @@ std::string to_string(const Call & call)
 
 std::string to_string(Oper oper)
 {
-    switch (oper)
+    switch (oper.oper)
     {
-        case PLUS:
+        case Oper::PLUS:
             return "+";
-        case MINUS:
+        case Oper::MINUS:
             return "-";
-        case MULT:
+        case Oper::MULT:
             return "*";
-        case DIV:
+        case Oper::DIV:
             return "/";
-        case MOD:
+        case Oper::MOD:
             return "%";
-        case GT:
+        case Oper::GT:
             return ">";
-        case LT:
+        case Oper::LT:
             return "<";
-        case EQ:
+        case Oper::EQ:
             return "==";
-        case GE:
+        case Oper::GE:
             return ">=";
-        case LE:
+        case Oper::LE:
             return "<=";
-        case NE:
+        case Oper::NE:
             return "!=";
-        case AND:
+        case Oper::AND:
             return "&&";
-        case OR:
+        case Oper::OR:
             return "||";
     }
     throw std::runtime_error("unknown operator");

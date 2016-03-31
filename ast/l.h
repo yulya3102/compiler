@@ -1,5 +1,7 @@
 #pragma once
 
+#include <parse/location.hh>
+
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 
@@ -11,16 +13,23 @@ namespace ast
 {
 
 /* Types */
-enum AtomType
+struct AtomType
 {
-    BOOL,
-    INT
+    enum AtomTypeName
+    {
+        BOOL,
+        INT
+    };
+
+    location loc;
+    AtomTypeName type;
 };
 
 struct Type;
 
 struct PointerType
 {
+    location loc;
     std::shared_ptr<Type> type;
 };
 
@@ -31,6 +40,7 @@ struct Type
         : type(t)
     {}
 
+    location loc;
     boost::variant<AtomType, PointerType> type;
 };
 
@@ -38,12 +48,14 @@ struct Type
 
 struct VarDeclaration
 {
+    location loc;
     Type type;
     std::string name;
 };
 
 struct FuncDeclaration
 {
+    location loc;
     Type type;
     std::string name;
     std::list<VarDeclaration> arguments;
@@ -56,6 +68,7 @@ struct Declaration
         : declaration(t)
     {}
 
+    location loc;
     boost::variant<FuncDeclaration> declaration;
 };
 
@@ -70,6 +83,7 @@ struct Const
         : constant(t)
     {}
 
+    location loc;
     boost::variant<bool, int64_t> constant;
 };
 
@@ -80,6 +94,7 @@ struct Value
         : value(t)
     {}
 
+    location loc;
     boost::variant<
         Const,          // bool or int
         std::string     // variable name
@@ -88,35 +103,43 @@ struct Value
 
 struct Call
 {
+    location loc;
     std::string function;
     std::list<Expression> arguments;
 };
 
-enum Oper
+struct Oper
 {
-    PLUS,
-    MINUS,
-    MULT,
-    DIV,
-    MOD,
-    GT,
-    LT,
-    EQ,
-    GE,
-    LE,
-    NE,
-    AND,
-    OR
+    enum OperName
+    {
+        PLUS,
+        MINUS,
+        MULT,
+        DIV,
+        MOD,
+        GT,
+        LT,
+        EQ,
+        GE,
+        LE,
+        NE,
+        AND,
+        OR
+    };
+    location loc;
+    OperName oper;
 };
 
 struct BinOperator
 {
+    location loc;
     std::shared_ptr<Expression> lhs, rhs;
     Oper oper;
 };
 
 struct Dereference
 {
+    location loc;
     std::shared_ptr<Expression> expr;
 };
 
@@ -127,6 +150,7 @@ struct Expression
         : expression(t)
     {}
 
+    location loc;
     boost::variant<Value, BinOperator, Dereference, Call> expression;
 };
 
@@ -134,12 +158,14 @@ struct Expression
 
 struct VarDefinition
 {
+    location loc;
     VarDeclaration declaration;
     Expression value;
 };
 
 struct Assignment
 {
+    location loc;
     std::string varname;
     Expression value;
 };
@@ -148,36 +174,44 @@ struct Statement;
 
 struct If
 {
+    location loc;
     Expression condition;
     std::shared_ptr<Statement> thenBody, elseBody;
 };
 
 struct While
 {
+    location loc;
     Expression condition;
     std::shared_ptr<Statement> body;
 };
 
 struct Skip
-{};
+{
+    location loc;
+};
 
 struct Seq
 {
+    location loc;
     std::shared_ptr<Statement> first, second;
 };
 
 struct Read
 {
+    location loc;
     std::string varname;
 };
 
 struct Write
 {
+    location loc;
     std::shared_ptr<Expression> expr;
 };
 
 struct Return
 {
+    location loc;
     std::shared_ptr<Expression> expr;
 };
 
@@ -188,6 +222,7 @@ struct Statement
         : statement(t)
     {}
 
+    location loc;
     boost::variant<
         Skip,
         VarDeclaration,
@@ -205,6 +240,7 @@ struct Statement
 
 struct FuncDefinition
 {
+    location loc;
     FuncDeclaration declaration;
     Statement statement;
 };
@@ -216,6 +252,7 @@ struct Definition
         : definition(t)
     {}
 
+    location loc;
     boost::variant<VarDeclaration, FuncDefinition> definition;
 };
 
@@ -226,11 +263,13 @@ struct CodeEntry
         : entry(t)
     {}
 
+    location loc;
     boost::variant<Declaration, Definition> entry;
 };
 
 struct Code
 {
+    location loc;
     std::list<CodeEntry> entries;
 };
 

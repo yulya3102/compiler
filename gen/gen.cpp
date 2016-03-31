@@ -51,11 +51,11 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
 
 llvm::Type * gen_type(const ast::AtomType & type)
 {
-    switch (type)
+    switch (type.type)
     {
-        case ast::BOOL:
+        case ast::AtomType::BOOL:
             return llvm::Type::getInt1Ty(llvm::getGlobalContext());
-        case ast::INT:
+        case ast::AtomType::INT:
             return llvm::Type::getInt64Ty(llvm::getGlobalContext());
     }
 
@@ -176,33 +176,33 @@ llvm::Value * gen_expr(const frame & ctx, const ast::BinOperator & op)
     llvm::Value * lhs = gen_expr(ctx, *op.lhs);
     llvm::Value * rhs = gen_expr(ctx, *op.rhs);
 
-    switch (op.oper)
+    switch (op.oper.oper)
     {
-        case ast::PLUS:
+        case ast::Oper::PLUS:
             return get_builder().CreateAdd(lhs, rhs);
-        case ast::MINUS:
+        case ast::Oper::MINUS:
             return get_builder().CreateSub(lhs, rhs);
-        case ast::MULT:
+        case ast::Oper::MULT:
             return get_builder().CreateMul(lhs, rhs);
-        case ast::DIV:
+        case ast::Oper::DIV:
             return get_builder().CreateSDiv(lhs, rhs);
-        case ast::MOD:
+        case ast::Oper::MOD:
             return get_builder().CreateSRem(lhs, rhs);
-        case ast::GT:
+        case ast::Oper::GT:
             return get_builder().CreateICmpSGT(lhs, rhs);
-        case ast::LT:
+        case ast::Oper::LT:
             return get_builder().CreateICmpSLT(lhs, rhs);
-        case ast::EQ:
+        case ast::Oper::EQ:
             return get_builder().CreateICmpEQ(lhs, rhs);
-        case ast::GE:
+        case ast::Oper::GE:
             return get_builder().CreateICmpSGE(lhs, rhs);
-        case ast::LE:
+        case ast::Oper::LE:
             return get_builder().CreateICmpSLE(lhs, rhs);
-        case ast::NE:
+        case ast::Oper::NE:
             return get_builder().CreateICmpNE(lhs, rhs);
-        case ast::AND:
+        case ast::Oper::AND:
             return get_builder().CreateAnd(lhs, rhs);
-        case ast::OR:
+        case ast::Oper::OR:
             return get_builder().CreateOr(lhs, rhs);
     }
 

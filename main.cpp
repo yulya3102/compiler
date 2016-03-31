@@ -1,6 +1,7 @@
 #include <parse/parser.h>
 #include <parse/ast/l.h>
 #include <gen/gen.h>
+#include <sem/l.h>
 
 #include <iostream>
 #include <fstream>
@@ -19,6 +20,7 @@ int main(int argc, char ** argv)
 
         ast::parser p;
         ast::Code code = p.parse(in, std::cout);
+        sem::verify(code);
         codegen::generate(code, argv[i])->dump();
     }
 }

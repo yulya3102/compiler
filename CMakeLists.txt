@@ -7,7 +7,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wall -Wextra -Wno-unused-par
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(utils)
 add_subdirectory(parse)
+add_subdirectory(sem)
 add_subdirectory(gen)
 
-add_executable(parser main.cpp)
+add_executable(parser main.cpp sem/l.h sem/l.cpp)
 target_link_libraries(parser libparser libgen LLVMCore LLVMSupport)

@@ -4,14 +4,30 @@
 
 namespace ast
 {
-bool operator==(const Type &, const Type &)
+bool operator==(const AtomType & lhs, const AtomType & rhs)
 {
-    undefined;
+    return lhs.type == rhs.type;
 }
 
-bool operator!=(const Type &, const Type &)
+bool operator==(const FuncType & lhs, const FuncType & rhs)
 {
-    undefined;
+    return (*lhs.rettype == *rhs.rettype)
+        && (lhs.argtypes == rhs.argtypes);
+}
+
+bool operator==(const PointerType & lhs, const PointerType & rhs)
+{
+    return *lhs.type == *rhs.type;
+}
+
+bool operator==(const Type & lhs, const Type & rhs)
+{
+    return lhs.type == rhs.type;
+}
+
+bool operator!=(const Type & lhs, const Type & rhs)
+{
+    return !(lhs == rhs);
 }
 
 std::string to_string(const std::string & str)

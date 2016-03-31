@@ -279,6 +279,9 @@ struct Code
     std::list<CodeEntry> entries;
 };
 
+bool operator==(const AtomType & lhs, const AtomType & rhs);
+bool operator==(const FuncType & lhs, const FuncType & rhs);
+bool operator==(const PointerType & lhs, const PointerType & rhs);
 bool operator==(const Type &, const Type &);
 bool operator!=(const Type &, const Type &);
 

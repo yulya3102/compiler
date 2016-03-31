@@ -126,11 +126,6 @@ std::string name(const ast::CodeEntry & entry)
     return fmap([], x, name(x), entry.entry);
 }
 
-ast::location location(const ast::CodeEntry & entry)
-{
-    undefined;
-}
-
 bool is_definition(const ast::Declaration & entry)
 {
     return false;
@@ -156,9 +151,54 @@ bool verify(const context & ctx, const ast::VarDeclaration & entry)
     return true;
 }
 
-bool verify(const context & ctx, const ast::Statement & entry)
+bool verify(const context & ctx, const ast::Statement & entry);
+
+bool verify(const context & ctx, const ast::Skip & entry)
 {
     undefined;
+}
+
+bool verify(const context & ctx, const ast::Assignment & entry)
+{
+    undefined;
+}
+
+bool verify(const context & ctx, const ast::Seq & entry)
+{
+    if (!verify(ctx, *entry.first))
+        return false;
+
+    return verify(ctx, *entry.second);
+}
+
+bool verify(const context & ctx, const ast::If & entry)
+{
+    undefined;
+}
+
+bool verify(const context & ctx, const ast::While & entry)
+{
+    undefined;
+}
+
+bool verify(const context & ctx, const ast::Read & entry)
+{
+    undefined;
+}
+
+bool verify(const context & ctx, const ast::Write & entry)
+{
+    undefined;
+}
+
+bool verify(const context & ctx, const ast::Return & entry)
+{
+    undefined;
+}
+
+bool verify(const context & ctx, const ast::Statement & entry)
+{
+    return fmap([&ctx], x, verify(ctx, x), entry.statement);
 }
 
 bool verify(const context & ctx, const ast::FuncDefinition & entry)
@@ -186,10 +226,9 @@ bool verify(const ast::Code & code)
     {
         auto n = name(entry);
         auto t = type(entry);
-        auto l = location(entry);
         if (!(is_definition(entry)
-            ? ctx.define(n, t, l)
-            : ctx.declare(n, t, l)))
+            ? ctx.define(n, t, entry.loc)
+            : ctx.declare(n, t, entry.loc)))
             return false;
 
         if (!verify(ctx, entry))

@@ -234,11 +234,6 @@ frame::value gen_expr(const frame & ctx, const ast::Expression & expr)
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, expr.expression);
 }
 
-llvm::Value * gen_init_value(const ast::Type & type)
-{
-    undefined;
-}
-
 void gen_statement(frame & ctx, const ast::Skip &)
 { }
 

@@ -1,7 +1,19 @@
 #include "l.h"
 
+#include <utils/undefined.h>
+
 namespace ast
 {
+bool operator==(const Type &, const Type &)
+{
+    undefined;
+}
+
+bool operator!=(const Type &, const Type &)
+{
+    undefined;
+}
+
 std::string to_string(const std::string & str)
 {
     return str;

@@ -273,6 +273,9 @@ struct Code
     std::list<CodeEntry> entries;
 };
 
+bool operator==(const Type &, const Type &);
+bool operator!=(const Type &, const Type &);
+
 std::string to_string(AtomType);
 std::string to_string(const Type &);
 std::string to_string(const PointerType &);

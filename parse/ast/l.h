@@ -1,6 +1,6 @@
 #pragma once
 
-#include <parse/location.hh>
+#include "../location.hh"
 
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>

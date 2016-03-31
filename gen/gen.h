@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ast/l.h>
+#include <parse/ast/l.h>
 
 #include <llvm/IR/Module.h>
 

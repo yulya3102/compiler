@@ -1,5 +1,5 @@
 #include <parse/parser.h>
-#include <ast/l.h>
+#include <parse/ast/l.h>
 #include <gen/gen.h>
 
 #include <iostream>

@@ -5,7 +5,7 @@
 #include "parser.h"
 #include "lexer.h"
 
-#include <ast/l.h>
+#include "ast/l.h"
 
 #ifdef yylex
 #undef yylex

@@ -11,8 +11,8 @@ int c; int e;
     int f;
 _Bool g;
 
-int f(int a)
+_Bool f(int a)
 {
 c = a;
-return 1;
+return false;
 }

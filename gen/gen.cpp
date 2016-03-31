@@ -119,11 +119,7 @@ llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & 
     if (ctx.is_declared(entry.name))
     {
         frame::value found = ctx.get(entry.name);
-
-        if (found.second->getType()->isFunctionTy())
-            return llvm::cast<llvm::Function>(found.second);
-
-        throw std::runtime_error(entry.name + " redeclared as a different kind of symbol");
+        return llvm::cast<llvm::Function>(found.second);
     }
 
     std::vector <llvm::Type *> args;

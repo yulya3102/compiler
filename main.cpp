@@ -1,6 +1,6 @@
 #include <parse/parser.h>
 #include <ast/l.h>
-#include "codegen.h"
+#include <gen/gen.h>
 
 #include <iostream>
 #include <fstream>

@@ -2,9 +2,13 @@
 
 #include <utils/undefined.h>
 
+#include <boost/variant.hpp>
+
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
+
+#define fmap(x, expr, variant) boost::apply_visitor([] (const auto & x) { return expr; }, variant)
 
 namespace
 {
@@ -24,9 +28,29 @@ ast::Type type(const ast::Expression & expr)
     undefined;
 }
 
-ast::Type type(const ast::CodeEntry & entry)
+ast::Type type(const ast::Declaration & entry)
 {
     undefined;
+}
+
+ast::Type type(const ast::VarDeclaration & entry)
+{
+    return entry.type;
+}
+
+ast::Type type(const ast::FuncDefinition & entry)
+{
+    undefined;
+}
+
+ast::Type type(const ast::Definition & entry)
+{
+    return fmap(x, type(x), entry.definition);
+}
+
+ast::Type type(const ast::CodeEntry & entry)
+{
+    return fmap(x, type(x), entry.entry);
 }
 
 std::string name(const ast::Declaration & entry)
@@ -34,14 +58,29 @@ std::string name(const ast::Declaration & entry)
     undefined;
 }
 
+std::string name(const ast::VarDeclaration & entry)
+{
+    return entry.name;
+}
+
+std::string name(const ast::FuncDeclaration & entry)
+{
+    return entry.name;
+}
+
+std::string name(const ast::FuncDefinition & entry)
+{
+    return name(entry.declaration);
+}
+
 std::string name(const ast::Definition & entry)
 {
-    undefined;
+    return fmap(x, name(x), entry.definition);
 }
 
 std::string name(const ast::CodeEntry & entry)
 {
-    undefined;
+    return fmap(x, name(x), entry.entry);
 }
 
 ast::location location(const ast::CodeEntry & entry)

@@ -26,19 +26,19 @@ llvm::IRBuilder<> & get_builder()
     static llvm::IRBuilder<> builder(llvm::getGlobalContext());
     return builder;
 }
+
+template <typename T>
+llvm::Value * gen_rvalue(const codegen::frame & ctx, T expr)
+{
+    codegen::frame::value v = codegen::gen_expr(ctx, expr);
+    if (v.first == codegen::value_type::LOAD)
+        return get_builder().CreateLoad(v.second);
+    return v.second;
+}
 }
 
 namespace codegen
 {
-
-template <typename T>
-llvm::Value * gen_rvalue(const frame & ctx, T expr)
-{
-    frame::value v = gen_expr(ctx, expr);
-    if (v.first == value_type::LOAD)
-        return get_builder().CreateLoad(v.second);
-    return v.second;
-}
 
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name)
 {

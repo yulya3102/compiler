@@ -12,6 +12,7 @@
 #include <llvm/IR/GlobalVariable.h>
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/IR/TypeBuilder.h>
 #include <llvm/Support/raw_ostream.h>
 
 #include <boost/variant.hpp>
@@ -43,6 +44,7 @@ namespace codegen
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name)
 {
     std::unique_ptr<llvm::Module> result(new llvm::Module(name, llvm::getGlobalContext()));
+    gen_static_data(result.get());
 
     frame ctx(result.get());
     for (const auto & entry : code.entries)
@@ -293,9 +295,19 @@ void gen_statement(frame & ctx, const ast::Read & st)
     undefined;
 }
 
-void gen_statement(frame & ctx, const ast::Write & st)
+llvm::Value * gen_format_string(const ast::Type & type)
 {
     undefined;
+}
+
+void gen_statement(frame & ctx, const ast::Write & st)
+{
+    llvm::Value * f = ctx.module->getNamedValue("printf");
+    llvm::Value * v = gen_rvalue(ctx, *st.expr);
+    llvm::Value * format_string = gen_format_string(sem::type(*st.expr));
+    std::vector<llvm::Value *> args = { format_string, v };
+
+    get_builder().CreateCall(f, args);
 }
 
 void gen_statement(frame & ctx, const ast::Return & ret)
@@ -337,6 +349,14 @@ frame::value frame::get(const std::string & name) const
         return outer_scope->get(name);
 
     throw std::runtime_error("undefined symbol: " + name);
+}
+
+void gen_static_data(llvm::Module * module)
+{
+    llvm::FunctionType * type = llvm::TypeBuilder<int(char *, ...), false>::get(llvm::getGlobalContext());
+    llvm::Function::Create(type, llvm::Function::ExternalLinkage, "printf", module);
+
+    // TODO: declaration of scanf
 }
 
 }

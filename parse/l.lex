@@ -20,6 +20,7 @@ int yylineno = 1;
 
 string      [a-zA-Z]+
 integer     -?[0-9]+
+comment     "//".*\n
 
 %%
 
@@ -63,6 +64,7 @@ integer     -?[0-9]+
 
 [ \t]*      { yylloc->step(); }
 [\n]        { yylloc->lines(yyleng); yylloc->step(); }
+{comment}   { yylloc->lines(yyleng); yylloc->step(); }
 
 %%
 

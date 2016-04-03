@@ -287,7 +287,27 @@ void gen_statement(frame & ctx, const ast::If & st)
 
 void gen_statement(frame & ctx, const ast::While & st)
 {
-    undefined;
+    llvm::Function * f = get_builder().GetInsertBlock()->getParent();
+    llvm::BasicBlock * while_body = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_body", f);
+    llvm::BasicBlock * cond_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_cond");
+    llvm::BasicBlock * cont_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_cont");
+    get_builder().CreateBr(cond_block);
+
+    /* Generate condition */
+    get_builder().SetInsertPoint(cond_block);
+    llvm::Value * cond = gen_rvalue(ctx, st.condition);
+    get_builder().CreateCondBr(cond, while_body, cont_block);
+
+    /* Generate body branch */
+    get_builder().SetInsertPoint(while_body);
+    gen_statement(ctx, *st.body);
+    get_builder().CreateBr(cond_block);
+    while_body = get_builder().GetInsertBlock();
+
+    /* Continue */
+    f->getBasicBlockList().push_back(cond_block);
+    f->getBasicBlockList().push_back(cont_block);
+    get_builder().SetInsertPoint(cont_block);
 }
 
 void gen_statement(frame & ctx, const ast::Read & st)

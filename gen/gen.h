@@ -1,7 +1,7 @@
 #pragma once
 
 #include <parse/ast/l.h>
-#include <sem/ctx.h>
+#include <sem/types.h>
 
 #include <llvm/IR/Module.h>
 
@@ -20,10 +20,11 @@ enum value_type
 };
 
 using value = std::pair<value_type, llvm::Value *>;
-struct frame : sem::context<value>
+using typed_value = std::pair<ast::Type, value>;
+struct frame : sem::typed_ctx<value>
 {
     frame(llvm::Module * module, frame * outer_scope = nullptr)
-        : sem::context<value>(outer_scope)
+        : sem::typed_ctx<value>(outer_scope)
         , module(module)
     {}
 
@@ -45,15 +46,15 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry);
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry);
 void gen_entry(frame & ctx, const ast::FuncDeclaration & entry);
 
-value gen_expr(const frame & ctx, int64_t i);
-value gen_expr(const frame & ctx, bool b);
-value gen_expr(const frame & ctx, const ast::Const & v);
-value gen_expr(const frame & ctx, const std::string & v);
-value gen_expr(const frame & ctx, const ast::Value & v);
-value gen_expr(const frame & ctx, const ast::BinOperator & op);
-value gen_expr(const frame & ctx, const ast::Dereference & deref);
-value gen_expr(const frame & ctx, const ast::Call & call);
-value gen_expr(const frame & ctx, const ast::Expression & expr);
+typed_value gen_expr(const frame & ctx, int64_t i);
+typed_value gen_expr(const frame & ctx, bool b);
+typed_value gen_expr(const frame & ctx, const ast::Const & v);
+typed_value gen_expr(const frame & ctx, const std::string & v);
+typed_value gen_expr(const frame & ctx, const ast::Value & v);
+typed_value gen_expr(const frame & ctx, const ast::BinOperator & op);
+typed_value gen_expr(const frame & ctx, const ast::Dereference & deref);
+typed_value gen_expr(const frame & ctx, const ast::Call & call);
+typed_value gen_expr(const frame & ctx, const ast::Expression & expr);
 
 void gen_statement(frame & ctx, const ast::Skip & st);
 void gen_statement(frame & ctx, const ast::VarDeclaration & st);

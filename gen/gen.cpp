@@ -31,7 +31,7 @@ llvm::IRBuilder<> & get_builder()
 template <typename T>
 llvm::Value * gen_rvalue(const codegen::frame & ctx, T expr)
 {
-    codegen::frame::value v = codegen::gen_expr(ctx, expr);
+    codegen::value v = codegen::gen_expr(ctx, expr);
     if (v.first == codegen::value_type::LOAD)
         return get_builder().CreateLoad(v.second);
     return v.second;
@@ -97,7 +97,7 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
     llvm::Value * var = new llvm::GlobalVariable(
             *ctx.module, gen_type(entry.type), false,
             llvm::GlobalVariable::ExternalLinkage, nullptr, entry.name);
-    ctx.declare(value_type::LOAD, var, entry.name);
+    ctx.declare({value_type::LOAD, var}, entry.name);
 }
 
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
@@ -113,7 +113,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++proto_it)
         {
             arg_it->setName(proto_it->name);
-            inner_scope.declare(value_type::NO_LOAD, &*arg_it, proto_it->name);
+            inner_scope.declare({value_type::NO_LOAD, &*arg_it}, proto_it->name);
         }
     }
     gen_statement(inner_scope, entry.statement);
@@ -130,7 +130,7 @@ llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & 
 {
     if (ctx.is_declared(entry.name))
     {
-        frame::value found = ctx.get(entry.name);
+        value found = ctx.get(entry.name);
         return llvm::cast<llvm::Function>(found.second);
     }
 
@@ -143,7 +143,7 @@ llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & 
 
     llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, ctx.module);
 
-    ctx.declare(value_type::LOAD, f, entry.name);
+    ctx.declare({value_type::LOAD, f}, entry.name);
     return f;
 }
 
@@ -152,32 +152,32 @@ void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
     gen_func_declaration(ctx, entry);
 }
 
-frame::value gen_expr(const frame & ctx, int64_t i)
+value gen_expr(const frame & ctx, int64_t i)
 {
     return {value_type::NO_LOAD, get_builder().getInt64(i)};
 }
 
-frame::value gen_expr(const frame & ctx, bool b)
+value gen_expr(const frame & ctx, bool b)
 {
     return {value_type::NO_LOAD, get_builder().getInt1(b)};
 }
 
-frame::value gen_expr(const frame & ctx, const ast::Const & v)
+value gen_expr(const frame & ctx, const ast::Const & v)
 {
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, v.constant);
 }
 
-frame::value gen_expr(const frame & ctx, const std::string & v)
+value gen_expr(const frame & ctx, const std::string & v)
 {
     return ctx.get(v);
 }
 
-frame::value gen_expr(const frame & ctx, const ast::Value & v)
+value gen_expr(const frame & ctx, const ast::Value & v)
 {
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, v.value);
 }
 
-frame::value gen_expr(const frame & ctx, const ast::BinOperator & op)
+value gen_expr(const frame & ctx, const ast::BinOperator & op)
 {
     llvm::Value * lhs = gen_rvalue(ctx, *op.lhs);
     llvm::Value * rhs = gen_rvalue(ctx, *op.rhs);
@@ -215,12 +215,12 @@ frame::value gen_expr(const frame & ctx, const ast::BinOperator & op)
     throw std::runtime_error("unknown binary operator");
 }
 
-frame::value gen_expr(const frame & ctx, const ast::Dereference & deref)
+value gen_expr(const frame & ctx, const ast::Dereference & deref)
 {
     throw std::runtime_error("dereference: not implemented");
 }
 
-frame::value gen_expr(const frame & ctx, const ast::Call & call)
+value gen_expr(const frame & ctx, const ast::Call & call)
 {
     llvm::Value * f = ctx.get(call.function).second;
 
@@ -231,7 +231,7 @@ frame::value gen_expr(const frame & ctx, const ast::Call & call)
     return {value_type::NO_LOAD, get_builder().CreateCall(f, args)};
 }
 
-frame::value gen_expr(const frame & ctx, const ast::Expression & expr)
+value gen_expr(const frame & ctx, const ast::Expression & expr)
 {
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, expr.expression);
 }
@@ -242,7 +242,7 @@ void gen_statement(frame & ctx, const ast::Skip &)
 void gen_statement(frame & ctx, const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
-    ctx.declare(value_type::LOAD, val, v.name);
+    ctx.declare({value_type::LOAD, val}, v.name);
 }
 
 void gen_statement(frame & ctx, const ast::Assignment & st)
@@ -342,33 +342,6 @@ void gen_statement(frame & ctx, const ast::Return & ret)
 void gen_statement(frame & ctx, const ast::Statement & st)
 {
     return boost::apply_visitor([&ctx] (const auto & x) { return gen_statement(ctx, x); }, st.statement);
-}
-
-void frame::declare(value_type type, llvm::Value * v, const std::string & name)
-{
-    locals.emplace(name, std::make_pair(type, v));
-}
-
-bool frame::is_declared(const std::string & name)
-{
-    auto it = locals.find(name);
-
-    if (it == locals.end())
-        return false;
-
-    return true;
-}
-
-frame::value frame::get(const std::string & name) const
-{
-    auto it = locals.find(name);
-    if (it != locals.end())
-        return it->second;
-
-    if (outer_scope)
-        return outer_scope->get(name);
-
-    throw std::runtime_error("undefined symbol: " + name);
 }
 
 void gen_static_data(llvm::Module * module)

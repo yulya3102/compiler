@@ -9,6 +9,7 @@ int fib(int n)
 {
     if (n < 2)
         return 1;
+    else;
 
     int prev;   prev = 1;
     int cur;    cur  = 1;
@@ -20,7 +21,7 @@ int fib(int n)
         prev = cur;
         cur  = next;
         i = i + 1;
-    }
+    };
 
     return cur;
 }

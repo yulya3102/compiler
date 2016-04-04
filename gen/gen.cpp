@@ -82,6 +82,34 @@ llvm::Type * gen_type(const ast::Type & type)
     return boost::apply_visitor([] (const auto & x) { return gen_type(x); }, type.type);
 }
 
+llvm::Constant * gen_init(const ast::AtomType & type)
+{
+    switch (type.type)
+    {
+    case ast::AtomType::BOOL:
+        return get_builder().getInt1(false);
+    case ast::AtomType::INT:
+        return get_builder().getInt64(0);
+    }
+
+    throw std::runtime_error("unknown atom type");
+}
+
+llvm::Constant * gen_init(const ast::PointerType & type)
+{
+    undefined;
+}
+
+llvm::Constant * gen_init(const ast::FuncType & type)
+{
+    undefined;
+}
+
+llvm::Constant * gen_init(const ast::Type & type)
+{
+    return fmap([], x, gen_init(x), type.type);
+}
+
 void gen_entry(frame & ctx, const ast::Declaration & entry)
 {
     boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.declaration);
@@ -96,7 +124,7 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
 {
     llvm::Value * var = new llvm::GlobalVariable(
             *ctx.module, gen_type(entry.type), false,
-            llvm::GlobalVariable::ExternalLinkage, nullptr, entry.name);
+            llvm::GlobalVariable::ExternalLinkage, gen_init(entry.type), entry.name);
     ctx.declare({entry.type, {value_type::LOAD, var}}, entry.name);
 }
 

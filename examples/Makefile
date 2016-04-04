@@ -1,4 +1,4 @@
-all: calls fact fun_defs globals locals while write
+all: calls fact while
 
 %: %.o
 	gcc -o $@ $<

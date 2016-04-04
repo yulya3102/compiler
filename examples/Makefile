@@ -4,6 +4,9 @@
 %.o: %.ir
 	llc -o=$@ --filetype=obj $<
 
+%.s: %.ir
+	llc -o=$@ --filetype=asm $<
+
 LCC ?= ../build/lcc
 
 %.ir: %.lc

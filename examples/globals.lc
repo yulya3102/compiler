@@ -16,3 +16,11 @@ _Bool f(int a)
 c = a;
 return false;
 }
+
+int main()
+{
+    write(c);
+    f(10)
+    write(c);
+    return 0;
+}

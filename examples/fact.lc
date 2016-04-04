@@ -10,5 +10,6 @@ int main()
 {
     int res;
     res = fact(10);
-    return res;
+    write(res);
+    return 0;
 }

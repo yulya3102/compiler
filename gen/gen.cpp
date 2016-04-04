@@ -159,7 +159,7 @@ typed_value gen_expr(const frame & ctx, int64_t i)
 
 typed_value gen_expr(const frame & ctx, bool b)
 {
-    undefined;
+    return {ast::bool_type(), {value_type::NO_LOAD, get_builder().getInt1(b)}};
 }
 
 typed_value gen_expr(const frame & ctx, const ast::Const & v)

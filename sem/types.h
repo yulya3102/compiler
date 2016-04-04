@@ -16,9 +16,19 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
         : context<std::pair<ast::Type, T>>(outer_scope)
     {}
 
+    ast::Type get_type(int64_t) const
+    {
+        return ast::int_type();
+    }
+
+    ast::Type get_type(bool) const
+    {
+        return ast::bool_type();
+    }
+
     ast::Type get_type(const ast::Const & expr) const
     {
-        undefined;
+        return fmap([this], x, this->get_type(x), expr.constant);
     }
 
     ast::Type get_type(const std::string & expr) const

@@ -7,3 +7,9 @@ int f()
     a = a * 8;
     return a;
 }
+
+int main()
+{
+    write(f());
+    return 0;
+}

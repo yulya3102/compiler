@@ -20,7 +20,7 @@ return false;
 int main()
 {
     write(c);
-    f(10);
+    _Bool a; a = f(10);
     write(c);
     return 0;
 }

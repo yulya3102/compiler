@@ -16,9 +16,19 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
         : context<std::pair<ast::Type, T>>(outer_scope)
     {}
 
-    ast::Type get_type(const ast::Value & expr) const
+    ast::Type get_type(const ast::Const & expr) const
     {
         undefined;
+    }
+
+    ast::Type get_type(const std::string & expr) const
+    {
+        return this->get(expr).first;
+    }
+
+    ast::Type get_type(const ast::Value & expr) const
+    {
+        return fmap([this], x, this->get_type(x), expr.value);
     }
 
     ast::Type get_type(const ast::BinOperator & expr) const
@@ -33,7 +43,8 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
 
     ast::Type get_type(const ast::Call & expr) const
     {
-        undefined;
+        ast::Type func_type = this->get(expr.function).first;
+        return *boost::get<ast::FuncType>(func_type.type).rettype;
     }
 
     ast::Type get_type(const ast::Expression & expr) const

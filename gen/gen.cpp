@@ -317,7 +317,8 @@ void gen_statement(frame & ctx, const ast::Read & st)
 
 llvm::Value * gen_format_string(const ast::Type & type)
 {
-    undefined;
+    // TODO: check output type
+    return llvm::ConstantDataArray::getString(llvm::getGlobalContext(), "%d\n");
 }
 
 void gen_statement(frame & ctx, const ast::Write & st)

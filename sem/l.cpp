@@ -2,6 +2,7 @@
 #include "types.h"
 
 #include <utils/undefined.h>
+#include <utils/fmap.h>
 
 #include <boost/variant.hpp>
 
@@ -9,8 +10,6 @@
 #include <unordered_set>
 #include <iostream>
 #include <sstream>
-
-#define fmap(closure, x, expr, variant) boost::apply_visitor(closure (const auto & x) { return expr; }, variant)
 
 namespace
 {

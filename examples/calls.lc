@@ -1,14 +1,30 @@
+// Test function calls
+
+int ten()
+{
+    return 10;
+}
+
 int a;
 
-int f()
+int initA(int n)
 {
-    a = 2 * 2;
-    return 10;
+    a = n;
+    int b;    b = 14;
+    return 0;
 }
 
 int main()
 {
-    int c;
-    c = 42 * f();
+    write(ten());       // prints "10"
+    write(a);           // prints "0"
+    int b;
+    b = 88;
+    write(b);           // prints "88"
+    int ret;
+    ret = initA(42);    // function uses 'a' from outer scope and 'b' from its own scope
+    write(a);           // prints "42"
+    write(b);           // prints "88"
+
     return 0;
 }

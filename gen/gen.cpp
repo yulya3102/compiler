@@ -315,17 +315,18 @@ void gen_statement(frame & ctx, const ast::Read & st)
     undefined;
 }
 
-llvm::Value * gen_format_string(const ast::Type & type)
+llvm::Value * gen_format_string(frame & ctx, const ast::Type & type)
 {
     // TODO: check output type
-    return llvm::ConstantDataArray::getString(llvm::getGlobalContext(), "%d\n");
+    llvm::Value * format_ptr = ctx.module->getNamedValue("printf_int");
+    return format_ptr;
 }
 
 void gen_statement(frame & ctx, const ast::Write & st)
 {
     llvm::Value * f = ctx.module->getNamedValue("printf");
     llvm::Value * v = gen_rvalue(ctx, *st.expr);
-    llvm::Value * format_string = gen_format_string(ctx.get_type(*st.expr));
+    llvm::Value * format_string = gen_format_string(ctx, ctx.get_type(*st.expr));
     std::vector<llvm::Value *> args = { format_string, v };
 
     get_builder().CreateCall(f, args);
@@ -347,8 +348,14 @@ void gen_statement(frame & ctx, const ast::Statement & st)
 
 void gen_static_data(llvm::Module * module)
 {
-    llvm::FunctionType * type = llvm::TypeBuilder<int(char *, ...), false>::get(llvm::getGlobalContext());
+    llvm::FunctionType * type = llvm::TypeBuilder<int(...), false>::get(llvm::getGlobalContext());
     llvm::Function::Create(type, llvm::Function::ExternalLinkage, "printf", module);
+
+    llvm::Constant * printf_int_init
+            = llvm::ConstantDataArray::getString(llvm::getGlobalContext(), "%d\n");
+    llvm::Value * printf_int = new llvm::GlobalVariable(
+            *module, llvm::TypeBuilder<char[4], false>::get(llvm::getGlobalContext()), true,
+            llvm::GlobalVariable::InternalLinkage, printf_int_init, "printf_int");
 
     // TODO: declaration of scanf
 }

@@ -38,7 +38,7 @@ llvm::Type * gen_type(const ast::Type & type);
 llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry);
 
 void gen_static_data(llvm::Module * module);
-llvm::Value * gen_format_string(const ast::Type & type);
+llvm::Value * gen_format_string(frame & ctx, const ast::Type & type);
 
 void gen_entry(frame & ctx, const ast::Declaration & entry);
 void gen_entry(frame & ctx, const ast::Definition & entry);

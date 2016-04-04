@@ -6,10 +6,12 @@ int fact(int n)
     return n * fact(n - 1);
 }
 
-int main(int argc)
+int main()
 {
+    int n;
+    read(n);
     int res;
-    res = fact(argc);
+    res = fact(n);
     write(res);
     return 0;
 }

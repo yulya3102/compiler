@@ -340,7 +340,12 @@ void gen_statement(frame & ctx, const ast::While & st)
 
 void gen_statement(frame & ctx, const ast::Read & st)
 {
-    undefined;
+    llvm::Value * f = ctx.module->getNamedValue("scanf");
+    llvm::Value * v = ctx.get(st.varname).second.second;
+    llvm::Value * format_string = gen_format_string(ctx, ctx.get_type(st.varname));
+    std::vector<llvm::Value *> args = { format_string, v };
+
+    get_builder().CreateCall(f, args);
 }
 
 llvm::Value * gen_format_string(frame & ctx, const ast::Type & type)
@@ -385,7 +390,7 @@ void gen_static_data(llvm::Module * module)
             *module, llvm::TypeBuilder<char[4], false>::get(llvm::getGlobalContext()), true,
             llvm::GlobalVariable::InternalLinkage, printf_int_init, "printf_int");
 
-    // TODO: declaration of scanf
+    llvm::Function::Create(type, llvm::Function::ExternalLinkage, "scanf", module);
 }
 
 }

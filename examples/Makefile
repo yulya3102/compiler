@@ -4,5 +4,7 @@
 %.o: %.ir
 	llc -o=$@ --filetype=obj $<
 
+LCC ?= ../build/lcc
+
 %.ir: %.lc
-	../build/lcc $< 2> $@
+	$(LCC) $< 2> $@

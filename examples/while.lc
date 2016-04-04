@@ -3,6 +3,7 @@ int fib(int n);
 int main(int argc)
 {
     write(fib(argc));
+    return 0;
 }
 
 int fib(int n)

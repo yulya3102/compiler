@@ -161,13 +161,13 @@ statement:
           /* empty */   { $$ = new Statement(Skip()); }
         | var_def       { $$ = new Statement(*$1); }
         | name ASSIGN expr  { $$ = new Statement(Assignment{ yyla.location, *$1, *$3 }); }
-        | statement SEMICOLON statement { $$ = new Statement(Seq{yyla.location, shared($1), shared($3)}); }
         | IF LPAREN expr RPAREN statement ELSE statement { $$ = new Statement(If{yyla.location, *$3, shared($5), shared($7) }); }
         | CLPAREN statement CRPAREN { $$ = $2; }
         | WHILE LPAREN expr RPAREN statement { $$ = new Statement(While{yyla.location, *$3, shared($5)}); }
         | READ LPAREN name RPAREN { $$ = new Statement(Read{ yyla.location, *$3 }); }
         | WRITE LPAREN expr RPAREN { $$ = new Statement(Write{ yyla.location, shared($3) }); }
         | RETURN expr   { $$ = new Statement(Return{ yyla.location, shared($2) }); }
+        | statement SEMICOLON statement { $$ = new Statement(Seq{yyla.location, shared($1), shared($3)}); }
         ;
 
 expr:

@@ -35,6 +35,7 @@ struct PointerType
 
 struct FuncType
 {
+    location loc;
     std::shared_ptr<Type> rettype;
     std::list<Type> argtypes;
 };
@@ -43,12 +44,16 @@ struct Type
 {
     template <typename T>
     Type(const T & t)
-        : type(t)
+        : loc(t.loc)
+        , type(t)
     {}
 
     location loc;
     boost::variant<AtomType, PointerType, FuncType> type;
 };
+
+Type int_type(location loc = location(nullptr));
+Type bool_type(location loc = location(nullptr));
 
 /* Declarations */
 

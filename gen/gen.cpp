@@ -154,7 +154,7 @@ void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
 
 typed_value gen_expr(const frame & ctx, int64_t i)
 {
-    undefined;
+    return {ast::int_type(), {value_type::NO_LOAD, get_builder().getInt64(i)}};
 }
 
 typed_value gen_expr(const frame & ctx, bool b)
@@ -182,38 +182,35 @@ typed_value gen_expr(const frame & ctx, const ast::BinOperator & op)
     llvm::Value * lhs = gen_rvalue(ctx, *op.lhs);
     llvm::Value * rhs = gen_rvalue(ctx, *op.rhs);
 
-    undefined;
-    /*
     switch (op.oper.oper)
     {
         case ast::Oper::PLUS:
-            return {value_type::NO_LOAD, get_builder().CreateAdd(lhs, rhs)};
+            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateAdd(lhs, rhs)}};
         case ast::Oper::MINUS:
-            return {value_type::NO_LOAD, get_builder().CreateSub(lhs, rhs)};
+            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateSub(lhs, rhs)}};
         case ast::Oper::MULT:
-            return {value_type::NO_LOAD, get_builder().CreateMul(lhs, rhs)};
+            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateMul(lhs, rhs)}};
         case ast::Oper::DIV:
-            return {value_type::NO_LOAD, get_builder().CreateSDiv(lhs, rhs)};
+            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateSDiv(lhs, rhs)}};
         case ast::Oper::MOD:
-            return {value_type::NO_LOAD, get_builder().CreateSRem(lhs, rhs)};
+            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateSRem(lhs, rhs)}};
         case ast::Oper::GT:
-            return {value_type::NO_LOAD, get_builder().CreateICmpSGT(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSGT(lhs, rhs)}};
         case ast::Oper::LT:
-            return {value_type::NO_LOAD, get_builder().CreateICmpSLT(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSLT(lhs, rhs)}};
         case ast::Oper::EQ:
-            return {value_type::NO_LOAD, get_builder().CreateICmpEQ(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpEQ(lhs, rhs)}};
         case ast::Oper::GE:
-            return {value_type::NO_LOAD, get_builder().CreateICmpSGE(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSGE(lhs, rhs)}};
         case ast::Oper::LE:
-            return {value_type::NO_LOAD, get_builder().CreateICmpSLE(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSLE(lhs, rhs)}};
         case ast::Oper::NE:
-            return {value_type::NO_LOAD, get_builder().CreateICmpNE(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpNE(lhs, rhs)}};
         case ast::Oper::AND:
-            return {value_type::NO_LOAD, get_builder().CreateAnd(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateAnd(lhs, rhs)}};
         case ast::Oper::OR:
-            return {value_type::NO_LOAD, get_builder().CreateOr(lhs, rhs)};
+            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateOr(lhs, rhs)}};
     }
-    */
 
     throw std::runtime_error("unknown binary operator");
 }

@@ -63,11 +63,6 @@ namespace sem
 {
 
 /*
-ast::Type type(const ast::Expression & expr)
-{
-    undefined;
-}
-
 ast::Type type(const ast::Declaration & entry)
 {
     undefined;

@@ -232,4 +232,15 @@ std::string to_string(const Code & code)
 {
     return to_string(code.entries.cbegin(), code.entries.cend(), "\n\n");
 }
+
+Type int_type(location loc)
+{
+    return AtomType{loc, AtomType::INT};
+}
+
+Type bool_type(location loc)
+{
+    return AtomType{loc, AtomType::BOOL};
+}
+
 }

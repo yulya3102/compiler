@@ -9,9 +9,14 @@ int fact(int n)
 int main()
 {
     int n;
-    read(n);
     int res;
-    res = fact(n);
-    write(res);
+    {
+        while (true)
+        {
+            read(n);
+            res = fact(n);
+            write(res);
+        };
+    };
     return 0;
 }

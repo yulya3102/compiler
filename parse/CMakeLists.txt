@@ -14,7 +14,7 @@ add_custom_command(
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/l.y++
 )
 
-add_library(libparser SHARED
+add_library(parser SHARED
     ast/l.h ast/l.cpp
     parser.h parser.cpp
     lexer.h lexer.cpp

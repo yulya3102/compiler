@@ -1,4 +1,4 @@
-all: calls fact while
+all: calls fact
 
 %: %.o
 	gcc -o $@ $<

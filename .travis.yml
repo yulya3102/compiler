@@ -13,3 +13,4 @@ language: cpp
 script:
     - cmake .
     - make
+    - make -C examples test

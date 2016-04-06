@@ -9,7 +9,7 @@ all: calls fact
 %.s: %.ir
 	llc -o=$@ --filetype=asm $<
 
-LCC ?= ../build/lcc
+LCC ?= ../lcc
 
 %.ir: %.lc
 	$(LCC) $< 2> $@

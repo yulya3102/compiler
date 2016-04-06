@@ -233,12 +233,12 @@ std::string to_string(const Code & code)
     return to_string(code.entries.cbegin(), code.entries.cend(), "\n\n");
 }
 
-Type int_type(location loc)
+Type int_type(std::shared_ptr<location> loc)
 {
     return AtomType{loc, AtomType::INT};
 }
 
-Type bool_type(location loc)
+Type bool_type(std::shared_ptr<location> loc)
 {
     return AtomType{loc, AtomType::BOOL};
 }

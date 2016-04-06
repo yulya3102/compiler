@@ -136,49 +136,49 @@ fun_declaration:
         ;
 
 fun_signature:
-          type name LPAREN args RPAREN { $$ = new FuncDeclaration{yyla.location, *$1, *$2, *$4}; }
+          type name LPAREN args RPAREN { $$ = new FuncDeclaration{shared(&yyla.location), *$1, *$2, *$4}; }
         ;
           
 args:
           /* empty */           { $$ = new std::list<VarDeclaration>; }
-        | type name args_tail   { $3->push_front({yyla.location, *$1, *$2}); $$ = $3; }
+        | type name args_tail   { $3->push_front({shared(&yyla.location), *$1, *$2}); $$ = $3; }
         ;
 
 args_tail:
           /* empty */               { $$ = new std::list<VarDeclaration>; }
-        | COMMA type name args_tail { $4->push_front({yyla.location, *$2, *$3}); $$ = $4; }
+        | COMMA type name args_tail { $4->push_front({shared(&yyla.location), *$2, *$3}); $$ = $4; }
         ;
 
 var_def:
-          type name { $$ = new VarDeclaration{yyla.location, *$1, *$2}; }
+          type name { $$ = new VarDeclaration{shared(&yyla.location), *$1, *$2}; }
         ;
 
 fun_def:
-          fun_signature CLPAREN statements CRPAREN { $$ = new FuncDefinition{yyla.location, *$1, *$3}; }
+          fun_signature CLPAREN statements CRPAREN { $$ = new FuncDefinition{shared(&yyla.location), *$1, *$3}; }
         ;
 
 statements:
           /* empty */           { $$ = new Statement(Skip()); }
-        | statement statements  { $$ = new Statement(Seq{yyla.location, shared($1), shared($2)}); }
+        | statement statements  { $$ = new Statement(Seq{shared(&yyla.location), shared($1), shared($2)}); }
 
 statement:
           var_def SEMICOLON       { $$ = new Statement(*$1); }
-        | name ASSIGN expr SEMICOLON  { $$ = new Statement(Assignment{ yyla.location, *$1, *$3 }); }
-        | IF LPAREN expr RPAREN statement ELSE statement { $$ = new Statement(If{yyla.location, *$3, shared($5), shared($7) }); }
+        | name ASSIGN expr SEMICOLON  { $$ = new Statement(Assignment{ shared(&yyla.location), *$1, *$3 }); }
+        | IF LPAREN expr RPAREN statement ELSE statement { $$ = new Statement(If{shared(&yyla.location), *$3, shared($5), shared($7) }); }
         | CLPAREN statements CRPAREN { $$ = $2; }
-        | WHILE LPAREN expr RPAREN statement { $$ = new Statement(While{yyla.location, *$3, shared($5)}); }
-        | READ LPAREN name RPAREN SEMICOLON { $$ = new Statement(Read{ yyla.location, *$3 }); }
-        | WRITE LPAREN expr RPAREN SEMICOLON { $$ = new Statement(Write{ yyla.location, shared($3) }); }
-        | RETURN expr SEMICOLON   { $$ = new Statement(Return{ yyla.location, shared($2) }); }
+        | WHILE LPAREN expr RPAREN statement { $$ = new Statement(While{shared(&yyla.location), *$3, shared($5)}); }
+        | READ LPAREN name RPAREN SEMICOLON { $$ = new Statement(Read{ shared(&yyla.location), *$3 }); }
+        | WRITE LPAREN expr RPAREN SEMICOLON { $$ = new Statement(Write{ shared(&yyla.location), shared($3) }); }
+        | RETURN expr SEMICOLON   { $$ = new Statement(Return{ shared(&yyla.location), shared($2) }); }
         ;
 
 expr:
           bool               { $$ = new Expression(Value($1)); }
         | int                { $$ = new Expression(Value($1)); }
         | name               { $$ = new Expression(Value(*$1)); }
-        | expr operator expr { $$ = new Expression(BinOperator{yyla.location, shared($1), shared($3), *$2}); }
-        | MULT expr          { $$ = new Expression(Dereference{yyla.location, shared($2)}); }
-        | name LPAREN call_args RPAREN { $$ = new Expression(Call{yyla.location, *$1, *$3}); }
+        | expr operator expr { $$ = new Expression(BinOperator{shared(&yyla.location), shared($1), shared($3), *$2}); }
+        | MULT expr          { $$ = new Expression(Dereference{shared(&yyla.location), shared($2)}); }
+        | name LPAREN call_args RPAREN { $$ = new Expression(Call{shared(&yyla.location), *$1, *$3}); }
         ;
 
 call_args:
@@ -192,25 +192,25 @@ call_args_tail:
         ;
 
 operator:
-          PLUS  { $$ = new Oper{yyla.location, Oper::PLUS}; }
-        | MINUS { $$ = new Oper{yyla.location, Oper::MINUS}; }
-        | MULT  { $$ = new Oper{yyla.location, Oper::MULT}; }
-        | DIV   { $$ = new Oper{yyla.location, Oper::DIV}; }
-        | MOD   { $$ = new Oper{yyla.location, Oper::MOD}; }
-        | LT    { $$ = new Oper{yyla.location, Oper::LT}; }
-        | GT    { $$ = new Oper{yyla.location, Oper::GT}; }
-        | EQ    { $$ = new Oper{yyla.location, Oper::EQ}; }
-        | LE    { $$ = new Oper{yyla.location, Oper::LE}; }
-        | GE    { $$ = new Oper{yyla.location, Oper::GE}; }
-        | NE    { $$ = new Oper{yyla.location, Oper::NE}; }
-        | AND   { $$ = new Oper{yyla.location, Oper::AND}; }
-        | OR    { $$ = new Oper{yyla.location, Oper::OR}; }
+          PLUS  { $$ = new Oper{shared(&yyla.location), Oper::PLUS}; }
+        | MINUS { $$ = new Oper{shared(&yyla.location), Oper::MINUS}; }
+        | MULT  { $$ = new Oper{shared(&yyla.location), Oper::MULT}; }
+        | DIV   { $$ = new Oper{shared(&yyla.location), Oper::DIV}; }
+        | MOD   { $$ = new Oper{shared(&yyla.location), Oper::MOD}; }
+        | LT    { $$ = new Oper{shared(&yyla.location), Oper::LT}; }
+        | GT    { $$ = new Oper{shared(&yyla.location), Oper::GT}; }
+        | EQ    { $$ = new Oper{shared(&yyla.location), Oper::EQ}; }
+        | LE    { $$ = new Oper{shared(&yyla.location), Oper::LE}; }
+        | GE    { $$ = new Oper{shared(&yyla.location), Oper::GE}; }
+        | NE    { $$ = new Oper{shared(&yyla.location), Oper::NE}; }
+        | AND   { $$ = new Oper{shared(&yyla.location), Oper::AND}; }
+        | OR    { $$ = new Oper{shared(&yyla.location), Oper::OR}; }
         ;
 
 type:
-          INTEGER_TYPE          { $$ = new Type(AtomType{yyla.location, AtomType::INT}); }
-        | BOOLEAN_TYPE          { $$ = new Type(AtomType{yyla.location, AtomType::BOOL}); }
-        | type MULT             { $$ = new Type(PointerType({ yyla.location, shared($1) })); }
+          INTEGER_TYPE          { $$ = new Type(AtomType{shared(&yyla.location), AtomType::INT}); }
+        | BOOLEAN_TYPE          { $$ = new Type(AtomType{shared(&yyla.location), AtomType::BOOL}); }
+        | type MULT             { $$ = new Type(PointerType({ shared(&yyla.location), shared($1) })); }
         | LPAREN type RPAREN    { $$ = $2; }
         ;
 

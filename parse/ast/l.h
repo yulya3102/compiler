@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../location.hh"
-
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 
@@ -12,6 +10,8 @@
 namespace ast
 {
 
+class location;
+
 /* Types */
 struct AtomType
 {
@@ -21,7 +21,7 @@ struct AtomType
         INT
     };
 
-    location loc;
+    std::shared_ptr<location> loc;
     AtomTypeName type;
 };
 
@@ -29,13 +29,13 @@ struct Type;
 
 struct PointerType
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Type> type;
 };
 
 struct FuncType
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Type> rettype;
     std::list<Type> argtypes;
 };
@@ -48,25 +48,25 @@ struct Type
         , type(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<AtomType, PointerType, FuncType> type;
 };
 
-Type int_type(location loc = location(nullptr));
-Type bool_type(location loc = location(nullptr));
+Type int_type(std::shared_ptr<location> loc = nullptr);
+Type bool_type(std::shared_ptr<location> loc = nullptr);
 
 /* Declarations */
 
 struct VarDeclaration
 {
-    location loc;
+    std::shared_ptr<location> loc;
     Type type;
     std::string name;
 };
 
 struct FuncDeclaration
 {
-    location loc;
+    std::shared_ptr<location> loc;
     Type type;
     std::string name;
     std::list<VarDeclaration> arguments;
@@ -79,7 +79,7 @@ struct Declaration
         : declaration(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<FuncDeclaration> declaration;
 };
 
@@ -94,7 +94,7 @@ struct Const
         : constant(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<bool, int64_t> constant;
 };
 
@@ -105,7 +105,7 @@ struct Value
         : value(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<
         Const,          // bool or int
         std::string     // variable name
@@ -114,7 +114,7 @@ struct Value
 
 struct Call
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::string function;
     std::list<Expression> arguments;
 };
@@ -137,20 +137,20 @@ struct Oper
         AND,
         OR
     };
-    location loc;
+    std::shared_ptr<location> loc;
     OperName oper;
 };
 
 struct BinOperator
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Expression> lhs, rhs;
     Oper oper;
 };
 
 struct Dereference
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Expression> expr;
 };
 
@@ -161,7 +161,7 @@ struct Expression
         : expression(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<Value, BinOperator, Dereference, Call> expression;
 };
 
@@ -169,14 +169,14 @@ struct Expression
 
 struct VarDefinition
 {
-    location loc;
+    std::shared_ptr<location> loc;
     VarDeclaration declaration;
     Expression value;
 };
 
 struct Assignment
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::string varname;
     Expression value;
 };
@@ -185,44 +185,44 @@ struct Statement;
 
 struct If
 {
-    location loc;
+    std::shared_ptr<location> loc;
     Expression condition;
     std::shared_ptr<Statement> thenBody, elseBody;
 };
 
 struct While
 {
-    location loc;
+    std::shared_ptr<location> loc;
     Expression condition;
     std::shared_ptr<Statement> body;
 };
 
 struct Skip
 {
-    location loc;
+    std::shared_ptr<location> loc;
 };
 
 struct Seq
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Statement> first, second;
 };
 
 struct Read
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::string varname;
 };
 
 struct Write
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Expression> expr;
 };
 
 struct Return
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::shared_ptr<Expression> expr;
 };
 
@@ -233,7 +233,7 @@ struct Statement
         : statement(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<
         Skip,
         VarDeclaration,
@@ -251,7 +251,7 @@ struct Statement
 
 struct FuncDefinition
 {
-    location loc;
+    std::shared_ptr<location> loc;
     FuncDeclaration declaration;
     Statement statement;
 };
@@ -263,7 +263,7 @@ struct Definition
         : definition(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<VarDeclaration, FuncDefinition> definition;
 };
 
@@ -274,13 +274,13 @@ struct CodeEntry
         : entry(t)
     {}
 
-    location loc;
+    std::shared_ptr<location> loc;
     boost::variant<Declaration, Definition> entry;
 };
 
 struct Code
 {
-    location loc;
+    std::shared_ptr<location> loc;
     std::list<CodeEntry> entries;
 };
 

@@ -13,4 +13,4 @@ language: cpp
 script:
     - cmake .
     - make
-    - make -C examples test
+    - LLC=llc-3.7 make -C examples test

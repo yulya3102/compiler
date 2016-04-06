@@ -1,13 +1,15 @@
 examples: scope fact
 
+LLC ?= llc
+
 %: %.o
 	gcc -o $@ $<
 
 %.o: %.ir
-	llc -o=$@ --filetype=obj $<
+	$(LLC) -o=$@ --filetype=obj $<
 
 %.s: %.ir
-	llc -o=$@ --filetype=asm $<
+	$(LLC) -o=$@ --filetype=asm $<
 
 LCC ?= ../lcc
 

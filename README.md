@@ -1,4 +1,5 @@
 Compiler from simple C-like language to LLVM IR.
+[![Build Status](https://travis-ci.org/yulya3102/compiler.svg?branch=master)](https://travis-ci.org/yulya3102/compiler)
 
 ## Build dependencies
 

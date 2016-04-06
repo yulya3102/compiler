@@ -1,4 +1,4 @@
-all: calls fact
+all: scope fact
 
 %: %.o
 	gcc -o $@ $<

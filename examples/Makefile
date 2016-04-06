@@ -1,4 +1,4 @@
-all: scope fact
+examples: scope fact
 
 %: %.o
 	gcc -o $@ $<
@@ -16,6 +16,6 @@ LCC ?= ../lcc
 
 .PHONY: test
 
-test: all
+test: examples
 	./scope.test && echo "OK"
 	./fact.test  && echo "OK"

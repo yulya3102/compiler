@@ -12,4 +12,4 @@ all: scope fact
 LCC ?= ../lcc
 
 %.ir: %.lc
-	$(LCC) $< > $@
+	$(LCC) $< $@

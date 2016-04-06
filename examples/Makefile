@@ -13,3 +13,9 @@ LCC ?= ../lcc
 
 %.ir: %.lc
 	$(LCC) $< $@
+
+.PHONY: test
+
+test: all
+	./scope.test && echo "OK"
+	./fact.test  && echo "OK"

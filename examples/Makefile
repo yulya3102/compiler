@@ -1,4 +1,9 @@
-examples: scope fact
+EXAMPLES = scope.lc fact.lc
+OBJECTS = $(patsubst %.lc,%.o,$(EXAMPLES))
+TRANSLATED = $(patsubst %.lc,%.ir,$(EXAMPLES))
+RESULTS = $(patsubst %.lc,%,$(EXAMPLES))
+
+examples: $(RESULTS)
 
 LLC ?= llc
 
@@ -21,3 +26,6 @@ LCC ?= ../lcc
 test: examples
 	./scope.test && echo "OK"
 	./fact.test  && echo "OK"
+
+clean:
+	rm -f $(OBJECTS) $(TRANSLATED) $(RESULTS)

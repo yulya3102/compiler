@@ -14,6 +14,6 @@ add_subdirectory(parse)
 add_subdirectory(sem)
 add_subdirectory(gen)
 
-add_executable(lcc main.cpp sem/ctx.h sem/types.h sem/l.h sem/l.cpp)
+add_executable(lcc main.cpp)
 llvm_map_components_to_libnames(llvm_libs support core)
-target_link_libraries(lcc parser gen utils ${llvm_libs})
+target_link_libraries(lcc parser gen utils sem ${llvm_libs})

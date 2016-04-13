@@ -14,6 +14,16 @@
 namespace
 {
 struct top {};
+
+bool operator==(top, top)
+{
+    return true;
+}
+
+bool operator!=(top, top)
+{
+    return false;
+}
 }
 /*
 struct context

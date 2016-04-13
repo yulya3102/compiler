@@ -15,7 +15,11 @@ struct context
 
     void declare(T t, const std::string & name)
     {
-        locals.emplace(name, t);
+        auto it = locals.find(name);
+        if (it == locals.end())
+            locals.emplace(name, t);
+        else if (it->second != t)
+            throw std::runtime_error("symbol '" + name + "' redeclared with different value");
     }
 
     bool is_declared(const std::string & name)

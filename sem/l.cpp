@@ -3,6 +3,7 @@
 
 #include <utils/undefined.h>
 #include <utils/fmap.h>
+#include <utils/top.h>
 
 #include <boost/variant.hpp>
 
@@ -11,20 +12,6 @@
 #include <iostream>
 #include <sstream>
 
-namespace
-{
-struct top {};
-
-bool operator==(top, top)
-{
-    return true;
-}
-
-bool operator!=(top, top)
-{
-    return false;
-}
-}
 /*
 struct context
 {

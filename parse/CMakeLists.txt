@@ -15,7 +15,7 @@ add_custom_command(
 )
 
 add_library(parser SHARED
-    ast/l.h ast/l.cpp ast/types.h
+    ast/l.h ast/l.cpp ast/types.h ast/expr.h
     parser.h parser.cpp
     lexer.h lexer.cpp
     l.h

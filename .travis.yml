@@ -1,10 +1,11 @@
 sudo: required
 before_install:
     - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    - sudo add-apt-repository ppa:george-edison55/precise-backports -y
     - sudo add-apt-repository "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main"
     - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -
     - sudo apt-get -qq update
-    - sudo apt-get install -y g++-4.9 llvm-3.7-dev libedit-dev
+    - sudo apt-get install -y g++-4.9 llvm-3.7-dev libedit-dev cmake
     - export CXX="g++-4.9" CC="gcc-4.9"
     - sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ xenial main"
     - sudo apt-get -qq update

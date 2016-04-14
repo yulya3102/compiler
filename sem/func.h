@@ -6,15 +6,15 @@
 #include <parse/ast/types.h>
 
 #include <utils/fmap.h>
+#include <utils/top.h>
 
 namespace sem
 {
-template <typename T>
-struct function_ctx : typed_ctx<T>
+struct function_ctx : typed_ctx<top>
 {
     function_ctx(const ast::Type & return_type,
-                 const typed_ctx<T> * outer_scope = nullptr)
-        : typed_ctx<T>(outer_scope)
+                 const typed_ctx<top> * outer_scope = nullptr)
+        : typed_ctx<top>(outer_scope)
         , return_type(return_type)
     {}
 

@@ -22,6 +22,12 @@ struct context
             throw std::runtime_error("symbol '" + name + "' redeclared with different value");
     }
 
+    bool is_locally_declared(const std::string & name)
+    {
+        auto r = maybe_get_local(name);
+        return static_cast<bool>(r);
+    }
+
     bool is_declared(const std::string & name)
     {
         boost::optional<T> res = maybe_get(name);
@@ -37,12 +43,19 @@ struct context
     }
 
 private:
-    boost::optional<T> maybe_get(const std::string & name) const
+    boost::optional<T> maybe_get_local(const std::string & name) const
     {
         auto it = locals.find(name);
-
         if (it != locals.end())
             return it->second;
+        return boost::none;
+    }
+
+    boost::optional<T> maybe_get(const std::string & name) const
+    {
+        auto r = maybe_get_local(name);
+        if (r)
+            return *r;
 
         if (outer_scope)
             return outer_scope->get(name);

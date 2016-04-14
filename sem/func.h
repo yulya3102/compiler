@@ -18,9 +18,7 @@ struct function_ctx : typed_ctx<T>
     {}
 
     void verify_statement(const ast::Skip & st)
-    {
-        undefined;
-    }
+    {}
 
     void verify_statement(const ast::VarDeclaration & st)
     {

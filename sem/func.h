@@ -23,12 +23,17 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::VarDeclaration & st)
     {
-        undefined;
+        if (this->is_locally_declared(st.name))
+            throw semantic_error(st.loc, "variable '" + st.name + "' was already declared");
+        this->declare({st.type, top()}, st.name);
     }
 
     void verify_statement(const ast::Assignment & st)
     {
-        undefined;
+        auto var_type = this->get_type(st.varname);
+        auto expr_type = this->get_type(st.value);
+        if (var_type != expr_type)
+            throw semantic_error(st.loc, "variable type does not match assigned expression type");
     }
 
     void verify_statement(const ast::Seq & st)
@@ -54,7 +59,8 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::Write & st)
     {
-        undefined;
+        if (this->get_type(*st.expr) != ast::int_type())
+            throw semantic_error(st.loc, "write() argument must have integer type");
     }
 
     void verify_statement(const ast::Return & st)

@@ -43,17 +43,20 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::If & st)
     {
-        undefined;
+        expect_type(this->get_type(st.condition), ast::bool_type(), "condition must have boolean type");
+        verify_statement(*st.thenBody);
+        verify_statement(*st.elseBody);
     }
 
     void verify_statement(const ast::While & st)
     {
-        undefined;
+        expect_type(this->get_type(st.condition), ast::bool_type(), "condition must have boolean type");
+        verify_statement(*st.body);
     }
 
     void verify_statement(const ast::Read & st)
     {
-        undefined;
+        expect_type(this->get_type(st.varname), ast::int_type(), "read() argument must have integer type");
     }
 
     void verify_statement(const ast::Write & st)

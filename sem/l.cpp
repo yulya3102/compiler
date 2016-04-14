@@ -16,9 +16,11 @@
 
 namespace sem
 {
+std::string name(const ast::FuncDeclaration & entry);
+
 std::string name(const ast::Declaration & entry)
 {
-    undefined;
+    return fmap([], x, name(x), entry.declaration);
 }
 
 std::string name(const ast::VarDeclaration & entry)
@@ -63,7 +65,10 @@ bool is_definition(const ast::CodeEntry & entry)
 
 void verify(const typed_ctx<top> & ctx, const ast::Declaration & entry)
 {
-    undefined;
+    // Correctness of redeclaration was already checked in verify(code)
+    // and entry was already declared
+
+    // Do nothing
 }
 
 void verify(const typed_ctx<top> & ctx, const ast::VarDeclaration & entry)

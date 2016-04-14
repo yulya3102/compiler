@@ -4,4 +4,4 @@ add_library(sem SHARED
     l.h l.cpp
 )
 
-target_link_libraries(sem utils parser)
+target_link_libraries(sem utils ast)

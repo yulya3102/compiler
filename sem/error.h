@@ -1,6 +1,6 @@
 #pragma once
 
-#include <parse/l.h>
+#include <parse/location.hh>
 
 #include <stdexcept>
 #include <memory>

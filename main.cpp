@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 
     ast::parser p;
     ast::Code code = p.parse(in, std::cout);
-    // sem::verify(code);
+    sem::verify(code);
     std::unique_ptr<llvm::Module> module = codegen::generate(code, argv[1]);
 
     std::error_code err;

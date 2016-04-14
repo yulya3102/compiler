@@ -14,40 +14,6 @@
 
 namespace sem
 {
-
-ast::Type type(const ast::Declaration & entry)
-{
-    undefined;
-}
-
-ast::Type type(const ast::VarDeclaration & entry)
-{
-    return entry.type;
-}
-
-ast::Type type(const ast::FuncDeclaration & entry)
-{
-    std::list<ast::Type> args;
-    for (auto & arg : entry.arguments)
-        args.push_back(type(arg));
-    return ast::FuncType{entry.loc, std::make_shared<ast::Type>(entry.type), args};
-}
-
-ast::Type type(const ast::FuncDefinition & entry)
-{
-    return type(entry.declaration);
-}
-
-ast::Type type(const ast::Definition & entry)
-{
-    return fmap([], x, type(x), entry.definition);
-}
-
-ast::Type type(const ast::CodeEntry & entry)
-{
-    return fmap([], x, type(x), entry.entry);
-}
-
 std::string name(const ast::Declaration & entry)
 {
     undefined;
@@ -176,7 +142,7 @@ void verify(const ast::Code & code)
     for (auto entry : code.entries)
     {
         auto entry_name = name(entry);
-        ctx.declare({ type(entry), top() }, entry_name);
+        ctx.declare({ ctx.get_type(entry), top() }, entry_name);
         if (is_definition(entry))
         {
             if (definitions.is_declared(entry_name))

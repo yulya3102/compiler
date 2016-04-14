@@ -70,5 +70,30 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
         std::shared_ptr<ast::Type> rettype(new ast::Type(expr.type));
         return ast::FuncType{expr.loc, rettype, args};
     }
+
+    ast::Type get_type(const ast::Declaration & entry) const
+    {
+        return fmap([this], x, this->get_type(x), entry.declaration);
+    }
+
+    ast::Type get_type(const ast::VarDeclaration & entry) const
+    {
+        return entry.type;
+    }
+
+    ast::Type get_type(const ast::FuncDefinition & entry) const
+    {
+        return this->get_type(entry.declaration);
+    }
+
+    ast::Type get_type(const ast::Definition & entry) const
+    {
+        return fmap([this], x, this->get_type(x), entry.definition);
+    }
+
+    ast::Type get_type(const ast::CodeEntry & entry) const
+    {
+        return fmap([this], x, this->get_type(x), entry.entry);
+    }
 };
 }

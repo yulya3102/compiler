@@ -12,50 +12,6 @@
 #include <iostream>
 #include <sstream>
 
-/*
-struct context
-{
-    void declare(const std::string & name, const ast::Type & type,
-                 const ast::location & loc)
-    {
-        if (declared.find(name) == declared.end())
-        {
-            declared.emplace(name, type);
-            return;
-        }
-
-        if (declared.at(name) == type)
-            return;
-
-        std::stringstream descss;
-        descss << "error at " << loc
-               << ": symbol '" << name
-               << "' redeclared with different type";
-        throw std::runtime_error(descss.str());
-    }
-
-    void define(const std::string & name, const ast::Type & type,
-                const ast::location & loc)
-    {
-        declare(name, type, loc);
-
-        if (defined.find(name) == defined.end())
-            return;
-
-        std::stringstream descss;
-        descss << "error at " << loc
-               << ": symbol '" << name
-               << "' was already defined";
-        throw std::runtime_error(descss.str());
-    }
-
-    std::unordered_map<std::string, ast::Type> declared;
-    std::unordered_set<std::string> defined;
-    context * parent;
-};
-}
-*/
-
 namespace sem
 {
 

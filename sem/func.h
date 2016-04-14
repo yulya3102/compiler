@@ -60,7 +60,8 @@ struct function_ctx : typed_ctx<T>
 
     void verify_statement(const ast::Return & st)
     {
-        undefined;
+        if (return_type != this->get_type(*st.expr))
+            throw std::runtime_error("function return type does not match return expression type");
     }
 
     void verify_statement(const ast::Statement & st)

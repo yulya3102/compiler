@@ -1,6 +1,7 @@
 #include "l.h"
 #include "types.h"
 #include "func.h"
+#include "error.h"
 
 #include <utils/undefined.h>
 #include <utils/fmap.h>
@@ -102,7 +103,7 @@ void verify(const ast::Code & code)
         if (is_definition(entry))
         {
             if (definitions.is_declared(entry_name))
-                throw std::runtime_error("entry '" + entry_name + "' was already defined");
+                throw semantic_error(entry.loc, "entry '" + entry_name + "' was already defined");
             else
                 definitions.declare(top(), entry_name);
         }

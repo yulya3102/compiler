@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "error.h"
 
 #include <parse/ast/types.h>
 
@@ -59,7 +60,7 @@ struct function_ctx : typed_ctx<T>
     void verify_statement(const ast::Return & st)
     {
         if (return_type != this->get_type(*st.expr))
-            throw std::runtime_error("function return type does not match return expression type");
+            throw semantic_error(st.loc, "function return type does not match return expression type");
     }
 
     void verify_statement(const ast::Statement & st)

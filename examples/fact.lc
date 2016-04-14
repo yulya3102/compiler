@@ -1,10 +1,4 @@
-int fact(int n)
-{
-    if (n < 2)
-        return 1;
-    else {}
-    return n * fact(n - 1);
-}
+int fact(int n);
 
 int main()
 {
@@ -17,4 +11,12 @@ int main()
         write(res);
     }
     return 0;
+}
+
+int fact(int n)
+{
+    if (n < 2)
+        return 1;
+    else {}
+    return n * fact(n - 1);
 }

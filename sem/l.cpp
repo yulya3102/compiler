@@ -216,16 +216,19 @@ void verify(const typed_ctx<top> & ctx, const ast::CodeEntry & entry)
 void verify(const ast::Code & code)
 {
     typed_ctx<top> ctx;
+    context<top> definitions;
     for (auto entry : code.entries)
     {
-        ctx.declare({ type(entry), top() }, name(entry));
+        auto entry_name = name(entry);
+        ctx.declare({ type(entry), top() }, entry_name);
         if (is_definition(entry))
         {
-            // TODO: check if name was already defined
-            // if it was, throw exception
-            // else define it
-            undefined;
+            if (definitions.is_declared(entry_name))
+                throw std::runtime_error("entry '" + entry_name + "' was already defined");
+            else
+                definitions.declare(top(), entry_name);
         }
+        verify(ctx, entry);
     }
 
 

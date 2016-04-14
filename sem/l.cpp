@@ -67,7 +67,10 @@ void verify(const typed_ctx<top> & ctx, const ast::Declaration & entry)
 
 void verify(const typed_ctx<top> & ctx, const ast::VarDeclaration & entry)
 {
-    undefined;
+    // Correctness of redeclaration was already checked in verify(code)
+    // and entry was already declared
+
+    // Do nothing
 }
 
 void verify(const typed_ctx<top> & ctx, const ast::FuncDefinition & entry)

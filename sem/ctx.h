@@ -9,7 +9,7 @@ namespace sem
 template <typename T>
 struct context
 {
-    context(context * outer_scope = nullptr)
+    context(const context * outer_scope = nullptr)
         : outer_scope(outer_scope)
     {}
 
@@ -51,6 +51,6 @@ private:
     }
 
     std::unordered_map<std::string, T> locals;
-    context * outer_scope;
+    const context * outer_scope;
 };
 }

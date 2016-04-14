@@ -12,7 +12,7 @@ namespace sem
 template <typename T>
 struct typed_ctx : context<std::pair<ast::Type, T>>
 {
-    typed_ctx(typed_ctx * outer_scope = nullptr)
+    typed_ctx(const typed_ctx * outer_scope = nullptr)
         : context<std::pair<ast::Type, T>>(outer_scope)
     {}
 

@@ -119,7 +119,7 @@ void verify(const typed_ctx<top> & ctx, const ast::Statement & entry)
 
 void verify(const typed_ctx<top> & ctx, const ast::FuncDefinition & entry)
 {
-    typed_ctx<top> inner_scope(ctx);
+    typed_ctx<top> inner_scope(&ctx);
     for (auto & arg : entry.declaration.arguments)
         inner_scope.declare({arg.type, top()}, arg.name);
     return verify(inner_scope, entry.statement);

@@ -1,5 +1,6 @@
 add_library(sem SHARED
-    ctx.h types.h func.h error.h
+    ctx.h func.h error.h
+    types.h types.cpp
     l.h l.cpp
 )
 

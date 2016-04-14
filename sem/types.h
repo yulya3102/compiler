@@ -9,6 +9,8 @@
 
 namespace sem
 {
+void expect_type(const ast::Type & real, const ast::Type & expected, const std::string & error_message);
+
 template <typename T>
 struct typed_ctx : context<std::pair<ast::Type, T>>
 {

@@ -1,5 +1,6 @@
 #include "l.h"
 #include "types.h"
+#include "func.h"
 
 #include <utils/undefined.h>
 #include <utils/fmap.h>
@@ -69,60 +70,12 @@ void verify(const typed_ctx<top> & ctx, const ast::VarDeclaration & entry)
     undefined;
 }
 
-void verify(const typed_ctx<top> & ctx, const ast::Statement & entry);
-
-void verify(const typed_ctx<top> & ctx, const ast::Skip & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::Assignment & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::Seq & entry)
-{
-    verify(ctx, *entry.first);
-    verify(ctx, *entry.second);
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::If & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::While & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::Read & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::Write & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::Return & entry)
-{
-    undefined;
-}
-
-void verify(const typed_ctx<top> & ctx, const ast::Statement & entry)
-{
-    return fmap([&ctx], x, verify(ctx, x), entry.statement);
-}
-
 void verify(const typed_ctx<top> & ctx, const ast::FuncDefinition & entry)
 {
-    typed_ctx<top> inner_scope(&ctx);
+    function_ctx<top> inner_scope(entry.declaration.type, &ctx);
     for (auto & arg : entry.declaration.arguments)
         inner_scope.declare({arg.type, top()}, arg.name);
-    return verify(inner_scope, entry.statement);
+    inner_scope.verify_statement(entry.statement);
 }
 
 void verify(const typed_ctx<top> & ctx, const ast::Definition & entry)

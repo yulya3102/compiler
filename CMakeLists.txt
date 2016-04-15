@@ -15,3 +15,4 @@ add_subdirectory(sem)
 add_subdirectory(gen)
 add_subdirectory(lcc)
 
+add_subdirectory(testing)

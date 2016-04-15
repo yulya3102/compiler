@@ -12,10 +12,12 @@ void try_compile(const std::string & code)
     lcc::compile(in, out, "try_compile");
 }
 
+#define EXPECT_SEMANTIC_ERROR(code) EXPECT_THROW(try_compile(code), sem::semantic_error)
+
 TEST(semantic, assignment_type_mismatch)
 {
-    EXPECT_THROW(try_compile("int main() { int a; a = true; }"), sem::semantic_error);
-    EXPECT_THROW(try_compile("int main() { _Bool a; a = 1; }"), sem::semantic_error);
+    EXPECT_SEMANTIC_ERROR("int main() { int a; a = true; }");
+    EXPECT_SEMANTIC_ERROR("int main() { _Bool a; a = 1; }");
 }
 
 int main(int argc, char ** argv)

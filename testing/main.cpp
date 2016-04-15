@@ -9,7 +9,7 @@ void try_compile(const std::string & code)
 {
     std::stringstream in(code);
     llvm::raw_null_ostream out;
-    lcc::compile(in, out, "try_compile");
+    lcc::compile_llvm(in, out, "try_compile");
 }
 
 #define EXPECT_SEMANTIC_ERROR(code) EXPECT_THROW(try_compile(code), sem::semantic_error)

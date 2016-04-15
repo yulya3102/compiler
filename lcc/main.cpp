@@ -17,5 +17,5 @@ int main(int argc, char ** argv)
     std::ifstream in(argv[1]);
     std::error_code err;
     llvm::raw_fd_ostream out(argv[2], err, llvm::sys::fs::OpenFlags::F_None);
-    lcc::compile(in, out, argv[1]);
+    lcc::compile_llvm(in, out, argv[1]);
 }

@@ -5,5 +5,5 @@
 
 namespace lcc
 {
-void compile(std::istream & in, llvm::raw_ostream & out, const std::string & module_name);
+void compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::string & module_name);
 }

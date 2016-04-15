@@ -7,7 +7,7 @@
 
 #include <llvm/IR/Module.h>
 
-void lcc::compile(std::istream & in, llvm::raw_ostream & out, const std::string & module_name)
+void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::string & module_name)
 {
     ast::parser p;
     ast::Code code = p.parse(in, std::cout);

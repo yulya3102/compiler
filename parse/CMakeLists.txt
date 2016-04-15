@@ -14,12 +14,12 @@ add_custom_command(
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/l.y++
 )
 
-add_library(ast SHARED
+add_library(ast
     ast/l.h ast/l.cpp ast/types.h ast/expr.h
     location.hh
 )
 
-add_library(parser SHARED
+add_library(parser
     parser.h parser.cpp
     lexer.h lexer.cpp
     l.h

@@ -1,4 +1,4 @@
-add_library(sem SHARED
+add_library(sem
     ctx.h func.h error.h
     types.h types.cpp
     l.h l.cpp

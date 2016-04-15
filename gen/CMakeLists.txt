@@ -1,3 +1,3 @@
-add_library(gen SHARED
+add_library(gen
     gen.h gen.cpp
 )

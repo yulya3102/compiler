@@ -15,7 +15,7 @@ add_custom_command(
 )
 
 add_library(ast
-    ast/l.h ast/l.cpp ast/types.h ast/expr.h
+    ast/l.h ast/l.cpp ast/types.h ast/expr.h ast/decl.h ast/statement.h
     location.hh
 )
 

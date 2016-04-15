@@ -16,7 +16,7 @@ LLC ?= llc
 %.s: %.ir
 	$(LLC) -o=$@ --filetype=asm $<
 
-LCC ?= ../lcc
+LCC ?= ../lcc/lcc
 
 %.ir: %.lc
 	$(LCC) $< $@

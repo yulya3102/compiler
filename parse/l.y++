@@ -37,7 +37,6 @@ std::shared_ptr<T> shared(T * ptr)
     Definition * definition;
     VarDeclaration * var_declaration;
     FuncDeclaration * fun_declaration;
-    VarDefinition * var_definition;
     FuncDefinition * fun_definition;
     Type * type;
     std::list<VarDeclaration> * args;

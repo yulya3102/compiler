@@ -10,13 +10,6 @@ namespace ast
 {
 /* Statements */
 
-struct VarDefinition
-{
-    std::shared_ptr<location> loc;
-    VarDeclaration declaration;
-    Expression value;
-};
-
 struct Assignment
 {
     std::shared_ptr<location> loc;

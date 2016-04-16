@@ -73,6 +73,7 @@ std::string to_string(const Call &);
 std::string to_string(Oper);
 std::string to_string(const BinOperator &);
 std::string to_string(const Dereference & d);
+std::string to_string(const Address & d);
 std::string to_string(const Assignment &);
 std::string to_string(const Statement &);
 std::string to_string(const If &);

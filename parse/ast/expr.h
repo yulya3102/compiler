@@ -80,6 +80,12 @@ struct Dereference
     std::shared_ptr<Expression> expr;
 };
 
+struct Address
+{
+    std::shared_ptr<location> loc;
+    std::shared_ptr<Expression> expr;
+};
+
 struct Expression
 {
     template <typename T>
@@ -88,6 +94,6 @@ struct Expression
     {}
 
     std::shared_ptr<location> loc;
-    boost::variant<Value, BinOperator, Dereference, Call> expression;
+    boost::variant<Value, BinOperator, Dereference, Address, Call> expression;
 };
 }

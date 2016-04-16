@@ -53,6 +53,7 @@ typed_value gen_expr(const frame & ctx, const std::string & v);
 typed_value gen_expr(const frame & ctx, const ast::Value & v);
 typed_value gen_expr(const frame & ctx, const ast::BinOperator & op);
 typed_value gen_expr(const frame & ctx, const ast::Dereference & deref);
+typed_value gen_expr(const frame & ctx, const ast::Address & addr);
 typed_value gen_expr(const frame & ctx, const ast::Call & call);
 typed_value gen_expr(const frame & ctx, const ast::Expression & expr);
 

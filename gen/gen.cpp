@@ -393,4 +393,9 @@ void gen_static_data(llvm::Module * module)
     llvm::Function::Create(type, llvm::Function::ExternalLinkage, "scanf", module);
 }
 
+typed_value gen_expr(const frame & ctx, const ast::Address & addr)
+{
+    undefined;
+}
+
 }

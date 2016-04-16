@@ -243,4 +243,9 @@ Type bool_type(std::shared_ptr<location> loc)
     return AtomType{loc, AtomType::BOOL};
 }
 
+std::string to_string(const Address & d)
+{
+    return "&" + to_string(*d.expr);
+}
+
 }

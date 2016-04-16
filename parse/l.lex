@@ -42,6 +42,7 @@ comment     "//".*\n
 "read"      { return token::READ; }
 "write"     { return token::WRITE; }
 "return"    { return token::RETURN; }
+"&"         { return token::ADDRESS; }
 "+"         { return token::PLUS; }
 "-"         { return token::MINUS; }
 "*"         { return token::MULT; }

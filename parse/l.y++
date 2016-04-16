@@ -60,6 +60,7 @@ std::shared_ptr<T> shared(T * ptr)
 %token              READ
 %token              WRITE
 %token              RETURN
+%token              ADDRESS
 %token              PLUS
 %token              MINUS
 %token              MULT
@@ -179,6 +180,7 @@ expr:
         | name               { $$ = new Expression(Value(*$1)); }
         | expr operator expr { $$ = new Expression(BinOperator{shared(&@$), shared($1), shared($3), *$2}); }
         | MULT expr          { $$ = new Expression(Dereference{shared(&@$), shared($2)}); }
+        | ADDRESS expr       { $$ = new Expression(Address{shared(&@$), shared($2)}); }
         | name LPAREN call_args RPAREN { $$ = new Expression(Call{shared(&@$), *$1, *$3}); }
         ;
 

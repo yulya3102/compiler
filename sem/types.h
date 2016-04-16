@@ -105,6 +105,11 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
         undefined;
     }
 
+    ast::Type get_type(const ast::Address & expr) const
+    {
+        undefined;
+    }
+
     ast::Type get_type(const ast::Call & expr) const
     {
         ast::Type func_type = this->get(expr.function).first;

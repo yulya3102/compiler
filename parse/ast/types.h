@@ -50,4 +50,5 @@ struct Type
 
 Type int_type(std::shared_ptr<location> loc = nullptr);
 Type bool_type(std::shared_ptr<location> loc = nullptr);
+Type pointer_type(const Type & type, std::shared_ptr<location> loc = nullptr);
 }

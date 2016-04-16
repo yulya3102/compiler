@@ -1,11 +1,14 @@
 #pragma once
 
 #include "ctx.h"
+#include "error.h"
 
 #include <parse/ast/l.h>
 
 #include <utils/undefined.h>
 #include <utils/fmap.h>
+
+#include <boost/variant/get.hpp>
 
 namespace sem
 {
@@ -102,12 +105,18 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
 
     ast::Type get_type(const ast::Dereference & expr) const
     {
-        undefined;
+        auto type = this->get_type(*expr.expr);
+
+        auto dereferenced_type = boost::get<ast::PointerType>(&type.type);
+        if (!dereferenced_type)
+            throw semantic_error(expr.loc, "dereference of non-pointer type is illegal");
+
+        return *(dereferenced_type->type);
     }
 
     ast::Type get_type(const ast::Address & expr) const
     {
-        undefined;
+        return ast::pointer_type(this->get_type(*expr.expr), expr.loc);
     }
 
     ast::Type get_type(const ast::Call & expr) const

@@ -61,7 +61,8 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::Write & st)
     {
-        expect_type(this->get_type(*st.expr), ast::int_type(), "write() argument must have integer type");
+        auto real = this->get_type(*st.expr);
+        expect_type(real, ast::int_type(), "write() argument must have integer type");
     }
 
     void verify_statement(const ast::Return & st)

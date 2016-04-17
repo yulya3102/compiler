@@ -31,7 +31,7 @@ llvm::IRBuilder<> & get_builder()
 template <typename T>
 llvm::Value * gen_rvalue(const codegen::frame & ctx, T expr)
 {
-    codegen::typed_value v = codegen::gen_expr(ctx, expr);
+    codegen::typed_value v = ctx.gen_expr(expr);
     if (v.second.first == codegen::value_type::LOAD)
         return get_builder().CreateLoad(v.second.second);
     return v.second.second;
@@ -145,7 +145,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
             inner_scope.declare({proto_it->type, {value_type::NO_LOAD, &*arg_it}}, proto_it->name);
         }
     }
-    gen_statement(inner_scope, entry.statement);
+    inner_scope.gen_statement(entry.statement);
     get_builder().CreateUnreachable();
 
     if (llvm::verifyFunction(*f, &llvm::errs()))
@@ -181,35 +181,35 @@ void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
     gen_func_declaration(ctx, entry);
 }
 
-typed_value gen_expr(const frame & ctx, int64_t i)
+typed_value frame::gen_expr(int64_t i) const
 {
     return {ast::int_type(), {value_type::NO_LOAD, get_builder().getInt64(i)}};
 }
 
-typed_value gen_expr(const frame & ctx, bool b)
+typed_value frame::gen_expr(bool b) const
 {
     return {ast::bool_type(), {value_type::NO_LOAD, get_builder().getInt1(b)}};
 }
 
-typed_value gen_expr(const frame & ctx, const ast::Const & v)
+typed_value frame::gen_expr(const ast::Const & v) const
 {
-    return fmap([&ctx], x, gen_expr(ctx, x), v.constant);
+    return fmap([this], x, this->gen_expr(x), v.constant);
 }
 
-typed_value gen_expr(const frame & ctx, const std::string & v)
+typed_value frame::gen_expr(const std::string & v) const
 {
-    return ctx.get(v);
+    return this->get(v);
 }
 
-typed_value gen_expr(const frame & ctx, const ast::Value & v)
+typed_value frame::gen_expr(const ast::Value & v) const
 {
-    return fmap([&ctx], x, gen_expr(ctx, x), v.value);
+    return fmap([this], x, this->gen_expr(x), v.value);
 }
 
-typed_value gen_expr(const frame & ctx, const ast::BinOperator & op)
+typed_value frame::gen_expr(const ast::BinOperator & op) const
 {
-    llvm::Value * lhs = gen_rvalue(ctx, *op.lhs);
-    llvm::Value * rhs = gen_rvalue(ctx, *op.rhs);
+    llvm::Value * lhs = gen_rvalue(*this, *op.lhs);
+    llvm::Value * rhs = gen_rvalue(*this, *op.rhs);
 
     switch (op.oper.oper)
     {
@@ -244,52 +244,52 @@ typed_value gen_expr(const frame & ctx, const ast::BinOperator & op)
     throw std::runtime_error("unknown binary operator");
 }
 
-typed_value gen_expr(const frame & ctx, const ast::Dereference & deref)
+typed_value frame::gen_expr(const ast::Dereference & deref) const
 {
     throw std::runtime_error("dereference: not implemented");
 }
 
-typed_value gen_expr(const frame & ctx, const ast::Call & call)
+typed_value frame::gen_expr(const ast::Call & call) const
 {
-    typed_value f = ctx.get(call.function);
+    typed_value f = this->get(call.function);
 
     std::vector<llvm::Value *> args;
     for (const auto & arg : call.arguments)
-        args.push_back(gen_rvalue(ctx, arg));
+        args.push_back(gen_rvalue(*this, arg));
 
-    return {ctx.get_type(call), {value_type::NO_LOAD, get_builder().CreateCall(f.second.second, args)}};
+    return {this->get_type(call), {value_type::NO_LOAD, get_builder().CreateCall(f.second.second, args)}};
 }
 
-typed_value gen_expr(const frame & ctx, const ast::Expression & expr)
+typed_value frame::gen_expr(const ast::Expression & expr) const
 {
-    return fmap([&ctx], x, gen_expr(ctx, x), expr.expression);
+    return fmap([this], x, this->gen_expr(x), expr.expression);
 }
 
-void gen_statement(frame & ctx, const ast::Skip &)
+void frame::gen_statement(const ast::Skip &)
 { }
 
-void gen_statement(frame & ctx, const ast::VarDeclaration & v)
+void frame::gen_statement(const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
-    ctx.declare({v.type, {value_type::LOAD, val}}, v.name);
+    this->declare({v.type, {value_type::LOAD, val}}, v.name);
 }
 
-void gen_statement(frame & ctx, const ast::Assignment & st)
+void frame::gen_statement(const ast::Assignment & st)
 {
-    llvm::Value * val = gen_rvalue(ctx, st.value);
-    get_builder().CreateStore(val, ctx.get(st.varname).second.second);
+    llvm::Value * val = gen_rvalue(*this, st.value);
+    get_builder().CreateStore(val, this->get(st.varname).second.second);
 }
 
-void gen_statement(frame & ctx, const ast::Seq & st)
+void frame::gen_statement(const ast::Seq & st)
 {
-    gen_statement(ctx, *st.first);
-    gen_statement(ctx, *st.second);
+    this->gen_statement(*st.first);
+    this->gen_statement(*st.second);
 }
 
-void gen_statement(frame & ctx, const ast::If & st)
+void frame::gen_statement(const ast::If & st)
 {
     /* Generate condition */
-    llvm::Value * cond = gen_rvalue(ctx, st.condition);
+    llvm::Value * cond = gen_rvalue(*this, st.condition);
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * then_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "then", f);
     llvm::BasicBlock * else_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "else");
@@ -298,14 +298,14 @@ void gen_statement(frame & ctx, const ast::If & st)
 
     /* Generate 'then' branch */
     get_builder().SetInsertPoint(then_block);
-    gen_statement(ctx, *st.thenBody);
+    this->gen_statement(*st.thenBody);
     get_builder().CreateBr(cont_block);
     then_block = get_builder().GetInsertBlock();
 
     /* Generate 'else' branch */
     f->getBasicBlockList().push_back(else_block);
     get_builder().SetInsertPoint(else_block);
-    gen_statement(ctx, *st.elseBody);
+    this->gen_statement(*st.elseBody);
     get_builder().CreateBr(cont_block);
     else_block = get_builder().GetInsertBlock();
 
@@ -314,7 +314,7 @@ void gen_statement(frame & ctx, const ast::If & st)
     get_builder().SetInsertPoint(cont_block);
 }
 
-void gen_statement(frame & ctx, const ast::While & st)
+void frame::gen_statement(const ast::While & st)
 {
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * while_body = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_body", f);
@@ -324,12 +324,12 @@ void gen_statement(frame & ctx, const ast::While & st)
 
     /* Generate condition */
     get_builder().SetInsertPoint(cond_block);
-    llvm::Value * cond = gen_rvalue(ctx, st.condition);
+    llvm::Value * cond = gen_rvalue(*this, st.condition);
     get_builder().CreateCondBr(cond, while_body, cont_block);
 
     /* Generate body branch */
     get_builder().SetInsertPoint(while_body);
-    gen_statement(ctx, *st.body);
+    this->gen_statement(*st.body);
     get_builder().CreateBr(cond_block);
     while_body = get_builder().GetInsertBlock();
 
@@ -339,11 +339,11 @@ void gen_statement(frame & ctx, const ast::While & st)
     get_builder().SetInsertPoint(cont_block);
 }
 
-void gen_statement(frame & ctx, const ast::Read & st)
+void frame::gen_statement(const ast::Read & st)
 {
-    llvm::Value * f = ctx.module->getNamedValue("scanf");
-    llvm::Value * v = ctx.get(st.varname).second.second;
-    llvm::Value * format_string = gen_format_string(ctx, ctx.get_type(st.varname));
+    llvm::Value * f = this->module->getNamedValue("scanf");
+    llvm::Value * v = this->get(st.varname).second.second;
+    llvm::Value * format_string = gen_format_string(*this, this->get_type(st.varname));
     std::vector<llvm::Value *> args = { format_string, v };
 
     get_builder().CreateCall(f, args);
@@ -356,28 +356,28 @@ llvm::Value * gen_format_string(frame & ctx, const ast::Type & type)
     return format_ptr;
 }
 
-void gen_statement(frame & ctx, const ast::Write & st)
+void frame::gen_statement(const ast::Write & st)
 {
-    llvm::Value * f = ctx.module->getNamedValue("printf");
-    llvm::Value * v = gen_rvalue(ctx, *st.expr);
-    llvm::Value * format_string = gen_format_string(ctx, ctx.get_type(*st.expr));
+    llvm::Value * f = this->module->getNamedValue("printf");
+    llvm::Value * v = gen_rvalue(*this, *st.expr);
+    llvm::Value * format_string = gen_format_string(*this, this->get_type(*st.expr));
     std::vector<llvm::Value *> args = { format_string, v };
 
     get_builder().CreateCall(f, args);
 }
 
-void gen_statement(frame & ctx, const ast::Return & ret)
+void frame::gen_statement(const ast::Return & ret)
 {
-    get_builder().CreateRet(gen_rvalue(ctx, *ret.expr));
+    get_builder().CreateRet(gen_rvalue(*this, *ret.expr));
 
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);
     get_builder().SetInsertPoint(unreachable);
 }
 
-void gen_statement(frame & ctx, const ast::Statement & st)
+void frame::gen_statement(const ast::Statement & st)
 {
-    return fmap([&ctx], x, gen_statement(ctx, x), st.statement);
+    return fmap([this], x, this->gen_statement(x), st.statement);
 }
 
 void gen_static_data(llvm::Module * module)
@@ -394,7 +394,7 @@ void gen_static_data(llvm::Module * module)
     llvm::Function::Create(type, llvm::Function::ExternalLinkage, "scanf", module);
 }
 
-typed_value gen_expr(const frame & ctx, const ast::Address & addr)
+typed_value frame::gen_expr(const ast::Address & addr) const
 {
     undefined;
 }

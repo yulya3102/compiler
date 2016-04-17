@@ -28,6 +28,28 @@ struct frame : sem::typed_ctx<value>
         , module(module)
     {}
 
+    typed_value gen_expr(int64_t i) const;
+    typed_value gen_expr(bool b) const;
+    typed_value gen_expr(const ast::Const & v) const;
+    typed_value gen_expr(const std::string & v) const;
+    typed_value gen_expr(const ast::Value & v) const;
+    typed_value gen_expr(const ast::BinOperator & op) const;
+    typed_value gen_expr(const ast::Dereference & deref) const;
+    typed_value gen_expr(const ast::Address & addr) const;
+    typed_value gen_expr(const ast::Call & call) const;
+    typed_value gen_expr(const ast::Expression & expr) const;
+
+    void gen_statement(const ast::Skip & st);
+    void gen_statement(const ast::VarDeclaration & st);
+    void gen_statement(const ast::Assignment & st);
+    void gen_statement(const ast::Seq & st);
+    void gen_statement(const ast::If & st);
+    void gen_statement(const ast::While & st);
+    void gen_statement(const ast::Read & st);
+    void gen_statement(const ast::Write & st);
+    void gen_statement(const ast::Return & ret);
+    void gen_statement(const ast::Statement & st);
+
     llvm::Module * module;
 };
 
@@ -45,26 +67,4 @@ void gen_entry(frame & ctx, const ast::Definition & entry);
 void gen_entry(frame & ctx, const ast::VarDeclaration & entry);
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry);
 void gen_entry(frame & ctx, const ast::FuncDeclaration & entry);
-
-typed_value gen_expr(const frame & ctx, int64_t i);
-typed_value gen_expr(const frame & ctx, bool b);
-typed_value gen_expr(const frame & ctx, const ast::Const & v);
-typed_value gen_expr(const frame & ctx, const std::string & v);
-typed_value gen_expr(const frame & ctx, const ast::Value & v);
-typed_value gen_expr(const frame & ctx, const ast::BinOperator & op);
-typed_value gen_expr(const frame & ctx, const ast::Dereference & deref);
-typed_value gen_expr(const frame & ctx, const ast::Address & addr);
-typed_value gen_expr(const frame & ctx, const ast::Call & call);
-typed_value gen_expr(const frame & ctx, const ast::Expression & expr);
-
-void gen_statement(frame & ctx, const ast::Skip & st);
-void gen_statement(frame & ctx, const ast::VarDeclaration & st);
-void gen_statement(frame & ctx, const ast::Assignment & st);
-void gen_statement(frame & ctx, const ast::Seq & st);
-void gen_statement(frame & ctx, const ast::If & st);
-void gen_statement(frame & ctx, const ast::While & st);
-void gen_statement(frame & ctx, const ast::Read & st);
-void gen_statement(frame & ctx, const ast::Write & st);
-void gen_statement(frame & ctx, const ast::Return & ret);
-void gen_statement(frame & ctx, const ast::Statement & st);
 }

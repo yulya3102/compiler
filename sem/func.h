@@ -18,6 +18,11 @@ struct function_ctx : typed_ctx<top>
         , return_type(return_type)
     {}
 
+    void verify_expr(const ast::Expression & expr)
+    {
+        undefined;
+    }
+
     void verify_statement(const ast::Skip & st)
     {}
 
@@ -30,6 +35,8 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::Assignment & st)
     {
+        verify_expr(st.lvalue);
+        verify_expr(st.rvalue);
         auto lvalue_type = this->get_type(st.lvalue);
         auto rvalue_type = this->get_type(st.rvalue);
         expect_type(rvalue_type, lvalue_type, "location type does not match assigned expression type");
@@ -43,6 +50,7 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::If & st)
     {
+        verify_expr(st.condition);
         expect_type(this->get_type(st.condition), ast::bool_type(), "condition must have boolean type");
         verify_statement(*st.thenBody);
         verify_statement(*st.elseBody);
@@ -50,23 +58,27 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::While & st)
     {
+        verify_expr(st.condition);
         expect_type(this->get_type(st.condition), ast::bool_type(), "condition must have boolean type");
         verify_statement(*st.body);
     }
 
     void verify_statement(const ast::Read & st)
     {
+        verify_expr(st.varname);
         expect_type(this->get_type(st.varname), ast::int_type(), "read() argument must have integer type");
     }
 
     void verify_statement(const ast::Write & st)
     {
+        verify_expr(*st.expr);
         auto real = this->get_type(*st.expr);
         expect_type(real, ast::int_type(), "write() argument must have integer type");
     }
 
     void verify_statement(const ast::Return & st)
     {
+        verify_expr(*st.expr);
         expect_type(this->get_type(*st.expr), return_type, "function return type does not match return expression type");
     }
 

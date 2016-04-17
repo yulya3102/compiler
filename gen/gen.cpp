@@ -246,7 +246,7 @@ typed_value frame::gen_expr(const ast::BinOperator & op) const
 
 typed_value frame::gen_expr(const ast::Dereference & deref) const
 {
-    throw std::runtime_error("dereference: not implemented");
+    undefined;
 }
 
 typed_value frame::gen_expr(const ast::Call & call) const

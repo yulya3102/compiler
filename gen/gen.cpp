@@ -48,7 +48,7 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
 
     frame ctx(result.get());
     for (const auto & entry : code.entries)
-        boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.entry);
+        fmap([&ctx], x, gen_entry(ctx, x), entry.entry);
 
     if (llvm::verifyModule(*result, &llvm::errs()))
     {
@@ -80,7 +80,7 @@ llvm::Type * gen_type(const ast::PointerType & type)
 
 llvm::Type * gen_type(const ast::Type & type)
 {
-    return boost::apply_visitor([] (const auto & x) { return gen_type(x); }, type.type);
+    return fmap([], x, gen_type(x), type.type);
 }
 
 llvm::Constant * gen_init(const ast::AtomType & type)
@@ -113,12 +113,12 @@ llvm::Constant * gen_init(const ast::Type & type)
 
 void gen_entry(frame & ctx, const ast::Declaration & entry)
 {
-    boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.declaration);
+    fmap([&ctx], x, gen_entry(ctx, x), entry.declaration);
 }
 
 void gen_entry(frame & ctx, const ast::Definition & entry)
 {
-    boost::apply_visitor([&ctx] (const auto & x) { gen_entry(ctx, x); }, entry.definition);
+    fmap([&ctx], x, gen_entry(ctx, x), entry.definition);
 }
 
 void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
@@ -193,7 +193,7 @@ typed_value gen_expr(const frame & ctx, bool b)
 
 typed_value gen_expr(const frame & ctx, const ast::Const & v)
 {
-    return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, v.constant);
+    return fmap([&ctx], x, gen_expr(ctx, x), v.constant);
 }
 
 typed_value gen_expr(const frame & ctx, const std::string & v)
@@ -203,7 +203,7 @@ typed_value gen_expr(const frame & ctx, const std::string & v)
 
 typed_value gen_expr(const frame & ctx, const ast::Value & v)
 {
-    return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, v.value);
+    return fmap([&ctx], x, gen_expr(ctx, x), v.value);
 }
 
 typed_value gen_expr(const frame & ctx, const ast::BinOperator & op)
@@ -262,7 +262,7 @@ typed_value gen_expr(const frame & ctx, const ast::Call & call)
 
 typed_value gen_expr(const frame & ctx, const ast::Expression & expr)
 {
-    return boost::apply_visitor([&ctx] (const auto & x) { return gen_expr(ctx, x); }, expr.expression);
+    return fmap([&ctx], x, gen_expr(ctx, x), expr.expression);
 }
 
 void gen_statement(frame & ctx, const ast::Skip &)
@@ -377,7 +377,7 @@ void gen_statement(frame & ctx, const ast::Return & ret)
 
 void gen_statement(frame & ctx, const ast::Statement & st)
 {
-    return boost::apply_visitor([&ctx] (const auto & x) { return gen_statement(ctx, x); }, st.statement);
+    return fmap([&ctx], x, gen_statement(ctx, x), st.statement);
 }
 
 void gen_static_data(llvm::Module * module)

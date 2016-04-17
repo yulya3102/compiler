@@ -18,9 +18,43 @@ struct function_ctx : typed_ctx<top>
         , return_type(return_type)
     {}
 
-    void verify_expr(const ast::Expression & expr)
+    void verify_expr(const ast::Const & expr)
+    { }
+
+    void verify_expr(const std::string & expr)
+    {
+        if (!this->is_declared(expr))
+            throw semantic_error(undefined_expr(std::shared_ptr<ast::location>), expr + " was not declared in this scope");
+    }
+
+    void verify_expr(const ast::Value & expr)
+    {
+        fmap([this], x, this->verify_expr(x), expr.value);
+    }
+
+    void verify_expr(const ast::BinOperator & expr)
     {
         undefined;
+    }
+
+    void verify_expr(const ast::Dereference & expr)
+    {
+        undefined;
+    }
+
+    void verify_expr(const ast::Address & expr)
+    {
+        undefined;
+    }
+
+    void verify_expr(const ast::Call & expr)
+    {
+        undefined;
+    }
+
+    void verify_expr(const ast::Expression & expr)
+    {
+        fmap([this], x, this->verify_expr(x), expr.expression);
     }
 
     void verify_statement(const ast::Skip & st)

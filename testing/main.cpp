@@ -21,11 +21,6 @@ TEST(semantic, assignment_type_mismatch)
     EXPECT_SEMANTIC_ERROR("int main() { _Bool a; a = 1; }");
 }
 
-TEST(implemented, pointers)
-{
-    try_compile("int main() { int a; a = 0; int * b; b = &a; write(*b); return 0; }");
-}
-
 std::string test_compiled(const std::string & code, const std::string & input)
 {
     undefined;

@@ -21,7 +21,7 @@ TEST(semantic, assignment_type_mismatch)
     EXPECT_SEMANTIC_ERROR("int main() { _Bool a; a = 1; }");
 }
 
-std::string test_compiled(const std::string & code, const std::string & input)
+std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input)
 {
     std::stringstream in(code);
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
@@ -55,14 +55,14 @@ TEST(compiled, fact)
         "    else {}"
         "    return n * fact(n - 1);"
         "}";
-    std::stringstream input, expected_output;
     std::function<int(int)> fact = [&fact] (int n) { if (n > 1) return n * fact(n - 1); else return 1; };
+    std::vector<int> input, expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
     {
-        input << i << std::endl;
-        expected_output << fact(i) << std::endl;
+        input.push_back(i);
+        expected_output.push_back(fact(i));
     }
-    EXPECT_EQ(test_compiled(code, input.str()), expected_output.str());
+    EXPECT_EQ(test_compiled(code, input), expected_output);
 }
 
 TEST(compiled, scope)
@@ -98,13 +98,8 @@ int main()
 
     return 0;
 })";
-    std::stringstream expected_output;
-    expected_output << 10 << std::endl;
-    expected_output << 0 << std::endl;
-    expected_output << 88 << std::endl;
-    expected_output << 42 << std::endl;
-    expected_output << 88 << std::endl;
-    EXPECT_EQ(test_compiled(code, ""), expected_output.str());
+    std::vector<int> expected_output = {10, 0, 88, 42, 88};
+    EXPECT_EQ(test_compiled(code, {}), expected_output);
 }
 
 int main(int argc, char ** argv)

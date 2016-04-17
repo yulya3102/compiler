@@ -1,0 +1,15 @@
+int a(int * b)
+{
+    *b = 42;
+    return 0;
+}
+
+int main()
+{
+    int c;
+    c = 0;
+    write(c);
+    a(c);
+    write(c);
+    return 0;
+}

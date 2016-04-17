@@ -74,7 +74,8 @@ llvm::Type * gen_type(const ast::AtomType & type)
 
 llvm::Type * gen_type(const ast::PointerType & type)
 {
-    undefined;
+    auto dereferenced = gen_type(*type.type);
+    return dereferenced->getPointerTo();
 }
 
 llvm::Type * gen_type(const ast::Type & type)

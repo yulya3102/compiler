@@ -50,13 +50,6 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
 
     ast::Type get_type(const ast::BinOperator & expr) const
     {
-        auto exp_type = binop_expected_argtype(expr.oper.oper);
-        expect_type(this->get_type(*expr.lhs), exp_type,
-                    "arguments of '" + ast::to_string(expr.oper)
-                    + "' must have '" + ast::to_string(exp_type) + "' type");
-        expect_type(this->get_type(*expr.rhs), exp_type,
-                    "arguments of '" + ast::to_string(expr.oper)
-                    + "' must have '" + ast::to_string(exp_type) + "' type");
         return binop_rettype(expr.oper.oper);
     }
 

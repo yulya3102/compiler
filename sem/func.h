@@ -34,7 +34,14 @@ struct function_ctx : typed_ctx<top>
 
     void verify_expr(const ast::BinOperator & expr)
     {
-        undefined;
+        this->verify_expr(*expr.lhs);
+        this->verify_expr(*expr.rhs);
+
+        auto exp_type = binop_expected_argtype(expr.oper.oper);
+        for (auto type : {*expr.lhs, *expr.rhs})
+            expect_type(this->get_type(type), exp_type,
+                        "arguments of '" + ast::to_string(expr.oper)
+                        + "' must have '" + ast::to_string(exp_type) + "' type");
     }
 
     void verify_expr(const ast::Dereference & expr)

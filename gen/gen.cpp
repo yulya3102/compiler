@@ -278,8 +278,9 @@ void frame::gen_statement(const ast::VarDeclaration & v)
 
 void frame::gen_statement(const ast::Assignment & st)
 {
-    llvm::Value * val = gen_rvalue(*this, st.value);
-    get_builder().CreateStore(val, this->get(st.varname).second.second);
+    llvm::Value * lval = this->gen_expr(st.lvalue).second.second;
+    llvm::Value * rval = gen_rvalue(*this, st.rvalue);
+    get_builder().CreateStore(rval, lval);
 }
 
 void frame::gen_statement(const ast::Seq & st)

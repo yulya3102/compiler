@@ -13,8 +13,8 @@ namespace ast
 struct Assignment
 {
     std::shared_ptr<location> loc;
-    std::string varname;
-    Expression value;
+    Expression lvalue;
+    Expression rvalue;
 };
 
 struct Statement;

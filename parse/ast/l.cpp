@@ -160,7 +160,7 @@ std::string to_string(const Dereference & d)
 
 std::string to_string(const Assignment & as)
 {
-    return as.varname + " = " + to_string(as.value);
+    return to_string(as.lvalue) + " = " + to_string(as.rvalue);
 }
 
 std::string to_string(const Statement & st)

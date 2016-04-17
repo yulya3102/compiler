@@ -30,9 +30,9 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::Assignment & st)
     {
-        auto var_type = this->get_type(st.varname);
-        auto expr_type = this->get_type(st.value);
-        expect_type(expr_type, var_type, "variable type does not match assigned expression type");
+        auto lvalue_type = this->get_type(st.lvalue);
+        auto rvalue_type = this->get_type(st.rvalue);
+        expect_type(rvalue_type, lvalue_type, "location type does not match assigned expression type");
     }
 
     void verify_statement(const ast::Seq & st)

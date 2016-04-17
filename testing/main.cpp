@@ -23,6 +23,10 @@ TEST(semantic, assignment_type_mismatch)
 
 std::string test_compiled(const std::string & code, const std::string & input)
 {
+    std::stringstream in(code);
+    std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
+    lcc::compile_executable(in, compiled);
+
     undefined;
 }
 

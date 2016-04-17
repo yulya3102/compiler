@@ -396,7 +396,10 @@ void gen_static_data(llvm::Module * module)
 
 typed_value frame::gen_expr(const ast::Address & addr) const
 {
-    undefined;
+    typed_value v = this->gen_expr(*addr.expr);
+    llvm::ArrayRef<llvm::Value *> idxList = { get_builder().getInt32(0) };
+    llvm::Value * res = get_builder().CreateGEP(v.second.second, idxList, "address");
+    return {this->get_type(addr), {value_type::NO_LOAD, res}};
 }
 
 }

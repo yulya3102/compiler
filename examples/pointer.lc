@@ -9,7 +9,8 @@ int main()
     int c;
     c = 0;
     write(c);
-    a(c);
+    int g;
+    g = a(c);
     write(c);
     return 0;
 }

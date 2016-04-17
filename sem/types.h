@@ -13,6 +13,8 @@
 namespace sem
 {
 void expect_type(const ast::Type & real, const ast::Type & expected, const std::string & error_message);
+ast::Type binop_expected_argtype(ast::Oper::OperName op);
+ast::Type binop_rettype(ast::Oper::OperName op);
 
 template <typename T>
 struct typed_ctx : context<std::pair<ast::Type, T>>
@@ -48,59 +50,14 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
 
     ast::Type get_type(const ast::BinOperator & expr) const
     {
-        auto expected_arg_type = [] (ast::Oper::OperName op)
-        {
-            switch (op)
-            {
-                case ast::Oper::PLUS:
-                case ast::Oper::MINUS:
-                case ast::Oper::MULT:
-                case ast::Oper::DIV:
-                case ast::Oper::MOD:
-                case ast::Oper::GT:
-                case ast::Oper::LT:
-                case ast::Oper::EQ:
-                case ast::Oper::GE:
-                case ast::Oper::LE:
-                    return ast::int_type();
-                case ast::Oper::NE:
-                case ast::Oper::AND:
-                case ast::Oper::OR:
-                    return ast::bool_type();
-            }
-            throw std::runtime_error("unknown operator");
-        };
-        auto return_type = [] (ast::Oper::OperName op)
-        {
-            switch (op)
-            {
-                case ast::Oper::PLUS:
-                case ast::Oper::MINUS:
-                case ast::Oper::MULT:
-                case ast::Oper::DIV:
-                case ast::Oper::MOD:
-                    return ast::int_type();
-                case ast::Oper::GT:
-                case ast::Oper::LT:
-                case ast::Oper::EQ:
-                case ast::Oper::GE:
-                case ast::Oper::LE:
-                case ast::Oper::NE:
-                case ast::Oper::AND:
-                case ast::Oper::OR:
-                    return ast::bool_type();
-            }
-            throw std::runtime_error("unknown operator");
-        };
-
-        auto exp_type = expected_arg_type(expr.oper.oper);
+        auto exp_type = binop_expected_argtype(expr.oper.oper);
         expect_type(this->get_type(*expr.lhs), exp_type,
                     "arguments of '" + ast::to_string(expr.oper)
                     + "' must have '" + ast::to_string(exp_type) + "' type");
         expect_type(this->get_type(*expr.rhs), exp_type,
                     "arguments of '" + ast::to_string(expr.oper)
                     + "' must have '" + ast::to_string(exp_type) + "' type");
-        return return_type(expr.oper.oper);
+        return binop_rettype(expr.oper.oper);
     }
 
     ast::Type get_type(const ast::Dereference & expr) const

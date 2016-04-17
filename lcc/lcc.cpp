@@ -6,6 +6,7 @@
 #include <sem/l.h>
 
 #include <llvm/IR/Module.h>
+#include <llvm/Support/FileSystem.h>
 #include <cstdlib>
 
 void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::string & module_name)
@@ -18,21 +19,26 @@ void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::st
     module->print(out, nullptr);
 }
 
+std::string lcc::create_temp_file(const char * pattern, std::size_t suffix_size)
+{
+    char filename[strlen(pattern) + 1];
+    strcpy(filename, pattern);
+    int tmp_fd = mkstemps(filename, suffix_size);
+    close(tmp_fd);
+    return filename;
+}
+
 void lcc::compile_executable(std::istream & in, const std::string & output_name)
 {
-    char ll_filename[255];
+    std::string ll_filename = create_temp_file("lcc_XXXXXX.ll", 3);
     {
-        strcpy(ll_filename, "lcc_XXXXXX.ll");
-        int tmp_fd = mkstemps(ll_filename, 3);
-        llvm::raw_fd_ostream out(tmp_fd, true);
+        std::error_code err;
+        llvm::raw_fd_ostream out(ll_filename, err, llvm::sys::fs::OpenFlags::F_None);
         compile_llvm(in, out, output_name);
     }
 
-    char object_filename[255];
+    std::string object_filename = create_temp_file("lcc_XXXXXX.o", 2);
     {
-        strcpy(object_filename, "lcc_XXXXXX.o");
-        int tmp_fd = mkstemps(object_filename, 2);
-        close(tmp_fd);
         std::string command("llc -o=");
         command += object_filename;
         command += " --filetype=obj ";

@@ -21,7 +21,7 @@ This will build the `lcc` binary in the build directory.
 
 * C-like function definitions
 * single line comments
-* types: `int` (signed 64 bit) and `_Bool` (with `true` and `false` values)
+* types: `int` (signed 64 bit), `_Bool` (with `true` and `false` values) and `pointer`
 * global variables (default-initialized with `0` or `false`)
 * local variables
 * arithmetic expessions
@@ -47,4 +47,4 @@ environment variable.
 ## TODOs
 
 * I/O error handling
-* pointer types
+* function pointer types

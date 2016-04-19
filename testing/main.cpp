@@ -27,6 +27,28 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
     lcc::compile_executable(in, compiled);
 
+    // TODO: error handling
+    int process_input[2];
+    pipe(process_input);
+    int process_output[2];
+    pipe(process_output);
+    pid_t child = fork();
+    if (child == 0)
+    {
+        dup2(process_input[0], STDIN_FILENO);
+        close(process_input[1]);
+        dup2(process_output[1], STDOUT_FILENO);
+        close(process_output[0]);
+
+        execl(compiled.c_str(), compiled.c_str(), nullptr);
+    }
+    close(process_input[0]);
+    close(process_output[1]);
+
+    for (auto i : input)
+        dprintf(process_input[1], "%d\n", i);
+
+    // TODO: parse vector<int> from process_output[0]
     undefined;
 }
 

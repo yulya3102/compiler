@@ -46,7 +46,13 @@ struct function_ctx : typed_ctx<top>
 
     void verify_expr(const ast::Dereference & expr)
     {
-        undefined;
+        this->verify_expr(*expr.expr);
+
+        ast::Type type = this->get_type(*expr.expr);
+
+        auto pointer_type = boost::get<ast::PointerType>(&type.type);
+        if (!pointer_type)
+            throw semantic_error(expr.loc, "trying to dereference non-pointer type");
     }
 
     void verify_expr(const ast::Address & expr)

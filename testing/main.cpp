@@ -36,20 +36,29 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     if (child == 0)
     {
         dup2(process_input[0], STDIN_FILENO);
+        close(process_input[0]);
         close(process_input[1]);
         dup2(process_output[1], STDOUT_FILENO);
         close(process_output[0]);
+        close(process_output[1]);
 
         execl(compiled.c_str(), compiled.c_str(), nullptr);
     }
     close(process_input[0]);
     close(process_output[1]);
 
+    FILE * pin = fdopen(process_input[1], "w");
     for (auto i : input)
-        dprintf(process_input[1], "%d\n", i);
+        fprintf(pin, "%d\n", i);
+    fflush(pin);
 
-    // TODO: parse vector<int> from process_output[0]
-    undefined;
+    FILE * pout = fdopen(process_output[0], "r");
+    int i;
+    std::vector<int> result;
+    while (fscanf(pout, "%d", &i) != EOF)
+        result.push_back(i);
+
+    return result;
 }
 
 TEST(compiled, fact)

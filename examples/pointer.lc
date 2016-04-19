@@ -8,9 +8,9 @@ int main()
 {
     int c;
     c = 0;
-    write(c);
+    write(c);   // prints "0"
     int g;
     g = a(&c);
-    write(c);
+    write(c);   // prints "42"
     return 0;
 }

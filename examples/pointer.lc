@@ -10,7 +10,7 @@ int main()
     c = 0;
     write(c);
     int g;
-    g = a(c);
+    g = a(&c);
     write(c);
     return 0;
 }

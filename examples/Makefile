@@ -1,4 +1,4 @@
-EXAMPLES = scope.lc fact.lc
+EXAMPLES = scope.lc fact.lc pointer.lc
 OBJECTS = $(patsubst %.lc,%.o,$(EXAMPLES))
 TRANSLATED = $(patsubst %.lc,%.ir,$(EXAMPLES))
 RESULTS = $(patsubst %.lc,%,$(EXAMPLES))
@@ -26,6 +26,7 @@ LCC ?= ../lcc/lcc
 test: examples
 	./scope.test && echo "OK"
 	./fact.test  && echo "OK"
+	./pointer.test && echo "OK"
 
 clean:
 	rm -f $(OBJECTS) $(TRANSLATED) $(RESULTS)

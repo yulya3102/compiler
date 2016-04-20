@@ -78,6 +78,15 @@ llvm::Type * gen_type(const ast::PointerType & type)
     return dereferenced->getPointerTo();
 }
 
+llvm::Type * gen_type(const ast::FuncType & type)
+{
+    llvm::Type * rettype = gen_type(*type.rettype);
+    std::vector<llvm::Type *> argtypes;
+    for (auto argtype : type.argtypes)
+        argtypes.push_back(gen_type(argtype));
+    return llvm::FunctionType::get(rettype, argtypes, false);
+}
+
 llvm::Type * gen_type(const ast::Type & type)
 {
     return fmap([], x, gen_type(x), type.type);

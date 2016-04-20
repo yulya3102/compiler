@@ -47,4 +47,3 @@ environment variable.
 ## TODOs
 
 * I/O error handling
-* function pointer types

@@ -62,6 +62,10 @@ struct function_ctx : typed_ctx<top>
 
     void verify_expr(const ast::Call & expr)
     {
+        this->verify_expr(*expr.function);
+        for (auto arg : expr.arguments)
+            this->verify_expr(arg);
+
         ast::Type type = this->get_type(*expr.function);
 
         auto func_type = boost::get<ast::FuncType>(&type.type);

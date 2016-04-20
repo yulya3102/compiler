@@ -28,7 +28,7 @@ int test(int start, int end, int(int) * func)
     while (i < end)
     {
         write(i);
-        write(*func(i));
+        write((*func)(i));
         i = i + 1;
     }
     return i;

@@ -109,7 +109,7 @@ std::string to_string(const Expression & expr)
 
 std::string to_string(const Call & call)
 {
-    return call.function
+    return to_string(*call.function)
         + "("
         + to_string(call.arguments.begin(), call.arguments.end(), ",")
         + ")";

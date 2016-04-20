@@ -41,7 +41,7 @@ struct Value
 struct Call
 {
     std::shared_ptr<location> loc;
-    std::string function;
+    std::shared_ptr<Expression> function;
     std::list<Expression> arguments;
 };
 

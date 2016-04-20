@@ -71,7 +71,7 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
 
     ast::Type get_type(const ast::Call & expr) const
     {
-        ast::Type func_type = this->get(expr.function).first;
+        ast::Type func_type = this->get_type(*expr.function);
         return *boost::get<ast::FuncType>(func_type.type).rettype;
     }
 

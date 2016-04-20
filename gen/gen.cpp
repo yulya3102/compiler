@@ -252,7 +252,7 @@ typed_value frame::gen_expr(const ast::Dereference & deref) const
 
 typed_value frame::gen_expr(const ast::Call & call) const
 {
-    typed_value f = this->get(call.function);
+    typed_value f = this->gen_expr(*call.function);
 
     std::vector<llvm::Value *> args;
     for (const auto & arg : call.arguments)

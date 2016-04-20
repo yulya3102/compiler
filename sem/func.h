@@ -62,11 +62,11 @@ struct function_ctx : typed_ctx<top>
 
     void verify_expr(const ast::Call & expr)
     {
-        ast::Type type = this->get_type(expr.function);
+        ast::Type type = this->get_type(*expr.function);
 
         auto func_type = boost::get<ast::FuncType>(&type.type);
         if (!func_type)
-            throw semantic_error(expr.loc, "'" + expr.function + "' cannot be used as a function");
+            throw semantic_error(expr.loc, "this expression cannot be used as a function");
 
         if (func_type->argtypes.size() != expr.arguments.size())
             throw semantic_error(expr.loc, "function called with wrong number of parameters");

@@ -57,11 +57,6 @@ std::string to_string(const PointerType & type)
     return "(" + to_string(*type.type) + ") *";
 }
 
-std::string to_string(const FuncType & type)
-{
-    undefined;
-}
-
 std::string to_string(const Const & constant)
 {
     return boost::apply_visitor([] (const auto & x) { using std::to_string; return to_string(x); }, constant.constant);
@@ -86,6 +81,12 @@ std::string to_string(Iterator begin, Iterator end, const std::string & separato
     Iterator head = begin;
     begin++;
     return to_string(*head) + separator + to_string(begin, end, separator);
+}
+
+std::string to_string(const FuncType & type)
+{
+    std::string arglist = to_string(type.argtypes.begin(), type.argtypes.end(), ", ");
+    return to_string(*type.rettype) + "(" + arglist + ")";
 }
 
 std::string to_string(const FuncDeclaration & decl)

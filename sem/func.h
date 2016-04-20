@@ -57,7 +57,7 @@ struct function_ctx : typed_ctx<top>
 
     void verify_expr(const ast::Address & expr)
     {
-        undefined;
+        this->verify_expr(*expr.expr);
     }
 
     void verify_expr(const ast::Call & expr)

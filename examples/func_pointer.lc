@@ -12,7 +12,7 @@ int fib(int n)
     int cur;    cur = 1;
     int i;      i = 2;
     int next;
-    while (i <= n)
+    while (i < n)
     {
         next = prev + cur;
         prev = cur;

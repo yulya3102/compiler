@@ -39,6 +39,7 @@ std::shared_ptr<T> shared(T * ptr)
     FuncDeclaration * fun_declaration;
     FuncDefinition * fun_definition;
     Type * type;
+    std::list<Type> * argtypes;
     std::list<VarDeclaration> * args;
     Statement * statement;
     Oper * oper;
@@ -89,6 +90,7 @@ std::shared_ptr<T> shared(T * ptr)
 %type   <definition>        definition
 %type   <fun_definition>    fun_def
 %type   <type>              type
+%type   <argtypes>          argtypes argtypes_tail
 %type   <string>            name
 %type   <statement>         statement statements
 %type   <boolean>           bool
@@ -214,7 +216,18 @@ type:
           INTEGER_TYPE          { $$ = new Type(AtomType{shared(&@$), AtomType::INT}); }
         | BOOLEAN_TYPE          { $$ = new Type(AtomType{shared(&@$), AtomType::BOOL}); }
         | type MULT             { $$ = new Type(PointerType({ shared(&@$), shared($1) })); }
+        | type LPAREN argtypes RPAREN   { $$ = new Type(FuncType{ shared(&@$), shared($1), *$3 }); }
         | LPAREN type RPAREN    { $$ = $2; }
+        ;
+
+argtypes:
+          /* empty */           { $$ = new std::list<Type>; }
+        | type argtypes_tail    { $2->push_front(*$1); $$ = $2; }
+        ;
+
+argtypes_tail:
+          /* empty */               { $$ = new std::list<Type>; }
+        | COMMA type argtypes_tail  { $3->push_front(*$2); $$ = $3; }
         ;
 
 name:

@@ -55,6 +55,7 @@ struct frame : sem::typed_ctx<value>
 
 llvm::Type * gen_type(const ast::AtomType & type);
 llvm::Type * gen_type(const ast::PointerType & type);
+llvm::Type * gen_type(const ast::FuncType & type);
 llvm::Type * gen_type(const ast::Type & type);
 
 llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry);

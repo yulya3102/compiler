@@ -107,7 +107,7 @@ llvm::Constant * gen_init(const ast::AtomType & type)
 
 llvm::Constant * gen_init(const ast::PointerType & type)
 {
-    undefined;
+    return nullptr;
 }
 
 llvm::Constant * gen_init(const ast::FuncType & type)

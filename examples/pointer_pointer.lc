@@ -9,8 +9,10 @@ int main()
     int c;
     c = 0;
     write(c);   // prints "0"
+    int * e;
+    e = &c;
     int g;
-    g = a(&(&c));
+    g = a(&e);
     write(c);   // prints "42"
     return 0;
 }

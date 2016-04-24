@@ -32,7 +32,7 @@ template <typename T>
 llvm::Value * gen_rvalue(const codegen::frame & ctx, T expr)
 {
     codegen::typed_value v = ctx.gen_expr(expr);
-    if (v.second.first == codegen::value_type::LOAD)
+    if (v.second.first == codegen::value_type::LVALUE)
         return get_builder().CreateLoad(v.second.second);
     return v.second.second;
 }
@@ -135,7 +135,7 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
     llvm::Value * var = new llvm::GlobalVariable(
             *ctx.module, gen_type(entry.type), false,
             llvm::GlobalVariable::ExternalLinkage, gen_init(entry.type), entry.name);
-    ctx.declare({entry.type, {value_type::LOAD, var}}, entry.name);
+    ctx.declare({entry.type, {value_type::LVALUE, var}}, entry.name);
 }
 
 void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
@@ -151,7 +151,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++proto_it)
         {
             arg_it->setName(proto_it->name);
-            inner_scope.declare({proto_it->type, {value_type::NO_LOAD, &*arg_it}}, proto_it->name);
+            inner_scope.declare({proto_it->type, {value_type::RVALUE, &*arg_it}}, proto_it->name);
         }
     }
     inner_scope.gen_statement(entry.statement);
@@ -181,7 +181,7 @@ llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & 
 
     llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, ctx.module);
 
-    ctx.declare({ctx.get_type(entry), {value_type::LOAD, f}}, entry.name);
+    ctx.declare({ctx.get_type(entry), {value_type::LVALUE, f}}, entry.name);
     return f;
 }
 
@@ -192,12 +192,12 @@ void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
 
 typed_value frame::gen_expr(int64_t i) const
 {
-    return {ast::int_type(), {value_type::NO_LOAD, get_builder().getInt64(i)}};
+    return {ast::int_type(), {value_type::RVALUE, get_builder().getInt64(i)}};
 }
 
 typed_value frame::gen_expr(bool b) const
 {
-    return {ast::bool_type(), {value_type::NO_LOAD, get_builder().getInt1(b)}};
+    return {ast::bool_type(), {value_type::RVALUE, get_builder().getInt1(b)}};
 }
 
 typed_value frame::gen_expr(const ast::Const & v) const
@@ -223,31 +223,31 @@ typed_value frame::gen_expr(const ast::BinOperator & op) const
     switch (op.oper.oper)
     {
         case ast::Oper::PLUS:
-            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateAdd(lhs, rhs)}};
+            return {ast::int_type(), {value_type::RVALUE, get_builder().CreateAdd(lhs, rhs)}};
         case ast::Oper::MINUS:
-            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateSub(lhs, rhs)}};
+            return {ast::int_type(), {value_type::RVALUE, get_builder().CreateSub(lhs, rhs)}};
         case ast::Oper::MULT:
-            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateMul(lhs, rhs)}};
+            return {ast::int_type(), {value_type::RVALUE, get_builder().CreateMul(lhs, rhs)}};
         case ast::Oper::DIV:
-            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateSDiv(lhs, rhs)}};
+            return {ast::int_type(), {value_type::RVALUE, get_builder().CreateSDiv(lhs, rhs)}};
         case ast::Oper::MOD:
-            return {ast::int_type(), {value_type::NO_LOAD, get_builder().CreateSRem(lhs, rhs)}};
+            return {ast::int_type(), {value_type::RVALUE, get_builder().CreateSRem(lhs, rhs)}};
         case ast::Oper::GT:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSGT(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateICmpSGT(lhs, rhs)}};
         case ast::Oper::LT:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSLT(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateICmpSLT(lhs, rhs)}};
         case ast::Oper::EQ:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpEQ(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateICmpEQ(lhs, rhs)}};
         case ast::Oper::GE:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSGE(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateICmpSGE(lhs, rhs)}};
         case ast::Oper::LE:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpSLE(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateICmpSLE(lhs, rhs)}};
         case ast::Oper::NE:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateICmpNE(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateICmpNE(lhs, rhs)}};
         case ast::Oper::AND:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateAnd(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateAnd(lhs, rhs)}};
         case ast::Oper::OR:
-            return {ast::bool_type(), {value_type::NO_LOAD, get_builder().CreateOr(lhs, rhs)}};
+            return {ast::bool_type(), {value_type::RVALUE, get_builder().CreateOr(lhs, rhs)}};
     }
 
     throw std::runtime_error("unknown binary operator");
@@ -256,7 +256,7 @@ typed_value frame::gen_expr(const ast::BinOperator & op) const
 typed_value frame::gen_expr(const ast::Dereference & deref) const
 {
     llvm::Value * v = gen_rvalue(*this, *deref.expr);
-    return {this->get_type(deref), {value_type::LOAD, v}};
+    return {this->get_type(deref), {value_type::LVALUE, v}};
 }
 
 typed_value frame::gen_expr(const ast::Call & call) const
@@ -267,7 +267,7 @@ typed_value frame::gen_expr(const ast::Call & call) const
     for (const auto & arg : call.arguments)
         args.push_back(gen_rvalue(*this, arg));
 
-    return {this->get_type(call), {value_type::NO_LOAD, get_builder().CreateCall(f.second.second, args)}};
+    return {this->get_type(call), {value_type::RVALUE, get_builder().CreateCall(f.second.second, args)}};
 }
 
 typed_value frame::gen_expr(const ast::Expression & expr) const
@@ -281,7 +281,7 @@ void frame::gen_statement(const ast::Skip &)
 void frame::gen_statement(const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
-    this->declare({v.type, {value_type::LOAD, val}}, v.name);
+    this->declare({v.type, {value_type::LVALUE, val}}, v.name);
 }
 
 void frame::gen_statement(const ast::Assignment & st)
@@ -410,7 +410,7 @@ typed_value frame::gen_expr(const ast::Address & addr) const
     typed_value v = this->gen_expr(*addr.expr);
     llvm::ArrayRef<llvm::Value *> idxList = { get_builder().getInt32(0) };
     llvm::Value * res = get_builder().CreateGEP(v.second.second, idxList, "address");
-    return {this->get_type(addr), {value_type::NO_LOAD, res}};
+    return {this->get_type(addr), {value_type::RVALUE, res}};
 }
 
 }

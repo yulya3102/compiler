@@ -15,8 +15,8 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
 
 enum value_type
 {
-    LOAD,
-    NO_LOAD,
+    LVALUE,
+    RVALUE,
 };
 
 using value = std::pair<value_type, llvm::Value *>;

@@ -13,6 +13,7 @@ add_subdirectory(utils)
 add_subdirectory(parse)
 add_subdirectory(sem)
 add_subdirectory(gen)
+add_subdirectory(optimise)
 add_subdirectory(lcc)
 
 add_subdirectory(testing)

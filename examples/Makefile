@@ -1,4 +1,4 @@
-EXAMPLES = scope.lc fact.lc pointer.lc func_pointer.lc
+EXAMPLES = scope.lc fact.lc pointer.lc func_pointer.lc pointer_pointer.lc
 OBJECTS = $(patsubst %.lc,%.o,$(EXAMPLES))
 TRANSLATED = $(patsubst %.lc,%.ir,$(EXAMPLES))
 RESULTS = $(patsubst %.lc,%,$(EXAMPLES))
@@ -28,6 +28,7 @@ test: examples
 	./fact.test  && echo "OK"
 	./pointer.test && echo "OK"
 	./func_pointer.test && echo "OK"
+	./pointer_pointer.test && echo "OK"
 
 clean:
 	rm -f $(OBJECTS) $(TRANSLATED) $(RESULTS)

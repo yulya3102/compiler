@@ -1,0 +1,16 @@
+int a(int ** b)
+{
+    **b = 42;
+    return 0;
+}
+
+int main()
+{
+    int c;
+    c = 0;
+    write(c);   // prints "0"
+    int g;
+    g = a(&(&c));
+    write(c);   // prints "42"
+    return 0;
+}

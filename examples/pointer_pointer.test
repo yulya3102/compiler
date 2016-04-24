@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+cat > pointer_pointer.expected << EOF
+0
+42
+EOF
+
+`dirname "$0"`/pointer_pointer > pointer_pointer.actual
+
+diff -q pointer_pointer.expected pointer_pointer.actual

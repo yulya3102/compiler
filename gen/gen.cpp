@@ -255,8 +255,8 @@ typed_value frame::gen_expr(const ast::BinOperator & op) const
 
 typed_value frame::gen_expr(const ast::Dereference & deref) const
 {
-    typed_value v = this->gen_expr(*deref.expr);
-    return {this->get_type(deref), {value_type::LOAD, v.second.second}};
+    llvm::Value * v = gen_rvalue(*this, *deref.expr);
+    return {this->get_type(deref), {value_type::LOAD, v}};
 }
 
 typed_value frame::gen_expr(const ast::Call & call) const

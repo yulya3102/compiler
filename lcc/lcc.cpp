@@ -4,6 +4,7 @@
 #include <parse/ast/l.h>
 #include <gen/gen.h>
 #include <sem/l.h>
+#include <optimise/l.h>
 
 #include <llvm/IR/Module.h>
 #include <llvm/Support/FileSystem.h>
@@ -14,6 +15,7 @@ void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::st
     ast::parser p;
     ast::Code code = p.parse(in, std::cout);
     sem::verify(code);
+    optimise::optimise_tail_call(code);
     std::unique_ptr<llvm::Module> module = codegen::generate(code, module_name.c_str());
 
     module->print(out, nullptr);

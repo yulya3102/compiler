@@ -408,6 +408,8 @@ void gen_static_data(llvm::Module * module)
 typed_value frame::gen_expr(const ast::Address & addr) const
 {
     typed_value v = this->gen_expr(*addr.expr);
+    if (v.second.first != value_type::LVALUE)
+        throw sem::semantic_error(addr.loc, "trying to take address of rvalue");
     llvm::ArrayRef<llvm::Value *> idxList = { get_builder().getInt32(0) };
     llvm::Value * res = get_builder().CreateGEP(v.second.second, idxList, "address");
     return {this->get_type(addr), {value_type::RVALUE, res}};

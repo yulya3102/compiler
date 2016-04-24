@@ -40,6 +40,10 @@ llvm::Value * gen_rvalue(const codegen::frame & ctx, T expr)
 
 namespace codegen
 {
+void prepare(ast::Code & code)
+{
+    undefined;
+}
 
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name)
 {

@@ -11,6 +11,19 @@
 
 namespace codegen
 {
+/*
+ * After typechecking, there are some things left to do:
+ * for example, declaring local variables inside while loop
+ * is totally valid, but since I do that with alloca(), it
+ * can cause various crashes. I can avoid that with moving
+ * local variables declarations outside of the while loop.
+ * This won't break scope, since all semantic analysis has
+ * been done already, and scope violations was already banned.
+ *
+ * Some dirty hacks like described above should be done in
+ * prepare() function.
+ */
+void prepare(ast::Code & code);
 std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name);
 
 enum value_type

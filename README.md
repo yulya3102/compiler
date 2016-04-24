@@ -33,11 +33,13 @@ This will build the `lcc` binary in the build directory.
 
 ## Examples
 
-There are two examples in `examples/` directory:
+There are few examples in `examples/` directory:
 
 *   `scope.lc` tests proper scoping for global and local variables
 *   `fact.lc` recursively computes factorial for each number from stdin
     (e.g. `seq 10 | ./fact | head`)
+*   `pointer.lc`
+*   `func_pointer.lc`
 
 Examples can be built with `make` or `make <example name>` in examples
 directory. It will produce `scope` and `fact` binaries with `lcc` from

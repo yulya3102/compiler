@@ -38,7 +38,7 @@ int main()
     write(a);           // prints "42"
     write(b);           // prints "88"
 
-    testSubscope();
+    b = testSubscope(a);
 
     return 0;
 }

@@ -3,8 +3,8 @@ int main()
     int i; i = 0;
     while (i < 10)
     {
-        int a;
-        a = 5;
+        i = i + 1;
+        int a;  a = 5;
         if ((i + a) > 7)
         {
             int b;
@@ -16,8 +16,9 @@ int main()
             _Bool b;
             b = true;
             if (b)
-                write(24);
-            else {}
+                write(1);
+            else
+                write(0);
         }
     }
 }

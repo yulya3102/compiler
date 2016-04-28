@@ -166,7 +166,7 @@ fun_def:
 
 statements:
           /* empty */           { $$ = new Block{shared(&@$), {}}; }
-        | statement statements  { $2->statements.push_back(*$1); $$ = $2; }
+        | statement statements  { $2->statements.push_front(*$1); $$ = $2; }
 
 statement:
           var_def SEMICOLON       { $$ = new Statement(*$1); }

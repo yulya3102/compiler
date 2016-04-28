@@ -135,9 +135,11 @@ struct function_ctx : typed_ctx<top>
         expect_type(this->get_type(*st.expr), return_type, "function return type does not match return expression type");
     }
 
-    void verify_statement(const ast::Block & st)
+    void verify_statement(const ast::Block & block)
     {
-        undefined;
+        function_ctx inner_scope(this->return_type, this);
+        for (auto st : block.statements)
+            inner_scope.verify_statement(st);
     }
 
     void verify_statement(const ast::Statement & st)

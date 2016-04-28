@@ -381,9 +381,11 @@ void frame::gen_statement(const ast::Return & ret)
     get_builder().SetInsertPoint(unreachable);
 }
 
-void frame::gen_statement(const ast::Block & st)
+void frame::gen_statement(const ast::Block & block)
 {
-    undefined;
+    frame inner_scope(this->module, this);
+    for (auto st : block.statements)
+        inner_scope.gen_statement(st);
 }
 
 void frame::gen_statement(const ast::Statement & st)

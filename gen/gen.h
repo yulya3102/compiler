@@ -59,7 +59,7 @@ struct frame : sem::typed_ctx<value>
     void gen_statement(const ast::Read & st);
     void gen_statement(const ast::Write & st);
     void gen_statement(const ast::Return & ret);
-    void gen_statement(const ast::Block & st);
+    void gen_statement(const ast::Block & block);
     void gen_statement(const ast::Statement & st);
 
     llvm::Module * module;

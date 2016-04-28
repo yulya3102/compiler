@@ -239,6 +239,56 @@ int main()
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
 
+TEST(compiled, pointer)
+{
+    std::string code = R"(
+int a(int * b)
+{
+    *b = 42;
+    return 0;
+}
+
+int main()
+{
+    int c;
+    c = 0;
+    write(c);   // prints "0"
+    int g;
+    g = a(&c);
+    write(c);   // prints "42"
+    return 0;
+}
+    )";
+    std::vector<int> expected_output{0, 42};
+    EXPECT_EQ(expected_output, test_compiled(code, {}));
+}
+
+TEST(compiled, pointer_pointer)
+{
+    std::string code = R"(
+int a(int ** b)
+{
+    **b = 42;
+    return 0;
+}
+
+int main()
+{
+    int c;
+    c = 0;
+    write(c);   // prints "0"
+    int * e;
+    e = &c;
+    int g;
+    g = a(&e);
+    write(c);   // prints "42"
+    return 0;
+}
+    )";
+    std::vector<int> expected_output{0, 42};
+    EXPECT_EQ(expected_output, test_compiled(code, {}));
+}
+
 int main(int argc, char ** argv)
 {
     testing::InitGoogleTest(&argc, argv);

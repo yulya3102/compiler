@@ -20,7 +20,9 @@ struct semantic_error : std::runtime_error
     const char * what() const noexcept
     {
         std::stringstream ss;
-        ss << *loc << ": " << std::runtime_error::what();
+        if (loc)
+            ss << *loc << ": ";
+        ss << std::runtime_error::what();
         return ss.str().c_str();
     }
 

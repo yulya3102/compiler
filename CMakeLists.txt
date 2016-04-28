@@ -16,4 +16,5 @@ add_subdirectory(gen)
 add_subdirectory(optimise)
 add_subdirectory(lcc)
 
+enable_testing()
 add_subdirectory(testing)

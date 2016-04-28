@@ -15,4 +15,4 @@ language: cpp
 script:
     - cmake .
     - make
-    - ctest
+    - ctest -V

@@ -51,6 +51,7 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     for (auto i : input)
         fprintf(pin, "%d\n", i);
     fflush(pin);
+    fclose(pin);
 
     FILE * pout = fdopen(process_output[0], "r");
     int i;

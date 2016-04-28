@@ -15,4 +15,4 @@ language: cpp
 script:
     - cmake .
     - make
-    - ctest -V
+    - LLC=llc-3.7 ctest -V

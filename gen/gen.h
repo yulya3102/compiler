@@ -52,15 +52,14 @@ struct frame : sem::typed_ctx<value>
     typed_value gen_expr(const ast::Call & call) const;
     typed_value gen_expr(const ast::Expression & expr) const;
 
-    void gen_statement(const ast::Skip & st);
     void gen_statement(const ast::VarDeclaration & st);
     void gen_statement(const ast::Assignment & st);
-    void gen_statement(const ast::Seq & st);
     void gen_statement(const ast::If & st);
     void gen_statement(const ast::While & st);
     void gen_statement(const ast::Read & st);
     void gen_statement(const ast::Write & st);
     void gen_statement(const ast::Return & ret);
+    void gen_statement(const ast::Block & st);
     void gen_statement(const ast::Statement & st);
 
     llvm::Module * module;

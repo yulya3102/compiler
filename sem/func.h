@@ -85,9 +85,6 @@ struct function_ctx : typed_ctx<top>
         fmap([this], x, this->verify_expr(x), expr.expression);
     }
 
-    void verify_statement(const ast::Skip & st)
-    {}
-
     void verify_statement(const ast::VarDeclaration & st)
     {
         if (this->is_locally_declared(st.name))
@@ -102,12 +99,6 @@ struct function_ctx : typed_ctx<top>
         auto lvalue_type = this->get_type(st.lvalue);
         auto rvalue_type = this->get_type(st.rvalue);
         expect_type(rvalue_type, lvalue_type, "location type does not match assigned expression type");
-    }
-
-    void verify_statement(const ast::Seq & st)
-    {
-        verify_statement(*st.first);
-        verify_statement(*st.second);
     }
 
     void verify_statement(const ast::If & st)
@@ -142,6 +133,11 @@ struct function_ctx : typed_ctx<top>
     {
         verify_expr(*st.expr);
         expect_type(this->get_type(*st.expr), return_type, "function return type does not match return expression type");
+    }
+
+    void verify_statement(const ast::Block & st)
+    {
+        undefined;
     }
 
     void verify_statement(const ast::Statement & st)

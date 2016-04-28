@@ -158,7 +158,7 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
             inner_scope.declare({proto_it->type, {value_type::RVALUE, &*arg_it}}, proto_it->name);
         }
     }
-    inner_scope.gen_statement(entry.statement);
+    inner_scope.gen_statement(entry.statements);
     get_builder().CreateUnreachable();
 
     if (llvm::verifyFunction(*f, &llvm::errs()))
@@ -279,9 +279,6 @@ typed_value frame::gen_expr(const ast::Expression & expr) const
     return fmap([this], x, this->gen_expr(x), expr.expression);
 }
 
-void frame::gen_statement(const ast::Skip &)
-{ }
-
 void frame::gen_statement(const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
@@ -293,12 +290,6 @@ void frame::gen_statement(const ast::Assignment & st)
     llvm::Value * lval = this->gen_expr(st.lvalue).second.second;
     llvm::Value * rval = gen_rvalue(*this, st.rvalue);
     get_builder().CreateStore(rval, lval);
-}
-
-void frame::gen_statement(const ast::Seq & st)
-{
-    this->gen_statement(*st.first);
-    this->gen_statement(*st.second);
 }
 
 void frame::gen_statement(const ast::If & st)
@@ -388,6 +379,11 @@ void frame::gen_statement(const ast::Return & ret)
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);
     get_builder().SetInsertPoint(unreachable);
+}
+
+void frame::gen_statement(const ast::Block & st)
+{
+    undefined;
 }
 
 void frame::gen_statement(const ast::Statement & st)

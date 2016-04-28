@@ -33,17 +33,6 @@ struct While
     std::shared_ptr<Statement> body;
 };
 
-struct Skip
-{
-    std::shared_ptr<location> loc;
-};
-
-struct Seq
-{
-    std::shared_ptr<location> loc;
-    std::shared_ptr<Statement> first, second;
-};
-
 struct Read
 {
     std::shared_ptr<location> loc;
@@ -62,6 +51,12 @@ struct Return
     std::shared_ptr<Expression> expr;
 };
 
+struct Block
+{
+    std::shared_ptr<location> loc;
+    std::list<Statement> statements;
+};
+
 struct Statement
 {
     template <typename T>
@@ -71,15 +66,14 @@ struct Statement
 
     std::shared_ptr<location> loc;
     boost::variant<
-        Skip,
         VarDeclaration,
         Assignment,
-        Seq,
         If,
         While,
         Read,
         Write,
-        Return
+        Return,
+        Block
         > statement;
 };
 

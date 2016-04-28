@@ -22,7 +22,7 @@ struct FuncDefinition
 {
     std::shared_ptr<location> loc;
     FuncDeclaration declaration;
-    Statement statement;
+    Block statements;
 };
 
 struct Definition
@@ -78,11 +78,10 @@ std::string to_string(const Assignment &);
 std::string to_string(const Statement &);
 std::string to_string(const If &);
 std::string to_string(const While &);
-std::string to_string(const Skip &);
-std::string to_string(const Seq &);
 std::string to_string(const Read &);
 std::string to_string(const Write &);
 std::string to_string(const Return &);
+std::string to_string(const Block &);
 std::string to_string(const FuncDefinition &);
 std::string to_string(const Definition &);
 std::string to_string(const CodeEntry &);

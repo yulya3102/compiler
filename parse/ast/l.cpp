@@ -186,14 +186,9 @@ std::string to_string(const While & st)
         + "\n}\n";
 }
 
-std::string to_string(const Skip &)
+std::string to_string(const Block & block)
 {
-    return "";
-}
-
-std::string to_string(const Seq & seq)
-{
-    return to_string(*seq.first) + ";\n" + to_string(*seq.second);
+    return "{\n" + to_string(block.statements.begin(), block.statements.end(), ";\n") + "}";
 }
 
 std::string to_string(const Read & read)
@@ -215,7 +210,7 @@ std::string to_string(const FuncDefinition & def)
 {
     return to_string(def.declaration)
         + "\n{\n"
-        + to_string(def.statement)
+        + to_string(def.statements)
         + "\n}\n";
 }
 

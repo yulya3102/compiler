@@ -4,9 +4,8 @@ int main()
 {
     int n;
     int res;
-    while (true)
+    while (read(n))
     {
-        read(n);
         res = fact(n);
         write(res);
     }

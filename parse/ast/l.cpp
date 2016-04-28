@@ -172,18 +172,16 @@ std::string to_string(const Statement & st)
 std::string to_string(const If & st)
 {
     return "if (" + to_string(st.condition) + ")\n"
-        + "{\n"
         + to_string(*st.thenBody)
-        + "\n}\nelse {\n"
+        + "\nelse\n"
         + to_string(*st.elseBody)
-        + "\n}\n";
+        + "\n";
 }
 std::string to_string(const While & st)
 {
     return "while (" + to_string(st.condition) + ")\n"
-        + "{\n"
         + to_string(*st.body)
-        + "\n}\n";
+        + "\n";
 }
 
 std::string to_string(const Block & block)
@@ -208,10 +206,7 @@ std::string to_string(const Return & ret)
 
 std::string to_string(const FuncDefinition & def)
 {
-    return to_string(def.declaration)
-        + "\n{\n"
-        + to_string(def.statements)
-        + "\n}\n";
+    return to_string(def.declaration) + to_string(def.statements);
 }
 
 std::string to_string(const Definition & def)

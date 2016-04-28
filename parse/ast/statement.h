@@ -33,12 +33,6 @@ struct While
     std::shared_ptr<Block> body;
 };
 
-struct Read
-{
-    std::shared_ptr<location> loc;
-    std::string varname;
-};
-
 struct Write
 {
     std::shared_ptr<location> loc;
@@ -72,7 +66,6 @@ struct Statement
         Assignment,
         If,
         While,
-        Read,
         Write,
         Return,
         Block

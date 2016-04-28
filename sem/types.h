@@ -75,6 +75,11 @@ struct typed_ctx : context<std::pair<ast::Type, T>>
         return *boost::get<ast::FuncType>(func_type.type).rettype;
     }
 
+    ast::Type get_type(const ast::Read & expr) const
+    {
+        return ast::bool_type(expr.loc);
+    }
+
     ast::Type get_type(const ast::Expression & expr) const
     {
         return fmap([this], x, this->get_type(x), expr.expression);

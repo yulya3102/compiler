@@ -50,13 +50,13 @@ struct frame : sem::typed_ctx<value>
     typed_value gen_expr(const ast::Dereference & deref) const;
     typed_value gen_expr(const ast::Address & addr) const;
     typed_value gen_expr(const ast::Call & call) const;
+    typed_value gen_expr(const ast::Read & st) const;
     typed_value gen_expr(const ast::Expression & expr) const;
 
     void gen_statement(const ast::VarDeclaration & st);
     void gen_statement(const ast::Assignment & st);
     void gen_statement(const ast::If & st);
     void gen_statement(const ast::While & st);
-    void gen_statement(const ast::Read & st);
     void gen_statement(const ast::Write & st);
     void gen_statement(const ast::Return & ret);
     void gen_statement(const ast::Block & block);
@@ -73,7 +73,7 @@ llvm::Type * gen_type(const ast::Type & type);
 llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry);
 
 void gen_static_data(llvm::Module * module);
-llvm::Value * gen_format_string(frame & ctx, const ast::Type & type);
+llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type);
 
 void gen_entry(frame & ctx, const ast::Declaration & entry);
 void gen_entry(frame & ctx, const ast::Definition & entry);

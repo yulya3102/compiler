@@ -86,6 +86,12 @@ struct Address
     std::shared_ptr<Expression> expr;
 };
 
+struct Read
+{
+    std::shared_ptr<location> loc;
+    std::string varname;
+};
+
 struct Expression
 {
     template <typename T>
@@ -94,6 +100,6 @@ struct Expression
     {}
 
     std::shared_ptr<location> loc;
-    boost::variant<Value, BinOperator, Dereference, Address, Call> expression;
+    boost::variant<Value, BinOperator, Dereference, Address, Call, Read> expression;
 };
 }

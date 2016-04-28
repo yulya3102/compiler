@@ -80,6 +80,12 @@ struct function_ctx : typed_ctx<top>
             expect_type(this->get_type(*called_it), *it, "argument type mismatch");
     }
 
+    void verify_expr(const ast::Read & st)
+    {
+        this->verify_expr(st.varname);
+        expect_type(this->get_type(st.varname), ast::int_type(), "read() argument must have integer type");
+    }
+
     void verify_expr(const ast::Expression & expr)
     {
         fmap([this], x, this->verify_expr(x), expr.expression);
@@ -114,12 +120,6 @@ struct function_ctx : typed_ctx<top>
         verify_expr(st.condition);
         expect_type(this->get_type(st.condition), ast::bool_type(), "condition must have boolean type");
         verify_statement(*st.body);
-    }
-
-    void verify_statement(const ast::Read & st)
-    {
-        verify_expr(st.varname);
-        expect_type(this->get_type(st.varname), ast::int_type(), "read() argument must have integer type");
     }
 
     void verify_statement(const ast::Write & st)

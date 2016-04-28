@@ -274,6 +274,16 @@ typed_value frame::gen_expr(const ast::Call & call) const
     return {this->get_type(call), {value_type::RVALUE, get_builder().CreateCall(f.second.second, args)}};
 }
 
+typed_value frame::gen_expr(const ast::Read & st) const
+{
+    llvm::Value * f = this->module->getNamedValue("scanf");
+    llvm::Value * v = this->get(st.varname).second.second;
+    llvm::Value * format_string = gen_format_string(*this, this->get_type(st.varname));
+    std::vector<llvm::Value *> args = { format_string, v };
+
+    get_builder().CreateCall(f, args);
+}
+
 typed_value frame::gen_expr(const ast::Expression & expr) const
 {
     return fmap([this], x, this->gen_expr(x), expr.expression);
@@ -345,17 +355,7 @@ void frame::gen_statement(const ast::While & st)
     get_builder().SetInsertPoint(cont_block);
 }
 
-void frame::gen_statement(const ast::Read & st)
-{
-    llvm::Value * f = this->module->getNamedValue("scanf");
-    llvm::Value * v = this->get(st.varname).second.second;
-    llvm::Value * format_string = gen_format_string(*this, this->get_type(st.varname));
-    std::vector<llvm::Value *> args = { format_string, v };
-
-    get_builder().CreateCall(f, args);
-}
-
-llvm::Value * gen_format_string(frame & ctx, const ast::Type & type)
+llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type)
 {
     // TODO: check output type
     llvm::Value * format_ptr = ctx.module->getNamedValue("printf_int");

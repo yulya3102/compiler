@@ -1,4 +1,4 @@
-EXAMPLES = pointer.lc func_pointer.lc pointer_pointer.lc
+EXAMPLES = pointer.lc pointer_pointer.lc
 OBJECTS = $(patsubst %.lc,%.o,$(EXAMPLES))
 TRANSLATED = $(patsubst %.lc,%.ir,$(EXAMPLES))
 RESULTS = $(patsubst %.lc,%,$(EXAMPLES))
@@ -25,7 +25,6 @@ LCC ?= ../lcc/lcc
 
 test: examples
 	./pointer.test && echo "OK"
-	./func_pointer.test && echo "OK"
 	./pointer_pointer.test && echo "OK"
 
 clean:

@@ -62,6 +62,22 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     return result;
 }
 
+int fact(int n)
+{
+    if (n > 1)
+        return n * fact(n - 1);
+
+    return 1;
+}
+
+int fib(int n)
+{
+    if (n > 2)
+        return fib(n - 1) + fib(n - 2);
+
+    return 1;
+}
+
 TEST(compiled, fact)
 {
     std::string code =
@@ -86,7 +102,6 @@ TEST(compiled, fact)
         "    else {}"
         "    return n * fact(n - 1);"
         "}";
-    std::function<int(int)> fact = [&fact] (int n) { if (n > 1) return n * fact(n - 1); else return 1; };
     std::vector<int> input, expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
     {
@@ -160,6 +175,68 @@ TEST(semantic, subscope)
         "   return 0;"
         "}";
     EXPECT_NO_THROW(try_compile(code));
+}
+
+TEST(compiled, func_pointer)
+{
+    std::string code = R"(
+int fact(int n)
+{
+    if (n > 1)
+        return n * fact(n - 1);
+    else
+        return 1;
+}
+
+int fib(int n)
+{
+    int prev;   prev = 1;
+    int cur;    cur = 1;
+    int i;      i = 2;
+    int next;
+    while (i < n)
+    {
+        next = prev + cur;
+        prev = cur;
+        cur = next;
+        i = i + 1;
+    }
+    return cur;
+}
+
+int test(int start, int end, int(int) * func)
+{
+    int i;  i = start;
+    while (i <= end)
+    {
+        write(i);
+        write((*func)(i));
+        i = i + 1;
+    }
+    return i;
+}
+
+int main()
+{
+    int x;
+    x = test(1, 10, &fact);
+    x = test(1, 10, &fib);
+    return 0;
+}
+    )";
+
+    std::vector<int> expected_output;
+    for (std::size_t i = 1; i <= 10; ++i)
+    {
+        expected_output.push_back(i);
+        expected_output.push_back(fact(i));
+    }
+    for (std::size_t i = 1; i <= 10; ++i)
+    {
+        expected_output.push_back(i);
+        expected_output.push_back(fib(i));
+    }
+    EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
 
 int main(int argc, char ** argv)

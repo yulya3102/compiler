@@ -98,39 +98,68 @@ TEST(compiled, fact)
 
 TEST(compiled, scope)
 {
-    std::string code = R"(
-// Test function calls
-
-int ten()
-{
-    return 10;
-}
-
-int a;
-
-int initA(int n)
-{
-    a = n;
-    int b;    b = 14;
-    return 0;
-}
-
-int main()
-{
-    write(ten());       // prints "10"
-    write(a);           // prints "0"
-    int b;
-    b = 88;
-    write(b);           // prints "88"
-    int ret;
-    ret = initA(42);    // function uses 'a' from outer scope and 'b' from its own scope
-    write(a);           // prints "42"
-    write(b);           // prints "88"
-
-    return 0;
-})";
-    std::vector<int> expected_output = {10, 0, 88, 42, 88};
+    std::string code =
+        "int a;"
+        ""
+        "int initA(int n)"
+        "{"
+        "   a = n;"
+        "   int b;  b = 14;"
+        "   return 0;"
+        "}"
+        ""
+        "int main()"
+        "{"
+        "   write(a);"          // prints "0"
+        "   int b;  b = 88;"
+        "   write(b);"          // prints "88"
+        "   int ret;"
+        "   ret = initA(42);"   // function should use 'a' from outer scope and 'b' from its own scope
+        "   write(a);"          // prints "42"
+        "   write(b);"          // prints "88"
+        ""
+        "   return 0;"
+        "}";
+    std::vector<int> expected_output = {0, 88, 42, 88};
     EXPECT_EQ(test_compiled(code, {}), expected_output);
+}
+
+TEST(semantic, subscope)
+{
+    std::string code =
+        "int main()"
+        "{"
+        // Test inner block scoping
+        "   {"
+        "       int b;  b = 0;"
+        "   }"
+        "   _Bool b; b = true;"
+        ""
+        // Test if scoping
+        "   if (true)"
+        "   {"
+        "       int a; a = 1;"
+        "   }"
+        "   else"
+        "       int c;"
+        ""
+        "   _Bool a;"
+        "   _Bool c;"
+        ""
+        // Test while scoping
+        "   while (true)"
+        "   {"
+        "       int d; d = 1;"
+        "   }"
+        "   while (false)"
+        "       int e;"
+        ""
+        "   _Bool d;"
+        "   _Bool e;"
+        ""
+        "   return 0;"
+        "}";
+    EXPECT_NO_THROW(try_compile(code));
 }
 
 int main(int argc, char ** argv)

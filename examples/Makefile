@@ -1,4 +1,4 @@
-EXAMPLES = scope.lc fact.lc pointer.lc func_pointer.lc pointer_pointer.lc
+EXAMPLES = pointer.lc func_pointer.lc pointer_pointer.lc
 OBJECTS = $(patsubst %.lc,%.o,$(EXAMPLES))
 TRANSLATED = $(patsubst %.lc,%.ir,$(EXAMPLES))
 RESULTS = $(patsubst %.lc,%,$(EXAMPLES))
@@ -24,8 +24,6 @@ LCC ?= ../lcc/lcc
 .PHONY: test
 
 test: examples
-	./scope.test && echo "OK"
-	./fact.test  && echo "OK"
 	./pointer.test && echo "OK"
 	./func_pointer.test && echo "OK"
 	./pointer_pointer.test && echo "OK"

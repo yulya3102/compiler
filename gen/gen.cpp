@@ -278,7 +278,7 @@ typed_value frame::gen_expr(const ast::Read & st) const
 {
     llvm::Value * f = this->module->getNamedValue("scanf");
     llvm::Value * v = this->get(st.varname).second.second;
-    llvm::Value * format_string = gen_format_string(*this, this->get_type(st.varname));
+    llvm::Value * format_string = this->module->getNamedValue("scanf_int");
     std::vector<llvm::Value *> args = { format_string, v };
     llvm::Value * scanf_result = get_builder().CreateCall(f, args);
     llvm::Value * eof_const = get_builder().getInt32(EOF);
@@ -408,6 +408,11 @@ void gen_static_data(llvm::Module * module)
             llvm::GlobalVariable::InternalLinkage, printf_int_init, "printf_int");
 
     llvm::Function::Create(type, llvm::Function::ExternalLinkage, "scanf", module);
+    llvm::Constant * scanf_int_init
+            = llvm::ConstantDataArray::getString(llvm::getGlobalContext(), "%d");
+    llvm::Value * scanf_int = new llvm::GlobalVariable(
+            *module, llvm::TypeBuilder<char[3], false>::get(llvm::getGlobalContext()), true,
+            llvm::GlobalVariable::InternalLinkage, scanf_int_init, "scanf_int");
 }
 
 typed_value frame::gen_expr(const ast::Address & addr) const

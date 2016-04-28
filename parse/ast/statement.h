@@ -17,20 +17,20 @@ struct Assignment
     Expression rvalue;
 };
 
-struct Statement;
+struct Block;
 
 struct If
 {
     std::shared_ptr<location> loc;
     Expression condition;
-    std::shared_ptr<Statement> thenBody, elseBody;
+    std::shared_ptr<Block> thenBody, elseBody;
 };
 
 struct While
 {
     std::shared_ptr<location> loc;
     Expression condition;
-    std::shared_ptr<Statement> body;
+    std::shared_ptr<Block> body;
 };
 
 struct Read
@@ -50,6 +50,8 @@ struct Return
     std::shared_ptr<location> loc;
     std::shared_ptr<Expression> expr;
 };
+
+struct Statement;
 
 struct Block
 {

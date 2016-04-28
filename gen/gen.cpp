@@ -280,8 +280,11 @@ typed_value frame::gen_expr(const ast::Read & st) const
     llvm::Value * v = this->get(st.varname).second.second;
     llvm::Value * format_string = gen_format_string(*this, this->get_type(st.varname));
     std::vector<llvm::Value *> args = { format_string, v };
+    llvm::Value * scanf_result = get_builder().CreateCall(f, args);
+    llvm::Value * eof_const = get_builder().getInt32(EOF);
+    llvm::Value * is_eof = get_builder().CreateICmpNE(scanf_result, eof_const, "is_eof");
 
-    return {this->get_type(st), {value_type::RVALUE, get_builder().CreateCall(f, args)}};
+    return {this->get_type(st), {value_type::RVALUE, is_eof}};
 }
 
 typed_value frame::gen_expr(const ast::Expression & expr) const

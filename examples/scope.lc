@@ -26,6 +26,38 @@ int testSubscope()
     return 0;
 }
 
+int ifSubscope()
+{
+    if (false)
+    {
+        int a;
+        a = 1;
+    }
+    else
+        int b;
+
+    _Bool a;
+    _Bool b;
+
+    return 0;
+}
+
+int whileSubscope()
+{
+    while (false)
+    {
+        int a;
+        a = 1;
+    }
+    while (true)
+        int b;
+
+    _Bool a;
+    _Bool b;
+
+    return 0;
+}
+
 int main()
 {
     write(ten());       // prints "10"
@@ -39,6 +71,8 @@ int main()
     write(b);           // prints "88"
 
     b = testSubscope();
+    b = whileSubscope();
+    b = ifSubscope();
 
     return 0;
 }

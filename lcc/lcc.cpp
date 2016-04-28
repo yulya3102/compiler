@@ -42,7 +42,8 @@ void lcc::compile_executable(std::istream & in, const std::string & output_name)
 
     std::string object_filename = create_temp_file("lcc_XXXXXX.o", 2);
     {
-        std::string command("llc -o=");
+        std::string command(get_env_variable("LLC", "llc"));
+        command += " -o=";
         command += object_filename;
         command += " --filetype=obj ";
         command += ll_filename;
@@ -50,10 +51,19 @@ void lcc::compile_executable(std::istream & in, const std::string & output_name)
     }
 
     {
-        std::string command("gcc -o ");
+        std::string command(get_env_variable("CC", "gcc"));
+        command += " -o ";
         command += output_name;
         command += " ";
         command += object_filename;
         std::system(command.c_str());
     }
+}
+
+std::string lcc::get_env_variable(const char * varname, const char * default_value)
+{
+    char * value = std::getenv(varname);
+    if (!value)
+        return default_value;
+    return value;
 }

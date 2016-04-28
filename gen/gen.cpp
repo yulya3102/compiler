@@ -281,7 +281,7 @@ typed_value frame::gen_expr(const ast::Read & st) const
     llvm::Value * format_string = gen_format_string(*this, this->get_type(st.varname));
     std::vector<llvm::Value *> args = { format_string, v };
 
-    get_builder().CreateCall(f, args);
+    return {this->get_type(st), {value_type::RVALUE, get_builder().CreateCall(f, args)}};
 }
 
 typed_value frame::gen_expr(const ast::Expression & expr) const

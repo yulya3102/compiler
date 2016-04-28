@@ -1,0 +1,23 @@
+int main()
+{
+    int i; i = 0;
+    while (i < 10)
+    {
+        int a;
+        a = 5;
+        if (i + a > 7)
+        {
+            int b;
+            b = 42;
+            write(b);
+        }
+        else
+        {
+            _Bool b;
+            b = true;
+            if (b)
+                write(24);
+            else {}
+        }
+    }
+}

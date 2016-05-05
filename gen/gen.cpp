@@ -156,6 +156,8 @@ void gen_entry(frame & ctx, const Function & entry)
             inner_scope.declare({proto_it->type, {value_type::RVALUE, &*arg_it}}, proto_it->name);
         }
     }
+    for (auto var : entry.variables)
+        inner_scope.gen_local_variable(var);
     for (auto statement : entry.statements)
         inner_scope.gen_statement(statement);
     get_builder().CreateUnreachable();
@@ -293,13 +295,11 @@ typed_value frame::gen_expr(const ast::Expression & expr) const
     return fmap([this], x, this->gen_expr(x), expr.expression);
 }
 
-/*
-void frame::gen_statement(const ast::VarDeclaration & v)
+void frame::gen_local_variable(const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
     this->declare({v.type, {value_type::LVALUE, val}}, v.name);
 }
-*/
 
 void frame::gen_statement(const ast::Assignment & st)
 {

@@ -41,9 +41,8 @@ struct frame : sem::typed_ctx<value>
     typed_value gen_expr(const ast::Read & st) const;
     typed_value gen_expr(const ast::Expression & expr) const;
 
-    /*
-    void gen_statement(const ast::VarDeclaration & st);
-    */
+    void gen_local_variable(const ast::VarDeclaration & st);
+
     void gen_statement(const ast::Assignment & st);
     void gen_statement(const ast::If & st);
     void gen_statement(const ast::While & st);

@@ -1,4 +1,5 @@
 #include "gen.h"
+#include "ast/l.h"
 
 #include <sem/l.h>
 

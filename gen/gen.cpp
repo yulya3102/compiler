@@ -46,9 +46,6 @@ std::unique_ptr<llvm::Module> generate(const Code & code, const char * name)
     std::unique_ptr<llvm::Module> result(new llvm::Module(name, llvm::getGlobalContext()));
     gen_static_data(result.get());
 
-    undefined;
-
-    /*
     frame ctx(result.get());
     for (const auto & entry : code.entries)
         fmap([&ctx], x, gen_entry(ctx, x), entry.entry);
@@ -60,7 +57,6 @@ std::unique_ptr<llvm::Module> generate(const Code & code, const char * name)
     }
 
     return std::move(result);
-    */
 }
 
 llvm::Type * gen_type(const ast::AtomType & type)
@@ -124,6 +120,7 @@ llvm::Constant * gen_init(const ast::Type & type)
     return fmap([], x, gen_init(x), type.type);
 }
 
+/*
 void gen_entry(frame & ctx, const ast::Declaration & entry)
 {
     fmap([&ctx], x, gen_entry(ctx, x), entry.declaration);
@@ -133,8 +130,9 @@ void gen_entry(frame & ctx, const ast::Definition & entry)
 {
     fmap([&ctx], x, gen_entry(ctx, x), entry.definition);
 }
+*/
 
-void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
+void gen_entry(frame & ctx, const Variable & entry)
 {
     llvm::Value * var = new llvm::GlobalVariable(
             *ctx.module, gen_type(entry.type), false,
@@ -142,23 +140,24 @@ void gen_entry(frame & ctx, const ast::VarDeclaration & entry)
     ctx.declare({entry.type, {value_type::LVALUE, var}}, entry.name);
 }
 
-void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
+void gen_entry(frame & ctx, const Function & entry)
 {
-    llvm::Function * f = gen_func_declaration(ctx, entry.declaration);
+    llvm::Function * f = gen_func_declaration(ctx, entry.name, entry.arguments, entry.type);
 
     llvm::BasicBlock * bb = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", f);
     get_builder().SetInsertPoint(bb);
 
     frame inner_scope(ctx.module, &ctx);
     {
-        auto proto_it = entry.declaration.arguments.begin();
+        auto proto_it = entry.arguments.begin();
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++proto_it)
         {
             arg_it->setName(proto_it->name);
             inner_scope.declare({proto_it->type, {value_type::RVALUE, &*arg_it}}, proto_it->name);
         }
     }
-    inner_scope.gen_statement(entry.statements);
+    for (auto statement : entry.statements)
+        inner_scope.gen_statement(statement);
     get_builder().CreateUnreachable();
 
     if (llvm::verifyFunction(*f, &llvm::errs()))
@@ -168,31 +167,33 @@ void gen_entry(frame & ctx, const ast::FuncDefinition & entry)
     }
 }
 
-llvm::Function * gen_func_declaration(frame & ctx, const ast::FuncDeclaration & entry)
+llvm::Function * gen_func_declaration(frame & ctx, const std::string & name, const std::list<Variable> & arguments, const ast::Type & rettype)
 {
-    if (ctx.is_declared(entry.name))
+    if (ctx.is_declared(name))
     {
-        typed_value found = ctx.get(entry.name);
+        typed_value found = ctx.get(name);
         return llvm::cast<llvm::Function>(found.second.second);
     }
 
     std::vector <llvm::Type *> args;
-    for (const auto & x : entry.arguments)
+    for (const auto & x : arguments)
         args.push_back(gen_type(x.type));
 
     llvm::FunctionType * type = llvm::FunctionType::get(
-            gen_type(entry.type), args, false);
+            gen_type(rettype), args, false);
 
-    llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, entry.name, ctx.module);
+    llvm::Function * f = llvm::Function::Create(type, llvm::Function::ExternalLinkage, name, ctx.module);
 
-    ctx.declare({ctx.get_type(entry), {value_type::LVALUE, f}}, entry.name);
+    ctx.declare({ctx.get_type(ast::FuncDeclaration{nullptr, rettype, name, arguments}), {value_type::LVALUE, f}}, name);
     return f;
 }
 
+/*
 void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
 {
     gen_func_declaration(ctx, entry);
 }
+*/
 
 typed_value frame::gen_expr(int64_t i) const
 {
@@ -292,11 +293,13 @@ typed_value frame::gen_expr(const ast::Expression & expr) const
     return fmap([this], x, this->gen_expr(x), expr.expression);
 }
 
+/*
 void frame::gen_statement(const ast::VarDeclaration & v)
 {
     llvm::Value * val = get_builder().CreateAlloca(gen_type(v.type), nullptr, v.name);
     this->declare({v.type, {value_type::LVALUE, val}}, v.name);
 }
+*/
 
 void frame::gen_statement(const ast::Assignment & st)
 {
@@ -317,14 +320,14 @@ void frame::gen_statement(const ast::If & st)
 
     /* Generate 'then' branch */
     get_builder().SetInsertPoint(then_block);
-    this->gen_statement(*st.thenBody);
+    undefined; // this->gen_statement(*st.thenBody);
     get_builder().CreateBr(cont_block);
     then_block = get_builder().GetInsertBlock();
 
     /* Generate 'else' branch */
     f->getBasicBlockList().push_back(else_block);
     get_builder().SetInsertPoint(else_block);
-    this->gen_statement(*st.elseBody);
+    undefined; // this->gen_statement(*st.elseBody);
     get_builder().CreateBr(cont_block);
     else_block = get_builder().GetInsertBlock();
 
@@ -348,7 +351,7 @@ void frame::gen_statement(const ast::While & st)
 
     /* Generate body branch */
     get_builder().SetInsertPoint(while_body);
-    this->gen_statement(*st.body);
+    undefined; // this->gen_statement(*st.body);
     get_builder().CreateBr(cond_block);
     while_body = get_builder().GetInsertBlock();
 
@@ -384,6 +387,7 @@ void frame::gen_statement(const ast::Return & ret)
     get_builder().SetInsertPoint(unreachable);
 }
 
+/*
 void frame::gen_statement(const ast::Block & block)
 {
     frame inner_scope(this->module, this);
@@ -392,6 +396,12 @@ void frame::gen_statement(const ast::Block & block)
 }
 
 void frame::gen_statement(const ast::Statement & st)
+{
+    return fmap([this], x, this->gen_statement(x), st.statement);
+}
+*/
+
+void frame::gen_statement(const Statement & st)
 {
     return fmap([this], x, this->gen_statement(x), st.statement);
 }

@@ -4,7 +4,13 @@
 
 #include <llvm/Support/raw_ostream.h>
 #include <gtest/gtest.h>
+#include <boost/utility/string_ref.hpp>
 #include <sstream>
+
+std::string to_string(const boost::string_ref & ref)
+{
+    return std::string(ref.begin(), ref.end());
+}
 
 void try_compile(const std::string & code)
 {
@@ -87,30 +93,11 @@ int fib(int n)
     return 1;
 }
 
+#include "compiled_fact.h"
+
 TEST(compiled, fact)
 {
-    std::string code =
-        "int fact(int n);"
-        ""
-        "int main()"
-        "{"
-        "    int n;"
-        "    int res;"
-        "    while (read(n))"
-        "    {"
-        "        res = fact(n);"
-        "        write(res);"
-        "    }"
-        "    return 0;"
-        "}"
-        ""
-        "int fact(int n)"
-        "{"
-        "    if (n < 2)"
-        "        return 1;"
-        "    else {}"
-        "    return n * fact(n - 1);"
-        "}";
+    std::string code = to_string(testing::compiled_fact);
     std::vector<int> input, expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
     {
@@ -120,40 +107,16 @@ TEST(compiled, fact)
     EXPECT_EQ(test_compiled(code, input), expected_output);
 }
 
+#include "compiled_scope.h"
+
 TEST(compiled, scope)
 {
-    std::string code =
-        "int a;"
-        ""
-        "int initA(int n)"
-        "{"
-        "   a = n;"
-        "   int b;  b = 14;"
-        "   return 0;"
-        "}"
-        ""
-        "int main()"
-        "{"
-        "   write(a);"          // prints "0"
-        "   int b;  b = 88;"
-        "   write(b);"          // prints "88"
-        "   int ret;"
-        "   ret = initA(42);"   // function should use 'a' from outer scope and 'b' from its own scope
-        "   write(a);"          // prints "42"
-        "   write(b);"          // prints "88"
-        ""
-        "   return 0;"
-        "}";
+    std::string code = to_string(testing::compiled_scope);
     std::vector<int> expected_output = {0, 88, 42, 88};
     EXPECT_EQ(test_compiled(code, {}), expected_output);
 }
 
 #include "semantic_subscope.h"
-
-std::string to_string(const boost::string_ref & ref)
-{
-    return std::string(ref.begin(), ref.end());
-}
 
 TEST(semantic, subscope)
 {
@@ -161,53 +124,11 @@ TEST(semantic, subscope)
     EXPECT_NO_THROW(try_compile(code));
 }
 
+#include "compiled_func_pointer.h"
+
 TEST(compiled, func_pointer)
 {
-    std::string code = R"(
-int fact(int n)
-{
-    if (n > 1)
-        return n * fact(n - 1);
-    else
-        return 1;
-}
-
-int fib(int n)
-{
-    int prev;   prev = 1;
-    int cur;    cur = 1;
-    int i;      i = 2;
-    int next;
-    while (i < n)
-    {
-        next = prev + cur;
-        prev = cur;
-        cur = next;
-        i = i + 1;
-    }
-    return cur;
-}
-
-int test(int start, int end, int(int) * func)
-{
-    int i;  i = start;
-    while (i <= end)
-    {
-        write(i);
-        write((*func)(i));
-        i = i + 1;
-    }
-    return i;
-}
-
-int main()
-{
-    int x;
-    x = test(1, 10, &fact);
-    x = test(1, 10, &fib);
-    return 0;
-}
-    )";
+    std::string code = to_string(testing::compiled_func_pointer);
 
     std::vector<int> expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
@@ -223,73 +144,29 @@ int main()
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
 
+#include "compiled_pointer.h"
+
 TEST(compiled, pointer)
 {
-    std::string code = R"(
-int a(int * b)
-{
-    *b = 42;
-    return 0;
-}
-
-int main()
-{
-    int c;
-    c = 0;
-    write(c);   // prints "0"
-    int g;
-    g = a(&c);
-    write(c);   // prints "42"
-    return 0;
-}
-    )";
+    std::string code = to_string(testing::compiled_pointer);
     std::vector<int> expected_output{0, 42};
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
+
+#include "compiled_pointer_pointer.h"
 
 TEST(compiled, pointer_pointer)
 {
-    std::string code = R"(
-int a(int ** b)
-{
-    **b = 42;
-    return 0;
-}
-
-int main()
-{
-    int c;
-    c = 0;
-    write(c);   // prints "0"
-    int * e;
-    e = &c;
-    int g;
-    g = a(&e);
-    write(c);   // prints "42"
-    return 0;
-}
-    )";
+    std::string code = to_string(testing::compiled_pointer_pointer);
     std::vector<int> expected_output{0, 42};
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
 
+#include "compiled_alloca_while.h"
+
 TEST(compiled, alloca_while)
 {
-    std::string code = R"(
-int main()
-{
-    int i; i = 0;
-    while (i < 100000000)
-    {
-        int j;  j = i;
-        write(i);
-
-        i = i + 1;
-    }
-
-    return 0;
-}
-    )";
+    std::string code = to_string(testing::compiled_alloca_while);
     std::vector<int> expected_output;
     for (int i = 0; i < 100000000; ++i)
         expected_output.push_back(i);

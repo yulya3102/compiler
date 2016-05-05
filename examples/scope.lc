@@ -1,0 +1,21 @@
+int a;
+
+int initA(int n)
+{
+   a = n;
+   int b;  b = 14;
+   return 0;
+}
+
+int main()
+{
+   write(a);          // prints 0
+   int b;  b = 88;
+   write(b);          // prints 88
+   int ret;
+   ret = initA(42);   // function should use 'a' from outer scope and 'b' from its own scope
+   write(a);          // prints 42
+   write(b);          // prints 88
+
+   return 0;
+}

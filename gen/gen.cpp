@@ -41,16 +41,14 @@ llvm::Value * gen_rvalue(const codegen::frame & ctx, T expr)
 
 namespace codegen
 {
-void prepare(ast::Code & code)
-{
-    undefined;
-}
-
-std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name)
+std::unique_ptr<llvm::Module> generate(const Code & code, const char * name)
 {
     std::unique_ptr<llvm::Module> result(new llvm::Module(name, llvm::getGlobalContext()));
     gen_static_data(result.get());
 
+    undefined;
+
+    /*
     frame ctx(result.get());
     for (const auto & entry : code.entries)
         fmap([&ctx], x, gen_entry(ctx, x), entry.entry);
@@ -62,6 +60,7 @@ std::unique_ptr<llvm::Module> generate(const ast::Code & code, const char * name
     }
 
     return std::move(result);
+    */
 }
 
 llvm::Type * gen_type(const ast::AtomType & type)

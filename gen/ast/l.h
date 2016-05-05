@@ -55,8 +55,15 @@ struct CodeEntry
     boost::variant<Variable, Function> entry;
 };
 
+std::list<CodeEntry> && construct_entries(const std::list<ast::CodeEntry> & entries);
+
 struct Code
 {
+    Code(const ast::Code & code)
+        : loc(code.loc)
+        , entries(construct_entries(code.entries))
+    {}
+
     std::shared_ptr<ast::location> loc;
     std::list<CodeEntry> entries;
 };

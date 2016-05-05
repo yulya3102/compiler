@@ -1,6 +1,6 @@
 add_library(gen
     gen.h gen.cpp
-    ast/l.h
+    ast/l.h ast/l.cpp
 )
 
 llvm_map_components_to_libnames(llvm_libs support core)

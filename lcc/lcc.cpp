@@ -16,8 +16,8 @@ void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::st
     ast::Code code = p.parse(in, std::cout);
     sem::verify(code);
     //optimise::optimise_tail_call(code);
-    //codegen::prepare(code);
-    std::unique_ptr<llvm::Module> module = codegen::generate(code, module_name.c_str());
+    codegen::Code gen_code(code);
+    std::unique_ptr<llvm::Module> module = codegen::generate(gen_code, module_name.c_str());
 
     module->print(out, nullptr);
 }

@@ -21,7 +21,7 @@ TEST(semantic, assignment_type_mismatch)
     EXPECT_SEMANTIC_ERROR("int main() { _Bool a; a = 1; }");
 }
 
-std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input)
+std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input, int expected_retcode = 0)
 {
     std::stringstream in(code);
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
@@ -58,6 +58,15 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     std::vector<int> result;
     while (fscanf(pout, "%d", &i) != EOF)
         result.push_back(i);
+
+    int status;
+    waitpid(child, &status, 0);
+    if (WIFEXITED(status) && (WEXITSTATUS(status) != expected_retcode))
+        throw std::runtime_error("Unexpected return code of a program: "
+                                 + std::to_string(WEXITSTATUS(status)));
+    if (WIFSIGNALED(status))
+        throw std::runtime_error("Program was terminated by a signal "
+                                 + std::to_string(WTERMSIG(status)));
 
     return result;
 }

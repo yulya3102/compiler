@@ -1,7 +1,7 @@
 add_subdirectory(bin2cpp)
 
 BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/semantic_subscope.h ${CMAKE_CURRENT_SOURCE_DIR}/semantic_subscope.cpp
-        testing::semantic_subscope ${CMAKE_CURRENT_SOURCE_DIR}/semantic_subscope.lc)
+        testing::semantic_subscope ${CMAKE_CURRENT_SOURCE_DIR}/../examples/semantic_subscope.lc)
 
 find_package(GTest REQUIRED)
 

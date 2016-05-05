@@ -1,0 +1,3 @@
+[submodule "testing/bin2cpp"]
+	path = testing/bin2cpp
+	url = https://bitbucket.org/lisyarus/bin2cpp/

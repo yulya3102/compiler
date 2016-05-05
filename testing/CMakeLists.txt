@@ -1,3 +1,5 @@
+add_subdirectory(bin2cpp)
+
 find_package(GTest REQUIRED)
 
 add_executable(test_compiler main.cpp)

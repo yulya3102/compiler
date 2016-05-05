@@ -148,41 +148,16 @@ TEST(compiled, scope)
     EXPECT_EQ(test_compiled(code, {}), expected_output);
 }
 
+#include "semantic_subscope.h"
+
+std::string to_string(const boost::string_ref & ref)
+{
+    return std::string(ref.begin(), ref.end());
+}
+
 TEST(semantic, subscope)
 {
-    std::string code =
-        "int main()"
-        "{"
-        // Test inner block scoping
-        "   {"
-        "       int b;  b = 0;"
-        "   }"
-        "   _Bool b; b = true;"
-        ""
-        // Test if scoping
-        "   if (true)"
-        "   {"
-        "       int a; a = 1;"
-        "   }"
-        "   else"
-        "       int c;"
-        ""
-        "   _Bool a;"
-        "   _Bool c;"
-        ""
-        // Test while scoping
-        "   while (true)"
-        "   {"
-        "       int d; d = 1;"
-        "   }"
-        "   while (false)"
-        "       int e;"
-        ""
-        "   _Bool d;"
-        "   _Bool e;"
-        ""
-        "   return 0;"
-        "}";
+    std::string code = to_string(testing::semantic_subscope);
     EXPECT_NO_THROW(try_compile(code));
 }
 

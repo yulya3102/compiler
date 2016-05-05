@@ -298,6 +298,32 @@ int main()
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
 
+TEST(compiled, alloca_while)
+{
+    std::string code = R"(
+int main()
+{
+    int i; i = 0;
+    while (i < 100000000)
+    {
+        int j;  j = i;
+        write(i);
+
+        i = i + 1;
+    }
+
+    return 0;
+}
+    )";
+    std::vector<int> expected_output;
+    for (int i = 0; i < 100000000; ++i)
+        expected_output.push_back(i);
+
+    auto res = test_compiled(code, {});
+
+    EXPECT_EQ(expected_output, res);
+}
+
 int main(int argc, char ** argv)
 {
     testing::InitGoogleTest(&argc, argv);

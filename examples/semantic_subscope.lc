@@ -26,7 +26,7 @@ int main()
        int e;
 
    _Bool d;
-   _Bool e;
+   int e;
 
    return 0;
 }

@@ -137,12 +137,7 @@ void gen_entry(frame & ctx, const ast::Definition & entry)
 */
 
 void gen_entry(frame & ctx, const Variable & entry)
-{
-    llvm::Value * var = new llvm::GlobalVariable(
-            *ctx.module, gen_type(entry.type), false,
-            llvm::GlobalVariable::ExternalLinkage, gen_init(entry.type), entry.name);
-    ctx.declare({entry.type, {value_type::LVALUE, var}}, entry.name);
-}
+{ }
 
 void gen_entry(frame & ctx, const Function & entry)
 {
@@ -441,7 +436,10 @@ typed_value frame::gen_expr(const ast::Address & addr) const
 
 void gen_declaration(frame & ctx, const Variable & entry)
 {
-    undefined;
+    llvm::Value * var = new llvm::GlobalVariable(
+            *ctx.module, gen_type(entry.type), false,
+            llvm::GlobalVariable::ExternalLinkage, gen_init(entry.type), entry.name);
+    ctx.declare({entry.type, {value_type::LVALUE, var}}, entry.name);
 }
 
 void gen_declaration(frame & ctx, const Function & entry)

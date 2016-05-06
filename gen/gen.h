@@ -44,7 +44,7 @@ struct frame : sem::typed_ctx<value>
     void gen_local_variable(const ast::VarDeclaration & st);
 
     void gen_statement(const ast::Assignment & st);
-    void gen_statement(const ast::If & st);
+    void gen_statement(const If & st);
     void gen_statement(const While & st);
     void gen_statement(const ast::Write & st);
     void gen_statement(const ast::Return & ret);

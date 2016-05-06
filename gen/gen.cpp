@@ -288,7 +288,7 @@ void frame::gen_statement(const ast::Assignment & st)
     get_builder().CreateStore(rval, lval);
 }
 
-void frame::gen_statement(const ast::If & st)
+void frame::gen_statement(const If & st)
 {
     /* Generate condition */
     llvm::Value * cond = gen_rvalue(*this, st.condition);

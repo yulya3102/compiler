@@ -290,8 +290,11 @@ void insert_statements(const ast::Block & st, std::list<Statement> & entries);
 
 void insert_statements(const ast::If & st, std::list<Statement> & entries)
 {
-    insert_statements(*st.thenBody, entries);
-    insert_statements(*st.elseBody, entries);
+    std::list<Statement> thenBody, elseBody;
+    insert_statements(*st.thenBody, thenBody);
+    insert_statements(*st.elseBody, elseBody);
+    If gen_st{st.loc, st.condition, thenBody, elseBody};
+    entries.push_back(Statement(gen_st));
 }
 
 void insert_statements(const ast::While & st, std::list<Statement> & entries)

@@ -12,6 +12,13 @@ namespace codegen
 {
 struct Statement;
 
+struct If
+{
+    std::shared_ptr<ast::location> loc;
+    ast::Expression condition;
+    std::list<Statement> thenBody, elseBody;
+};
+
 struct While
 {
     std::shared_ptr<ast::location> loc;
@@ -30,7 +37,7 @@ struct Statement
     std::shared_ptr<ast::location> loc;
     boost::variant<
         ast::Assignment,
-        ast::If,
+        If,
         While,
         ast::Write,
         ast::Return

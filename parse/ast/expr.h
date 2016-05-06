@@ -100,6 +100,13 @@ struct Expression
     {}
 
     std::shared_ptr<location> loc;
-    boost::variant<Value, BinOperator, Dereference, Address, Call, Read> expression;
+    boost::variant
+        < Value
+        , BinOperator
+        , Dereference
+        , Address
+        , Call
+        , Read
+        > expression;
 };
 }

@@ -296,7 +296,10 @@ void insert_statements(const ast::If & st, std::list<Statement> & entries)
 
 void insert_statements(const ast::While & st, std::list<Statement> & entries)
 {
-    insert_statements(*st.body, entries);
+    std::list<Statement> body;
+    insert_statements(*st.body, body);
+    While gen_st{st.loc, st.condition, body};
+    entries.push_back(Statement(gen_st));
 }
 
 void insert_statements(const ast::Block & st, std::list<Statement> & entries)

@@ -22,6 +22,7 @@ struct If
 struct While
 {
     std::shared_ptr<ast::location> loc;
+    std::string label;
     ast::Expression condition;
     std::list<Statement> body;
 };
@@ -29,6 +30,7 @@ struct While
 struct Continue
 {
     std::shared_ptr<ast::location> loc;
+    std::string label;
 };
 
 struct Statement

@@ -301,7 +301,7 @@ void insert_statements(const ast::While & st, std::list<Statement> & entries)
 {
     std::list<Statement> body;
     insert_statements(*st.body, body);
-    While gen_st{st.loc, st.condition, body};
+    While gen_st{st.loc, undefined_expr(std::string), st.condition, body};
     entries.push_back(Statement(gen_st));
 }
 

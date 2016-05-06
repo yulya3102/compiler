@@ -55,29 +55,49 @@ ast::Value annotate_variables(sem::typed_ctx<top> & frame, const ast::Value & ex
     return fmap([&frame], x, ast::Value(annotate_variables(frame, x)), expr.value);
 }
 
+ast::Expression annotate_variables(sem::typed_ctx<top> & frame, const ast::Expression & expr);
+
 ast::BinOperator annotate_variables(sem::typed_ctx<top> & frame, const ast::BinOperator & expr)
 {
-    undefined;
+    auto lhs = annotate_variables(frame, *expr.lhs);
+    auto rhs = annotate_variables(frame, *expr.rhs);
+
+    return {expr.loc,
+                std::shared_ptr<ast::Expression>(new ast::Expression(lhs)),
+                std::shared_ptr<ast::Expression>(new ast::Expression(rhs)),
+                expr.oper};
 }
 
 ast::Dereference annotate_variables(sem::typed_ctx<top> & frame, const ast::Dereference & expr)
 {
-    undefined;
+    auto deref = annotate_variables(frame, *expr.expr);
+
+    return {expr.loc,
+                std::shared_ptr<ast::Expression>(new ast::Expression(deref))};
 }
 
 ast::Address annotate_variables(sem::typed_ctx<top> & frame, const ast::Address & expr)
 {
-    undefined;
+    auto addr = annotate_variables(frame, *expr.expr);
+
+    return {expr.loc,
+                std::shared_ptr<ast::Expression>(new ast::Expression(addr))};
 }
 
 ast::Call annotate_variables(sem::typed_ctx<top> & frame, const ast::Call & expr)
 {
-    undefined;
+    auto func = annotate_variables(frame, *expr.function);
+
+    std::list<ast::Expression> arguments;
+    for (auto arg : expr.arguments)
+        arguments.push_back(annotate_variables(frame, arg));
+
+    return {expr.loc, std::shared_ptr<ast::Expression>(new ast::Expression(func)), arguments};
 }
 
 ast::Read annotate_variables(sem::typed_ctx<top> & frame, const ast::Read & expr)
 {
-    undefined;
+    return {expr.loc, annotated_variable(frame, expr.varname)};
 }
 
 ast::Expression annotate_variables(sem::typed_ctx<top> & frame, const ast::Expression & expr)
@@ -125,7 +145,10 @@ ast::While annotate_variables(sem::typed_ctx<top> & frame, const ast::While & st
 
 ast::Write annotate_variables(sem::typed_ctx<top> & frame, const ast::Write & st)
 {
-    undefined;
+    auto expr = annotate_variables(frame, *st.expr);
+
+    return {st.loc,
+                std::shared_ptr<ast::Expression>(new ast::Expression(expr))};
 }
 
 ast::Return annotate_variables(sem::typed_ctx<top> & frame, const ast::Return & st)

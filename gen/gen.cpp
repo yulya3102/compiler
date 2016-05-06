@@ -300,14 +300,16 @@ void frame::gen_statement(const If & st)
 
     /* Generate 'then' branch */
     get_builder().SetInsertPoint(then_block);
-    undefined; // this->gen_statement(*st.thenBody);
+    for (auto statement : st.thenBody)
+        this->gen_statement(statement);
     get_builder().CreateBr(cont_block);
     then_block = get_builder().GetInsertBlock();
 
     /* Generate 'else' branch */
     f->getBasicBlockList().push_back(else_block);
     get_builder().SetInsertPoint(else_block);
-    undefined; // this->gen_statement(*st.elseBody);
+    for (auto statement : st.elseBody)
+        this->gen_statement(statement);
     get_builder().CreateBr(cont_block);
     else_block = get_builder().GetInsertBlock();
 
@@ -331,7 +333,8 @@ void frame::gen_statement(const While & st)
 
     /* Generate body branch */
     get_builder().SetInsertPoint(while_body);
-    undefined; // this->gen_statement(*st.body);
+    for (auto statement : st.body)
+        this->gen_statement(statement);
     get_builder().CreateBr(cond_block);
     while_body = get_builder().GetInsertBlock();
 

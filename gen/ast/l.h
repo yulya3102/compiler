@@ -26,6 +26,11 @@ struct While
     std::list<Statement> body;
 };
 
+struct Continue
+{
+    std::shared_ptr<ast::location> loc;
+};
+
 struct Statement
 {
     template <typename T>
@@ -39,6 +44,7 @@ struct Statement
         ast::Assignment,
         If,
         While,
+        Continue,
         ast::Write,
         ast::Return
         > statement;

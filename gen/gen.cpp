@@ -347,6 +347,11 @@ void frame::gen_statement(const While & st)
     get_builder().SetInsertPoint(cont_block);
 }
 
+void frame::gen_statement(const Continue & st)
+{
+    undefined;
+}
+
 llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type)
 {
     // TODO: check output type

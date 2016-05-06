@@ -301,7 +301,10 @@ void insert_statements(const ast::While & st, std::list<Statement> & entries)
 {
     std::list<Statement> body;
     insert_statements(*st.body, body);
-    While gen_st{st.loc, undefined_expr(std::string), st.condition, body};
+    static std::size_t label_idx = 0;
+    std::string label = "label_" + label_idx;
+    label_idx += 1;
+    While gen_st{st.loc, label, st.condition, body};
     entries.push_back(Statement(gen_st));
 }
 

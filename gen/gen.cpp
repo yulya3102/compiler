@@ -316,7 +316,7 @@ void frame::gen_statement(const ast::If & st)
     get_builder().SetInsertPoint(cont_block);
 }
 
-void frame::gen_statement(const ast::While & st)
+void frame::gen_statement(const While & st)
 {
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * while_body = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_body", f);

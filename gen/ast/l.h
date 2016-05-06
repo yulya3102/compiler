@@ -10,6 +10,15 @@
 
 namespace codegen
 {
+struct Statement;
+
+struct While
+{
+    std::shared_ptr<ast::location> loc;
+    ast::Expression condition;
+    std::list<Statement> body;
+};
+
 struct Statement
 {
     template <typename T>
@@ -22,7 +31,7 @@ struct Statement
     boost::variant<
         ast::Assignment,
         ast::If,
-        ast::While,
+        While,
         ast::Write,
         ast::Return
         > statement;

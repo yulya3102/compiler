@@ -67,6 +67,9 @@ llvm::Function * gen_func_declaration(frame & ctx, const std::string & name, con
 void gen_static_data(llvm::Module * module);
 llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type);
 
+void gen_declaration(frame & ctx, const Variable & entry);
+void gen_declaration(frame & ctx, const Function & entry);
+
 void gen_entry(frame & ctx, const Variable & entry);
 void gen_entry(frame & ctx, const Function & entry);
 /*

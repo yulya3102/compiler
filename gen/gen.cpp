@@ -47,6 +47,10 @@ std::unique_ptr<llvm::Module> generate(const Code & code, const char * name)
     gen_static_data(result.get());
 
     frame ctx(result.get());
+
+    for (const auto & entry : code.entries)
+        fmap([&ctx], x, gen_declaration(ctx, x), entry.entry);
+
     for (const auto & entry : code.entries)
         fmap([&ctx], x, gen_entry(ctx, x), entry.entry);
 
@@ -433,6 +437,16 @@ typed_value frame::gen_expr(const ast::Address & addr) const
     llvm::ArrayRef<llvm::Value *> idxList = { get_builder().getInt32(0) };
     llvm::Value * res = get_builder().CreateGEP(v.second.second, idxList, "address");
     return {this->get_type(addr), {value_type::RVALUE, res}};
+}
+
+void gen_declaration(frame & ctx, const Variable & entry)
+{
+    undefined;
+}
+
+void gen_declaration(frame & ctx, const Function & entry)
+{
+    gen_func_declaration(ctx, entry.name, entry.arguments, entry.type);
 }
 
 }

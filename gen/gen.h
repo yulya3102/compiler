@@ -49,10 +49,6 @@ struct frame : sem::typed_ctx<value>
     void gen_statement(const ast::Write & st);
     void gen_statement(const ast::Return & ret);
     void gen_statement(const Statement & st);
-    /*
-    void gen_statement(const ast::Block & block);
-    void gen_statement(const ast::Statement & st);
-    */
 
     llvm::Module * module;
 };
@@ -72,10 +68,4 @@ void gen_declaration(frame & ctx, const Function & entry);
 
 void gen_entry(frame & ctx, const Variable & entry);
 void gen_entry(frame & ctx, const Function & entry);
-/*
-void gen_entry(frame & ctx, const ast::Declaration & entry);
-void gen_entry(frame & ctx, const ast::Definition & entry);
-void gen_entry(frame & ctx, const ast::FuncDefinition & entry);
-void gen_entry(frame & ctx, const ast::FuncDeclaration & entry);
-*/
 }

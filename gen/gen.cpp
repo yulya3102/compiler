@@ -124,18 +124,6 @@ llvm::Constant * gen_init(const ast::Type & type)
     return fmap([], x, gen_init(x), type.type);
 }
 
-/*
-void gen_entry(frame & ctx, const ast::Declaration & entry)
-{
-    fmap([&ctx], x, gen_entry(ctx, x), entry.declaration);
-}
-
-void gen_entry(frame & ctx, const ast::Definition & entry)
-{
-    fmap([&ctx], x, gen_entry(ctx, x), entry.definition);
-}
-*/
-
 void gen_entry(frame & ctx, const Variable & entry)
 { }
 
@@ -188,13 +176,6 @@ llvm::Function * gen_func_declaration(frame & ctx, const std::string & name, con
     ctx.declare({ctx.get_type(ast::FuncDeclaration{nullptr, rettype, name, arguments}), {value_type::LVALUE, f}}, name);
     return f;
 }
-
-/*
-void gen_entry(frame & ctx, const ast::FuncDeclaration & entry)
-{
-    gen_func_declaration(ctx, entry);
-}
-*/
 
 typed_value frame::gen_expr(int64_t i) const
 {
@@ -385,20 +366,6 @@ void frame::gen_statement(const ast::Return & ret)
     llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);
     get_builder().SetInsertPoint(unreachable);
 }
-
-/*
-void frame::gen_statement(const ast::Block & block)
-{
-    frame inner_scope(this->module, this);
-    for (auto st : block.statements)
-        inner_scope.gen_statement(st);
-}
-
-void frame::gen_statement(const ast::Statement & st)
-{
-    return fmap([this], x, this->gen_statement(x), st.statement);
-}
-*/
 
 void frame::gen_statement(const Statement & st)
 {

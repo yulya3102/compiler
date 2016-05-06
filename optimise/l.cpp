@@ -33,39 +33,14 @@ struct TCO
         return st;
     }
 
-    bool is_tail_call(const ast::Value & expr) const
-    {
-        return false;
-    }
-
-    bool is_tail_call(const ast::BinOperator & expr) const
-    {
-        return false;
-    }
-
-    bool is_tail_call(const ast::Dereference & expr) const
-    {
-        return false;
-    }
-
-    bool is_tail_call(const ast::Address & expr) const
-    {
-        return false;
-    }
-
-    bool is_tail_call(const ast::Call & expr) const
-    {
-        undefined;
-    }
-
-    bool is_tail_call(const ast::Read & expr) const
-    {
-        return false;
-    }
-
     bool is_tail_call(const ast::Expression & expr) const
     {
-        return fmap([this], x, this->is_tail_call(x), expr.expression);
+        const ast::Call * call_ptr = boost::get<ast::Call>(&expr.expression);
+        if (!call_ptr)
+            return false;
+
+        const ast::Call & call = *call_ptr;
+        undefined;
     }
 
     codegen::If optimise_statement(const codegen::If & st) const

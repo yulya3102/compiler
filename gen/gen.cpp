@@ -140,7 +140,10 @@ void gen_entry(frame & ctx, const Function & entry)
         for (auto arg_it = f->args().begin(); arg_it != f->args().end(); ++arg_it, ++proto_it)
         {
             arg_it->setName(proto_it->name);
-            inner_scope.declare({proto_it->type, {value_type::RVALUE, &*arg_it}}, proto_it->name);
+            inner_scope.gen_local_variable(*proto_it);
+            llvm::Value * lval = inner_scope.gen_expr(ast::Value(proto_it->name)).second.second;
+            llvm::Value * rval = &*arg_it;
+            get_builder().CreateStore(rval, lval);
         }
     }
     for (auto var : entry.variables)

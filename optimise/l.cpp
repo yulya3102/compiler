@@ -40,7 +40,13 @@ struct TCO
             return false;
 
         const ast::Call & call = *call_ptr;
-        undefined;
+        const ast::Value * value_ptr = boost::get<ast::Value>(&call.function->expression);
+        if (!value_ptr)
+            return false;
+
+        const ast::Value & value = *value_ptr;
+        const std::string & function_name = boost::get<std::string>(value.value);
+        return function_name == this->function_name;
     }
 
     codegen::If optimise_statement(const codegen::If & st) const

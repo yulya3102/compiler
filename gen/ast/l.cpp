@@ -21,7 +21,10 @@ Variable construct_entry(const ast::VarDeclaration & var)
 
 std::string annotated_variable(const sem::typed_ctx<top> & frame, const std::string & name)
 {
-    return name + "_" + ast::to_string(frame.get_type(name));
+    if (frame.is_declared(name))
+        return name + "_" + ast::to_string(frame.get_type(name));
+
+    return name;
 }
 
 ast::VarDeclaration annotate_variable(sem::typed_ctx<top> & frame, const ast::VarDeclaration & var)

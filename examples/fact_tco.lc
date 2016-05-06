@@ -31,6 +31,8 @@ int factOptimised(int accumulator, int n)
 
 int main()
 {
-    write(fact(42));
-    write(factOptimised(1, 42));
+    write(fact(10));
+    write(factOptimised(1, 10));
+
+    return 0;
 }

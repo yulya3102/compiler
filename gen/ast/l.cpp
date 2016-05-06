@@ -1,7 +1,10 @@
 #include "l.h"
 
+#include <sem/types.h>
+
 #include <utils/undefined.h>
 #include <utils/fmap.h>
+#include <utils/top.h>
 
 namespace codegen
 {
@@ -16,9 +19,148 @@ Variable construct_entry(const ast::VarDeclaration & var)
     return var;
 }
 
+std::string annotated_variable(const sem::typed_ctx<top> & frame, const std::string & name)
+{
+    return name + "_" + ast::to_string(frame.get_type(name));
+}
+
+ast::VarDeclaration annotate_variable(sem::typed_ctx<top> & frame, const ast::VarDeclaration & var)
+{
+    frame.declare({var.type, top()}, var.name);
+    return {var.loc, var.type, annotated_variable(frame, var.name)};
+}
+
+ast::FuncDeclaration annotate_variables(sem::typed_ctx<top> & frame, const ast::FuncDeclaration & func)
+{
+    std::list<ast::VarDeclaration> arguments;
+    for (auto var : func.arguments)
+    {
+        arguments.push_back(annotate_variable(frame, var));
+    }
+    return {func.loc, func.type, func.name, arguments};
+}
+
+ast::Const annotate_variables(sem::typed_ctx<top> & frame, const ast::Const & expr)
+{
+    return expr;
+}
+
+std::string annotate_variables(sem::typed_ctx<top> & frame, const std::string & expr)
+{
+    return annotated_variable(frame, expr);
+}
+
+ast::Value annotate_variables(sem::typed_ctx<top> & frame, const ast::Value & expr)
+{
+    return fmap([&frame], x, ast::Value(annotate_variables(frame, x)), expr.value);
+}
+
+ast::BinOperator annotate_variables(sem::typed_ctx<top> & frame, const ast::BinOperator & expr)
+{
+    undefined;
+}
+
+ast::Dereference annotate_variables(sem::typed_ctx<top> & frame, const ast::Dereference & expr)
+{
+    undefined;
+}
+
+ast::Address annotate_variables(sem::typed_ctx<top> & frame, const ast::Address & expr)
+{
+    undefined;
+}
+
+ast::Call annotate_variables(sem::typed_ctx<top> & frame, const ast::Call & expr)
+{
+    undefined;
+}
+
+ast::Read annotate_variables(sem::typed_ctx<top> & frame, const ast::Read & expr)
+{
+    undefined;
+}
+
+ast::Expression annotate_variables(sem::typed_ctx<top> & frame, const ast::Expression & expr)
+{
+    return fmap([&frame], x, ast::Expression(annotate_variables(frame, x)), expr.expression);
+}
+
+ast::VarDeclaration annotate_variables(sem::typed_ctx<top> & frame, const ast::VarDeclaration & st)
+{
+    return annotate_variable(frame, st);
+}
+
+ast::Assignment annotate_variables(sem::typed_ctx<top> & frame, const ast::Assignment & st)
+{
+    auto lvalue = annotate_variables(frame, st.lvalue);
+    auto rvalue = annotate_variables(frame, st.rvalue);
+    return {st.loc, lvalue, rvalue};
+}
+
+ast::Block annotate_variables(sem::typed_ctx<top> & frame, const ast::Block & st);
+
+ast::If annotate_variables(sem::typed_ctx<top> & frame, const ast::If & st)
+{
+    sem::typed_ctx<top> inner_frame(&frame);
+
+    auto cond = annotate_variables(inner_frame, st.condition);
+    auto thenBody = annotate_variables(inner_frame, *st.thenBody);
+    auto elseBody = annotate_variables(inner_frame, *st.elseBody);
+
+    return {st.loc, cond,
+                std::shared_ptr<ast::Block>(new ast::Block(thenBody)),
+                std::shared_ptr<ast::Block>(new ast::Block(elseBody))};
+}
+
+ast::While annotate_variables(sem::typed_ctx<top> & frame, const ast::While & st)
+{
+    sem::typed_ctx<top> inner_frame(&frame);
+
+    auto cond = annotate_variables(inner_frame, st.condition);
+    auto body = annotate_variables(inner_frame, *st.body);
+
+    return {st.loc, cond,
+                std::shared_ptr<ast::Block>(new ast::Block(body))};
+}
+
+ast::Write annotate_variables(sem::typed_ctx<top> & frame, const ast::Write & st)
+{
+    undefined;
+}
+
+ast::Return annotate_variables(sem::typed_ctx<top> & frame, const ast::Return & st)
+{
+    return {st.loc, std::shared_ptr<ast::Expression>(
+                    new ast::Expression(annotate_variables(frame, *st.expr)))};
+}
+
+ast::Statement annotate_variables(sem::typed_ctx<top> & frame, const ast::Statement & st)
+{
+    return fmap([&frame], x, ast::Statement(annotate_variables(frame, x)), st.statement);
+}
+
+ast::Block annotate_variables(sem::typed_ctx<top> & frame, const ast::Block & st)
+{
+    sem::typed_ctx<top> inner_frame(&frame);
+    std::list<ast::Statement> statements;
+
+    for (auto statement : st.statements)
+        statements.push_back(annotate_variables(inner_frame, statement));
+
+    return {st.loc, statements};
+}
+
+ast::FuncDefinition annotate_variables(const ast::FuncDefinition & func)
+{
+    sem::typed_ctx<top> frame;
+    auto decl = annotate_variables(frame, func.declaration);
+    auto body = annotate_variables(frame, func.statements);
+    return {func.loc, decl, body};
+}
+
 Function construct_entry(const ast::FuncDefinition & func)
 {
-    return func;
+    return annotate_variables(func);
 }
 
 void insert_entry(const ast::Definition & decl, std::list<CodeEntry> & entries)

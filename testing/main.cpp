@@ -176,6 +176,15 @@ TEST(compiled, alloca_while)
     EXPECT_EQ(expected_output, res);
 }
 
+#include "compiled_arg_var.h"
+
+TEST(compiled, arg_var)
+{
+    std::string code = to_string(testing::compiled_arg_var);
+    std::vector<int> expected_output = {0, 1, 0};
+    EXPECT_EQ(test_compiled(code, {}), expected_output);
+}
+
 int main(int argc, char ** argv)
 {
     testing::InitGoogleTest(&argc, argv);

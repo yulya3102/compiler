@@ -1,0 +1,14 @@
+int f(int n)
+{
+    n = n + 1;
+    return n;
+}
+
+int main()
+{
+    int a; a = 0;
+    write(a);       // 0
+    write(f(a));    // 1
+    write(a);       // 0
+    return 0;
+}

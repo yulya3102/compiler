@@ -219,6 +219,25 @@ std::list<Variable> function_variables(const ast::FuncDefinition & func)
 
     insert_variable(func.statements, variables);
 
+    /*
+     * Variable can't be declared more than once in one scope,
+     * semantic checker made sure of that.
+     * Also variables with different types can't have same names,
+     * as we annotated variables with their types.
+     * If any variable gets redeclared here, their locations
+     * can be safely merged into one location.
+     */
+    variables.sort([] (const Variable & lhs, const Variable & rhs)
+    {
+        return lhs.name < rhs.name;
+    });
+    auto it = std::unique(variables.begin(), variables.end(),
+                [] (const Variable & lhs, const Variable & rhs)
+    {
+        return lhs.name == rhs.name;
+    });
+    variables.erase(it, variables.end());
+
     return variables;
 }
 

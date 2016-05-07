@@ -110,7 +110,7 @@ TEST(compiled, fact)
 
 #include "compiled_fact_accum.h"
 
-TEST(compiled, fact_accum)
+TEST(compiled, DISABLED_fact_accum)
 {
     std::string code = to_string(testing::compiled_fact);
     std::string code_accum = to_string(testing::compiled_fact_accum);

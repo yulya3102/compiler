@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <boost/utility/string_ref.hpp>
 #include <sstream>
+#include <chrono>
 
 std::string to_string(const boost::string_ref & ref)
 {
@@ -105,6 +106,35 @@ TEST(compiled, fact)
         expected_output.push_back(fact(i));
     }
     EXPECT_EQ(test_compiled(code, input), expected_output);
+}
+
+#include "compiled_fact_accum.h"
+
+TEST(compiled, fact_accum)
+{
+    std::string code = to_string(testing::compiled_fact);
+    std::string code_accum = to_string(testing::compiled_fact_accum);
+
+    std::mt19937 generator;
+    std::uniform_int_distribution<std::uint64_t> distribution(1, 12);
+
+    std::size_t size = distribution(generator) * 1000;
+    std::vector<int> input;
+    for (std::size_t i = 0; i < size; ++i)
+        input.push_back(distribution(generator));
+
+    auto start = std::chrono::system_clock::now();
+    auto code_output = test_compiled(code, input);
+    auto end = std::chrono::system_clock::now();
+    auto code_duration = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start);
+
+    start = std::chrono::system_clock::now();
+    auto code_accum_output = test_compiled(code_accum, input);
+    end = std::chrono::system_clock::now();
+    auto code_accum_duration = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start);
+
+    EXPECT_EQ(code_output, code_accum_output);
+    EXPECT_LE(code_duration, code_accum_duration);
 }
 
 #include "compiled_scope.h"

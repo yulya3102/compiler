@@ -1,0 +1,28 @@
+int factAccumulated(int accumulator, int n)
+{
+    if (n > 1)
+    {
+        accumulator = accumulator * n;
+        n = n - 1;
+        return factAccumulated(accumulator, n);
+    }
+    else
+        return accumulator;
+}
+
+int fact(int n)
+{
+    return factAccumulated(1, n);
+}
+
+int main()
+{
+    int n;
+    int res;
+    while (read(n))
+    {
+        res = fact(n);
+        write(res);
+    }
+    return 0;
+}

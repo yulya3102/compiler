@@ -7,9 +7,6 @@ namespace optimise
 {
 namespace
 {
-void optimise_tail_call(codegen::Variable &)
-{ }
-
 std::list<std::string> argument_names(const codegen::Function & func)
 {
     std::list<std::string> result;
@@ -146,8 +143,10 @@ void optimise_tail_call(codegen::Function & func)
 
 void optimise_tail_call(codegen::Code & code)
 {
-    for (codegen::CodeEntry & entry : code.entries)
-        fmap([], x, optimise_tail_call(x), entry.entry);
+    optimise_functions([] (codegen::Function & f)
+    {
+        optimise_tail_call(f);
+        return std::list<codegen::Function>();
+    }, code);
 }
-
 }

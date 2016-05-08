@@ -118,7 +118,7 @@ TEST(compiled, fact_accum)
     std::mt19937 generator;
     std::uniform_int_distribution<std::uint64_t> distribution(1, 12);
 
-    std::size_t size = distribution(generator) * 1000;
+    std::size_t size = 10000;
     std::vector<int> input;
     for (std::size_t i = 0; i < size; ++i)
         input.push_back(distribution(generator));

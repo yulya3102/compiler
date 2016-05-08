@@ -368,8 +368,8 @@ llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type)
 void frame::gen_statement(const ast::Write & st)
 {
     llvm::Value * f = this->module->getNamedValue("printf");
-    llvm::Value * v = gen_rvalue(*this, *st.expr);
-    llvm::Value * format_string = gen_format_string(*this, this->get_type(*st.expr));
+    llvm::Value * v = gen_rvalue(*this, st.expr);
+    llvm::Value * format_string = gen_format_string(*this, this->get_type(st.expr));
     std::vector<llvm::Value *> args = { format_string, v };
 
     get_builder().CreateCall(f, args);
@@ -377,7 +377,7 @@ void frame::gen_statement(const ast::Write & st)
 
 void frame::gen_statement(const ast::Return & ret)
 {
-    get_builder().CreateRet(gen_rvalue(*this, *ret.expr));
+    get_builder().CreateRet(gen_rvalue(*this, ret.expr));
 
     llvm::Function * f = get_builder().GetInsertBlock()->getParent();
     llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);

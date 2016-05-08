@@ -36,13 +36,13 @@ struct While
 struct Write
 {
     std::shared_ptr<location> loc;
-    std::shared_ptr<Expression> expr;
+    Expression expr;
 };
 
 struct Return
 {
     std::shared_ptr<location> loc;
-    std::shared_ptr<Expression> expr;
+    Expression expr;
 };
 
 struct Statement;

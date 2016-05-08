@@ -124,15 +124,15 @@ struct function_ctx : typed_ctx<top>
 
     void verify_statement(const ast::Write & st)
     {
-        verify_expr(*st.expr);
-        auto real = this->get_type(*st.expr);
+        verify_expr(st.expr);
+        auto real = this->get_type(st.expr);
         expect_type(real, ast::int_type(), "write() argument must have integer type");
     }
 
     void verify_statement(const ast::Return & st)
     {
-        verify_expr(*st.expr);
-        expect_type(this->get_type(*st.expr), return_type, "function return type does not match return expression type");
+        verify_expr(st.expr);
+        expect_type(this->get_type(st.expr), return_type, "function return type does not match return expression type");
     }
 
     void verify_statement(const ast::Block & block)

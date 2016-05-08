@@ -148,16 +148,14 @@ ast::While annotate_variables(sem::typed_ctx<top> & frame, const ast::While & st
 
 ast::Write annotate_variables(sem::typed_ctx<top> & frame, const ast::Write & st)
 {
-    auto expr = annotate_variables(frame, *st.expr);
+    auto expr = annotate_variables(frame, st.expr);
 
-    return {st.loc,
-                std::shared_ptr<ast::Expression>(new ast::Expression(expr))};
+    return {st.loc, ast::Expression(expr)};
 }
 
 ast::Return annotate_variables(sem::typed_ctx<top> & frame, const ast::Return & st)
 {
-    return {st.loc, std::shared_ptr<ast::Expression>(
-                    new ast::Expression(annotate_variables(frame, *st.expr)))};
+    return {st.loc, ast::Expression(annotate_variables(frame, st.expr))};
 }
 
 ast::Statement annotate_variables(sem::typed_ctx<top> & frame, const ast::Statement & st)

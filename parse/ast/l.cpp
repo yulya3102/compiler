@@ -196,12 +196,12 @@ std::string to_string(const Read & read)
 
 std::string to_string(const Write & write)
 {
-    return "write(" + to_string(*write.expr) + ")";
+    return "write(" + to_string(write.expr) + ")";
 }
 
 std::string to_string(const Return & ret)
 {
-    return "return " + to_string(*ret.expr);
+    return "return " + to_string(ret.expr);
 }
 
 std::string to_string(const FuncDefinition & def)

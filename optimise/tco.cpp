@@ -89,7 +89,7 @@ struct TCO
 
     void optimise_statement(const ast::Return & st, std::list<codegen::Statement> & statements) const
     {
-        boost::optional<ast::Call> tail_call = get_recursive_call(*st.expr);
+        boost::optional<ast::Call> tail_call = get_recursive_call(st.expr);
         if (!tail_call)
         {
             statements.push_back(codegen::Statement(st));

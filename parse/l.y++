@@ -180,8 +180,8 @@ statement:
         | IF LPAREN expr RPAREN statement ELSE statement { $$ = new Statement(If{shared(&@$), *$3, statement_block(*$5), statement_block(*$7) }); }
         | CLPAREN statements CRPAREN { $$ = new Statement(*$2); }
         | WHILE LPAREN expr RPAREN statement { $$ = new Statement(While{shared(&@$), *$3, statement_block(*$5)}); }
-        | WRITE LPAREN expr RPAREN SEMICOLON { $$ = new Statement(Write{ shared(&@$), shared($3) }); }
-        | RETURN expr SEMICOLON   { $$ = new Statement(Return{ shared(&@$), shared($2) }); }
+        | WRITE LPAREN expr RPAREN SEMICOLON { $$ = new Statement(Write{ shared(&@$), *$3 }); }
+        | RETURN expr SEMICOLON   { $$ = new Statement(Return{ shared(&@$), *$2 }); }
         ;
 
 expr:

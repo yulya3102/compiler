@@ -39,7 +39,7 @@ std::list<codegen::Function> optimise(codegen::Function & f)
         codegen::Statement(
             ast::Return{
                 f.loc,
-                undefined_expr(std::shared_ptr<ast::Expression>)
+                undefined_expr(ast::Expression)
             }
         )
     );

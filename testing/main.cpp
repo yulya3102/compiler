@@ -78,20 +78,38 @@ struct p2open
 
     std::vector<int> read()
     {
-        char formatted[64];
+        const size_t size = 4096;
+        char buffer[size];
         while (!write_buffer.empty())
         {
-            int r = snprintf(formatted, 64, "%d\n", write_buffer.front());
-            full_write(inputfd, formatted, r);
+            int r = snprintf(buffer, size, "%d\n", write_buffer.front());
+            full_write(inputfd, buffer, r);
             write_buffer.pop();
         }
         close(inputfd);
 
-        FILE * pout = fdopen(outputfd, "r");
-        int i;
+        std::stringstream output;
+        int r;
+        do
+        {
+            r = ::read(outputfd, buffer, size);
+            if (r == -1)
+                throw std::runtime_error(strerror(errno));
+
+            output << std::string(buffer, r);
+        }
+        while (r != 0);
+
         std::vector<int> result;
-        while (fscanf(pout, "%d", &i) != EOF)
+        while (true)
+        {
+            int i;
+            output >> i;
+            if (!output)
+                break;
             result.push_back(i);
+        }
+
         return result;
     }
 

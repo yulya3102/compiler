@@ -28,52 +28,71 @@ TEST(semantic, assignment_type_mismatch)
     EXPECT_SEMANTIC_ERROR("int main() { _Bool a; a = 1; }");
 }
 
+struct p2open
+{
+    p2open(const char * command, int expected_exit_code = 0)
+    : expected_exit_code(expected_exit_code)
+    {
+        // TODO: error handling
+        int process_input[2];
+        pipe(process_input);
+        int process_output[2];
+        pipe(process_output);
+        child = fork();
+        if (child == 0)
+        {
+            dup2(process_input[0], STDIN_FILENO);
+            close(process_input[0]);
+            close(process_input[1]);
+            dup2(process_output[1], STDOUT_FILENO);
+            close(process_output[0]);
+            close(process_output[1]);
+
+            execl(command, command, nullptr);
+        }
+        close(process_input[0]);
+        close(process_output[1]);
+
+        inputfd = process_input[1];
+        outputfd = process_output[0];
+    }
+
+    ~p2open()
+    {
+        int status;
+        waitpid(child, &status, 0);
+        if (WIFEXITED(status) && (WEXITSTATUS(status) != expected_exit_code))
+            throw std::runtime_error("Unexpected return code of a program: "
+                                     + std::to_string(WEXITSTATUS(status)));
+        if (WIFSIGNALED(status))
+            throw std::runtime_error("Program was terminated by a signal "
+                                     + std::to_string(WTERMSIG(status)));
+    }
+
+    int expected_exit_code;
+    pid_t child;
+    int inputfd, outputfd;
+};
+
 std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input, int expected_retcode = 0)
 {
     std::stringstream in(code);
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
     lcc::compile_executable(in, compiled);
 
-    // TODO: error handling
-    int process_input[2];
-    pipe(process_input);
-    int process_output[2];
-    pipe(process_output);
-    pid_t child = fork();
-    if (child == 0)
-    {
-        dup2(process_input[0], STDIN_FILENO);
-        close(process_input[0]);
-        close(process_input[1]);
-        dup2(process_output[1], STDOUT_FILENO);
-        close(process_output[0]);
-        close(process_output[1]);
+    p2open proc(compiled.c_str());
 
-        execl(compiled.c_str(), compiled.c_str(), nullptr);
-    }
-    close(process_input[0]);
-    close(process_output[1]);
-
-    FILE * pin = fdopen(process_input[1], "w");
+    FILE * pin = fdopen(proc.inputfd, "w");
     for (auto i : input)
         fprintf(pin, "%d\n", i);
     fflush(pin);
     fclose(pin);
 
-    FILE * pout = fdopen(process_output[0], "r");
+    FILE * pout = fdopen(proc.outputfd, "r");
     int i;
     std::vector<int> result;
     while (fscanf(pout, "%d", &i) != EOF)
         result.push_back(i);
-
-    int status;
-    waitpid(child, &status, 0);
-    if (WIFEXITED(status) && (WEXITSTATUS(status) != expected_retcode))
-        throw std::runtime_error("Unexpected return code of a program: "
-                                 + std::to_string(WEXITSTATUS(status)));
-    if (WIFSIGNALED(status))
-        throw std::runtime_error("Program was terminated by a signal "
-                                 + std::to_string(WTERMSIG(status)));
 
     return result;
 }

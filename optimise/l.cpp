@@ -92,9 +92,14 @@ struct TCO
 
     void optimise_statement(const ast::Return & st, std::list<codegen::Statement> & statements) const
     {
-        if (get_tail_call(*st.expr))
-            undefined;
-        statements.push_back(codegen::Statement(st));
+        boost::optional<ast::Call> tail_call = get_tail_call(*st.expr);
+        if (!tail_call)
+        {
+            statements.push_back(codegen::Statement(st));
+            return;
+        }
+
+        undefined;
     }
 
     codegen::Function optimise() const

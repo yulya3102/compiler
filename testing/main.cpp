@@ -7,6 +7,7 @@
 #include <boost/utility/string_ref.hpp>
 #include <sstream>
 #include <chrono>
+#include <queue>
 
 std::string to_string(const boost::string_ref & ref)
 {
@@ -57,6 +58,30 @@ struct p2open
         outputfd = process_output[0];
     }
 
+    void write(int i)
+    {
+        write_buffer.push(i);
+    }
+
+    std::vector<int> read()
+    {
+        FILE * pin = fdopen(inputfd, "w");
+        while (!write_buffer.empty())
+        {
+            fprintf(pin, "%d\n", write_buffer.front());
+            write_buffer.pop();
+        }
+        fflush(pin);
+        fclose(pin);
+
+        FILE * pout = fdopen(outputfd, "r");
+        int i;
+        std::vector<int> result;
+        while (fscanf(pout, "%d", &i) != EOF)
+            result.push_back(i);
+        return result;
+    }
+
     ~p2open()
     {
         int status;
@@ -72,6 +97,7 @@ struct p2open
     int expected_exit_code;
     pid_t child;
     int inputfd, outputfd;
+    std::queue<int> write_buffer;
 };
 
 std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input, int expected_retcode = 0)
@@ -81,20 +107,9 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     lcc::compile_executable(in, compiled);
 
     p2open proc(compiled.c_str());
-
-    FILE * pin = fdopen(proc.inputfd, "w");
     for (auto i : input)
-        fprintf(pin, "%d\n", i);
-    fflush(pin);
-    fclose(pin);
-
-    FILE * pout = fdopen(proc.outputfd, "r");
-    int i;
-    std::vector<int> result;
-    while (fscanf(pout, "%d", &i) != EOF)
-        result.push_back(i);
-
-    return result;
+        proc.write(i);
+    return proc.read();
 }
 
 int fact(int n)

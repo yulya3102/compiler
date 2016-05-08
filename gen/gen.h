@@ -27,6 +27,7 @@ struct frame : sem::typed_ctx<value>
     frame(llvm::Module * module, frame * outer_scope = nullptr)
         : sem::typed_ctx<value>(outer_scope)
         , module(module)
+        , labels(&outer_scope->labels)
     {}
 
     typed_value gen_expr(int64_t i) const;
@@ -52,6 +53,7 @@ struct frame : sem::typed_ctx<value>
     void gen_statement(const Statement & st);
 
     llvm::Module * module;
+    sem::context<llvm::BasicBlock *> labels;
 };
 
 llvm::Type * gen_type(const ast::AtomType & type);

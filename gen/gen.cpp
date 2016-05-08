@@ -328,6 +328,7 @@ void frame::gen_statement(const While & st)
     llvm::BasicBlock * cond_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_cond");
     llvm::BasicBlock * cont_block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "while_cont");
     get_builder().CreateBr(cond_block);
+    this->labels.declare(while_body, st.label);
 
     /* Generate condition */
     get_builder().SetInsertPoint(cond_block);
@@ -349,7 +350,7 @@ void frame::gen_statement(const While & st)
 
 void frame::gen_statement(const Continue & st)
 {
-    llvm::BasicBlock * block = undefined_expr(llvm::BasicBlock *);
+    llvm::BasicBlock * block = this->labels.get(st.label);
     get_builder().CreateBr(block);
 }
 

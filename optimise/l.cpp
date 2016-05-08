@@ -33,20 +33,23 @@ struct TCO
         statements.push_back(codegen::Statement(st));
     }
 
-    bool is_tail_call(const ast::Expression & expr) const
+    boost::optional<ast::Call> get_tail_call(const ast::Expression & expr) const
     {
         const ast::Call * call_ptr = boost::get<ast::Call>(&expr.expression);
         if (!call_ptr)
-            return false;
+            return boost::none;
 
         const ast::Call & call = *call_ptr;
         const ast::Value * value_ptr = boost::get<ast::Value>(&call.function->expression);
         if (!value_ptr)
-            return false;
+            return boost::none;
 
         const ast::Value & value = *value_ptr;
         const std::string & function_name = boost::get<std::string>(value.value);
-        return function_name == this->function_name;
+        if (function_name != this->function_name)
+            return boost::none;
+
+        return call;
     }
 
     void optimise_statement(const codegen::If & st, std::list<codegen::Statement> & statements) const
@@ -89,7 +92,7 @@ struct TCO
 
     void optimise_statement(const ast::Return & st, std::list<codegen::Statement> & statements) const
     {
-        if (is_tail_call(*st.expr))
+        if (get_tail_call(*st.expr))
             undefined;
         statements.push_back(codegen::Statement(st));
     }

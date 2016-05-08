@@ -352,6 +352,10 @@ void frame::gen_statement(const Continue & st)
 {
     llvm::BasicBlock * block = this->labels.get(st.label);
     get_builder().CreateBr(block);
+
+    llvm::Function * f = get_builder().GetInsertBlock()->getParent();
+    llvm::BasicBlock * unreachable = llvm::BasicBlock::Create(llvm::getGlobalContext(), "unreachable", f);
+    get_builder().SetInsertPoint(unreachable);
 }
 
 llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type)

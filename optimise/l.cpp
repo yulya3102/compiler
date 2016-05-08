@@ -28,9 +28,9 @@ struct TCO
         , func(func)
     {}
 
-    ast::Assignment optimise_statement(const ast::Assignment & st) const
+    void optimise_statement(const ast::Assignment & st, std::list<codegen::Statement> & statements) const
     {
-        return st;
+        statements.push_back(codegen::Statement(st));
     }
 
     bool is_tail_call(const ast::Expression & expr) const
@@ -49,52 +49,49 @@ struct TCO
         return function_name == this->function_name;
     }
 
-    codegen::If optimise_statement(const codegen::If & st) const
+    void optimise_statement(const codegen::If & st, std::list<codegen::Statement> & statements) const
     {
         codegen::If result(st);
         result.thenBody.clear();
         result.elseBody.clear();
 
         for (auto statement : st.thenBody)
-            result.thenBody.push_back(fmap([this], x,
-                                      codegen::Statement(this->optimise_statement(x)),
-                                      statement.statement));
+            fmap([&], x, this->optimise_statement(x, result.thenBody),
+                 statement.statement);
         for (auto statement : st.elseBody)
-            result.elseBody.push_back(fmap([this], x,
-                                      codegen::Statement(this->optimise_statement(x)),
-                                      statement.statement));
+            fmap([&], x, this->optimise_statement(x, result.elseBody),
+                 statement.statement);
 
-        return result;
+        statements.push_back(codegen::Statement(result));
     }
 
-    codegen::While optimise_statement(const codegen::While & st) const
+    void optimise_statement(const codegen::While & st, std::list<codegen::Statement> & statements) const
     {
         codegen::While result(st);
         result.body.clear();
 
         for (auto statement : st.body)
-            result.body.push_back(fmap([this], x,
-                                  codegen::Statement(this->optimise_statement(x)),
-                                  statement.statement));
+            fmap([&], x, this->optimise_statement(x, result.body),
+                 statement.statement);
 
-        return result;
+        statements.push_back(codegen::Statement(result));
     }
 
-    codegen::Continue optimise_statement(const codegen::Continue & st) const
+    void optimise_statement(const codegen::Continue & st, std::list<codegen::Statement> & statements) const
     {
-        return st;
+        statements.push_back(codegen::Statement(st));
     }
 
-    ast::Write optimise_statement(const ast::Write & st) const
+    void optimise_statement(const ast::Write & st, std::list<codegen::Statement> & statements) const
     {
-        return st;
+        statements.push_back(codegen::Statement(st));
     }
 
-    ast::Return optimise_statement(const ast::Return & st) const
+    void optimise_statement(const ast::Return & st, std::list<codegen::Statement> & statements) const
     {
         if (is_tail_call(*st.expr))
             undefined;
-        return st;
+        statements.push_back(codegen::Statement(st));
     }
 
     codegen::Function optimise() const
@@ -103,9 +100,7 @@ struct TCO
         std::list<codegen::Statement> statements;
 
         for (auto st : func.statements)
-            statements.push_back(fmap([this], x,
-                                      codegen::Statement(this->optimise_statement(x)),
-                                      st.statement));
+            fmap([&], x, this->optimise_statement(x, statements), st.statement);
 
         codegen::While body{func.loc, entry_label,
                             ast::Const(true),

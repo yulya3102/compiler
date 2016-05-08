@@ -1,5 +1,5 @@
 add_library(optimise
-    l.h l.cpp
+    l.h tco.cpp
 )
 
 target_link_libraries(optimise utils ast)

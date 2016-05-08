@@ -63,16 +63,29 @@ struct p2open
         write_buffer.push(i);
     }
 
+    void full_write(int fd, char * buf, size_t count)
+    {
+        while (count > 0)
+        {
+            ssize_t r = ::write(fd, buf, count);
+            if (r == -1)
+                throw std::runtime_error(strerror(errno));
+
+            count -= r;
+            buf += r;
+        }
+    }
+
     std::vector<int> read()
     {
-        FILE * pin = fdopen(inputfd, "w");
+        char formatted[64];
         while (!write_buffer.empty())
         {
-            fprintf(pin, "%d\n", write_buffer.front());
+            int r = snprintf(formatted, 64, "%d\n", write_buffer.front());
+            full_write(inputfd, formatted, r);
             write_buffer.pop();
         }
-        fflush(pin);
-        fclose(pin);
+        close(inputfd);
 
         FILE * pout = fdopen(outputfd, "r");
         int i;

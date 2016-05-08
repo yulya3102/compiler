@@ -134,7 +134,7 @@ TEST(compiled, fact_accum)
     auto code_accum_duration = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start);
 
     EXPECT_EQ(code_output, code_accum_output);
-    EXPECT_LT(code_duration, code_accum_duration);
+    ASSERT_LT(code_duration, code_accum_duration);
 }
 
 #include "compiled_scope.h"

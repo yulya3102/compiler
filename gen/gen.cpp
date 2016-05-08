@@ -349,7 +349,8 @@ void frame::gen_statement(const While & st)
 
 void frame::gen_statement(const Continue & st)
 {
-    undefined;
+    llvm::BasicBlock * block = undefined_expr(llvm::BasicBlock *);
+    get_builder().CreateBr(block);
 }
 
 llvm::Value * gen_format_string(const frame & ctx, const ast::Type & type)

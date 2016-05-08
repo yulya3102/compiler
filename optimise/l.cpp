@@ -99,7 +99,19 @@ struct TCO
             return;
         }
 
-        undefined;
+        auto formal_arg_it = this->arguments.begin();
+        for (const ast::Expression & arg : tail_call->arguments)
+        {
+            ast::Value arg_var(*formal_arg_it);
+            ast::Expression lval(arg_var);
+            ast::Assignment statement{arg.loc, lval, arg};
+            statements.push_back(codegen::Statement(statement));
+            ++formal_arg_it;
+        }
+        assert(formal_arg_it == this->arguments.end());
+
+        codegen::Continue statement{tail_call->loc, this->entry_label};
+        statements.push_back(codegen::Statement(statement));
     }
 
     codegen::Function optimise() const

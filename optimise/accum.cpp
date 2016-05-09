@@ -1,4 +1,5 @@
 #include "l.h"
+#include "recursive.h"
 
 #include <utils/undefined.h>
 #include <utils/fmap.h>
@@ -104,26 +105,6 @@ bool calls_function(const ast::Expression & expr, const std::string & function_n
                 expr.expression);
 }
 
-std::list<ast::Expression> get_non_recursive_returns(const codegen::Function & f)
-{
-    std::list<ast::Expression> returns = get_returns(f);
-
-    returns.remove_if([f] (const ast::Expression & e)
-                      { return calls_function(e, f.name); });
-
-    return returns;
-}
-
-std::list<ast::Expression> get_recursive_returns(const codegen::Function & f)
-{
-    std::list<ast::Expression> returns = get_returns(f);
-
-    returns.remove_if([f] (const ast::Expression & e)
-                      { return !calls_function(e, f.name); });
-
-    return returns;
-}
-
 ast::Expression & get_call_to(ast::Expression & expr, const std::string & f)
 {
     undefined;
@@ -134,67 +115,101 @@ codegen::Variable accumulator_variable(const codegen::Function & f)
     return {f.loc, f.type, "_accumulator"};
 }
 
-void rewrite_returns_to_acc(codegen::Statement & st)
+struct Accum : Recursive
 {
-    ast::Return * ret = boost::get<ast::Return>(&st.statement);
-    if (ret)
+    Accum(codegen::Function & f)
+        : Recursive(f)
+    {}
+
+    std::list<ast::Expression> get_non_recursive_returns() const
     {
-        ast::Expression & return_value = ret->expr;
-        std::string function_name = undefined_expr(std::string);
-        ast::Expression & rec_call = get_call_to(return_value, function_name);
-        ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));
-        rec_call = ast::Value(accumulator_variable(undefined_expr(codegen::Function)).name);
-        new_return_value.arguments.push_back(return_value);
-        return_value = new_return_value;
-        return;
+        std::list<ast::Expression> returns = get_returns(f);
+
+        returns.remove_if([this] (const ast::Expression & e)
+                          { return calls_function(e, f.name); });
+
+        return returns;
     }
 
-    codegen::If * if_st = boost::get<codegen::If>(&st.statement);
-    if (if_st)
+    std::list<ast::Expression> get_recursive_returns() const
     {
-        for (auto s : if_st->thenBody)
-            rewrite_returns_to_acc(s);
-        for (auto s : if_st->elseBody)
-            rewrite_returns_to_acc(s);
-        return;
+        std::list<ast::Expression> returns = get_returns(f);
+
+        returns.remove_if([this] (const ast::Expression & e)
+                          { return !calls_function(e, f.name); });
+
+        return returns;
     }
 
-    codegen::While * while_st = boost::get<codegen::While>(&st.statement);
-    if (while_st)
+    void rewrite_returns_to_acc(codegen::Statement & st)
     {
-        for (auto s : while_st->body)
-            rewrite_returns_to_acc(s);
-        return;
-    }
-}
+        ast::Return * ret = boost::get<ast::Return>(&st.statement);
+        if (ret)
+        {
+            ast::Expression & return_value = ret->expr;
+            std::string function_name = undefined_expr(std::string);
+            ast::Expression & rec_call = get_call_to(return_value, function_name);
+            ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));
+            rec_call = ast::Value(accumulator_variable(undefined_expr(codegen::Function)).name);
+            new_return_value.arguments.push_back(return_value);
+            return_value = new_return_value;
+            return;
+        }
 
-void rewrite_returns_to_acc(codegen::Function & f)
-{
-    for (auto st : f.statements)
-        rewrite_returns_to_acc(st);
-}
+        codegen::If * if_st = boost::get<codegen::If>(&st.statement);
+        if (if_st)
+        {
+            for (auto s : if_st->thenBody)
+                rewrite_returns_to_acc(s);
+            for (auto s : if_st->elseBody)
+                rewrite_returns_to_acc(s);
+            return;
+        }
+
+        codegen::While * while_st = boost::get<codegen::While>(&st.statement);
+        if (while_st)
+        {
+            for (auto s : while_st->body)
+                rewrite_returns_to_acc(s);
+            return;
+        }
+    }
+
+    void rewrite_returns_to_acc()
+    {
+        for (auto st : f.statements)
+            rewrite_returns_to_acc(st);
+    }
+
+    std::list<codegen::Function> optimise()
+    {
+        std::list<ast::Expression> non_recursive = get_non_recursive_returns();
+        std::list<ast::Expression> recursive = get_recursive_returns();
+
+        if (non_recursive.size() != 1)
+            return {};
+        if (recursive.size() != 1)
+            return {};
+        if (is_name(recursive.front(), f.name))
+            return {};
+
+        ast::Expression init_acc = non_recursive.front();
+        codegen::Function func_acc(f);
+        func_acc.arguments.push_back(accumulator_variable(f));
+        f.statements.clear();
+        f.statements.push_back(
+            codegen::Statement(ast::Return{f.loc, init_acc})
+        );
+        Accum accum(func_acc);
+        accum.rewrite_returns_to_acc();
+        return { func_acc };
+    }
+};
 
 std::list<codegen::Function> optimise(codegen::Function & f)
 {
-    std::list<ast::Expression> non_recursive = get_non_recursive_returns(f);
-    std::list<ast::Expression> recursive = get_recursive_returns(f);
-
-    if (non_recursive.size() != 1)
-        return {};
-    if (recursive.size() != 1)
-        return {};
-    if (is_name(recursive.front(), f.name))
-        return {};
-
-    ast::Expression init_acc = non_recursive.front();
-    codegen::Function func_acc(f);
-    func_acc.arguments.push_back(accumulator_variable(f));
-    f.statements.clear();
-    f.statements.push_back(
-        codegen::Statement(ast::Return{f.loc, init_acc})
-    );
-    rewrite_returns_to_acc(func_acc);
-    return { func_acc };
+    Accum accum(f);
+    return accum.optimise();
 }
 }
 

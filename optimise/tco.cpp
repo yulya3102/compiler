@@ -1,4 +1,5 @@
 #include "l.h"
+#include "recursive.h"
 
 #include <utils/undefined.h>
 #include <utils/fmap.h>
@@ -16,23 +17,9 @@ std::list<std::string> argument_names(const codegen::Function & func)
     return result;
 }
 
-struct Recursive
-{
-    Recursive(const codegen::Function & f)
-        : f(f)
-    {}
-
-    const std::string & name() const
-    {
-        return f.name;
-    }
-
-    const codegen::Function & f;
-};
-
 struct TCO : Recursive
 {
-    TCO(const codegen::Function & func)
+    TCO(codegen::Function & func)
         : Recursive(func)
         , entry_label(func.name + "_entry")
         , arguments(argument_names(func))

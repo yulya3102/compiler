@@ -45,6 +45,19 @@ std::list<ast::Expression> get_returns(const codegen::Function & f)
     return result;
 }
 
+bool is_name(const ast::Expression & expr, const std::string & name)
+{
+    const ast::Value * v = boost::get<ast::Value>(&expr.expression);
+    if (!v)
+        return false;
+
+    const std::string * n = boost::get<std::string>(&v->value);
+    if (!n)
+        return false;
+
+    return *n == name;
+}
+
 bool calls_function(const ast::Expression & expr, const std::string & function_name);
 
 bool calls_function(const ast::Value & expr, const std::string & function_name)
@@ -70,13 +83,8 @@ bool calls_function(const ast::Address & expr, const std::string & function_name
 
 bool calls_function(const ast::Call & expr, const std::string & function_name)
 {
-    const ast::Value * f = boost::get<ast::Value>(&expr.function->expression);
-    if (f)
-    {
-        const std::string * name = boost::get<std::string>(&f->value);
-        if (name && (*name == function_name))
-            return true;
-    }
+    if (is_name(expr.function->expression, function_name))
+        return true;
 
     for (auto arg : expr.arguments)
         if (calls_function(arg, function_name))

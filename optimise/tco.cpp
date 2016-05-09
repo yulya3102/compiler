@@ -16,13 +16,26 @@ std::list<std::string> argument_names(const codegen::Function & func)
     return result;
 }
 
-struct TCO
+struct Recursive
+{
+    Recursive(const codegen::Function & f)
+        : f(f)
+    {}
+
+    const std::string & name() const
+    {
+        return f.name;
+    }
+
+    const codegen::Function & f;
+};
+
+struct TCO : Recursive
 {
     TCO(const codegen::Function & func)
-        : function_name(func.name)
+        : Recursive(func)
         , entry_label(func.name + "_entry")
         , arguments(argument_names(func))
-        , func(func)
     {}
 
     void optimise_statement(const ast::Assignment & st, std::list<codegen::Statement> & statements) const
@@ -43,7 +56,7 @@ struct TCO
 
         const ast::Value & value = *value_ptr;
         const std::string & function_name = boost::get<std::string>(value.value);
-        if (function_name != this->function_name)
+        if (function_name != this->name())
             return boost::none;
 
         return call;
@@ -113,13 +126,13 @@ struct TCO
 
     codegen::Function optimise() const
     {
-        codegen::Function result(func);
+        codegen::Function result(f);
         std::list<codegen::Statement> statements;
 
-        for (auto st : func.statements)
+        for (auto st : f.statements)
             fmap([&], x, this->optimise_statement(x, statements), st.statement);
 
-        codegen::While body{func.loc, entry_label,
+        codegen::While body{f.loc, entry_label,
                             ast::Const(true),
                             statements};
         result.statements.clear();
@@ -128,10 +141,8 @@ struct TCO
         return result;
     }
 
-    std::string function_name;
     std::string entry_label;
     std::list<std::string> arguments;
-    const codegen::Function & func;
 };
 
 void optimise_tail_call(codegen::Function & func)

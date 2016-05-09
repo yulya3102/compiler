@@ -124,6 +124,11 @@ std::list<ast::Expression> get_recursive_returns(const codegen::Function & f)
     return returns;
 }
 
+codegen::Variable accumulator_variable(const codegen::Function & f)
+{
+    return {f.loc, f.type, "_accumulator"};
+}
+
 void rewrite_returns_to_acc(codegen::Function & f)
 {
     undefined;
@@ -143,7 +148,7 @@ std::list<codegen::Function> optimise(codegen::Function & f)
 
     ast::Expression init_acc = non_recursive.front();
     codegen::Function func_acc(f);
-    func_acc.arguments.push_back({f.loc, f.type, "_accumulator"});
+    func_acc.arguments.push_back(accumulator_variable(f));
     f.statements.clear();
     f.statements.push_back(
         codegen::Statement(ast::Return{f.loc, init_acc})

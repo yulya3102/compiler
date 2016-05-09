@@ -1,6 +1,7 @@
 #include "l.h"
 
 #include <utils/undefined.h>
+#include <utils/fmap.h>
 
 namespace optimise
 {
@@ -44,9 +45,55 @@ std::list<ast::Expression> get_returns(const codegen::Function & f)
     return result;
 }
 
+bool calls_function(const ast::Expression & expr, const std::string & function_name);
+
+bool calls_function(const ast::Value & expr, const std::string & function_name)
+{
+    return false;
+}
+
+bool calls_function(const ast::BinOperator & expr, const std::string & function_name)
+{
+    return calls_function(*expr.lhs, function_name)
+        || calls_function(*expr.rhs, function_name);
+}
+
+bool calls_function(const ast::Dereference & expr, const std::string & function_name)
+{
+    return calls_function(*expr.expr, function_name);
+}
+
+bool calls_function(const ast::Address & expr, const std::string & function_name)
+{
+    return calls_function(*expr.expr, function_name);
+}
+
+bool calls_function(const ast::Call & expr, const std::string & function_name)
+{
+    const ast::Value * f = boost::get<ast::Value>(&expr.function->expression);
+    if (f)
+    {
+        const std::string * name = boost::get<std::string>(&f->value);
+        if (name && (*name == function_name))
+            return true;
+    }
+
+    for (auto arg : expr.arguments)
+        if (calls_function(arg, function_name))
+            return true;
+
+    return false;
+}
+
+bool calls_function(const ast::Read & expr, const std::string & function_name)
+{
+    return false;
+}
+
 bool calls_function(const ast::Expression & expr, const std::string & function_name)
 {
-    undefined;
+    return fmap([&function_name], x, calls_function(x, function_name),
+                expr.expression);
 }
 
 std::list<ast::Expression> get_non_recursive_returns(const codegen::Function & f)

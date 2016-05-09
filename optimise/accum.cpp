@@ -6,13 +6,55 @@ namespace optimise
 {
 namespace
 {
+void get_returns(const codegen::Statement & st, std::list<ast::Expression> & returns)
+{
+    const ast::Return * ret = boost::get<ast::Return>(&st.statement);
+    if (ret)
+    {
+        returns.push_back(ret->expr);
+        return;
+    }
+
+    const codegen::If * if_st = boost::get<codegen::If>(&st.statement);
+    if (if_st)
+    {
+        for (auto s : if_st->thenBody)
+            get_returns(s, returns);
+        for (auto s : if_st->elseBody)
+            get_returns(s, returns);
+        return;
+    }
+
+    const codegen::While * while_st = boost::get<codegen::While>(&st.statement);
+    if (while_st)
+    {
+        for (auto s : while_st->body)
+            get_returns(s, returns);
+        return;
+    }
+}
+
+std::list<ast::Expression> get_returns(const codegen::Function & f)
+{
+    std::list<ast::Expression> result;
+
+    for (auto st : f.statements)
+        get_returns(st, result);
+
+    return result;
+}
+
 std::list<ast::Expression> get_non_recursive_returns(const codegen::Function & f)
 {
+    std::list<ast::Expression> returns = get_returns(f);
+
     undefined;
 }
 
 std::list<ast::Expression> get_recursive_returns(const codegen::Function & f)
 {
+    std::list<ast::Expression> returns = get_returns(f);
+
     undefined;
 }
 

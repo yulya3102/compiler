@@ -147,10 +147,9 @@ struct Accum : Recursive
         if (ret)
         {
             ast::Expression & return_value = ret->expr;
-            std::string function_name = undefined_expr(std::string);
-            ast::Expression & rec_call = get_call_to(return_value, function_name);
+            ast::Expression & rec_call = get_call_to(return_value, name());
             ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));
-            rec_call = ast::Value(accumulator_variable(undefined_expr(codegen::Function)).name);
+            rec_call = ast::Value(accumulator_variable(f).name);
             new_return_value.arguments.push_back(return_value);
             return_value = new_return_value;
             return;

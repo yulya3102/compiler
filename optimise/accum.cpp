@@ -124,14 +124,54 @@ std::list<ast::Expression> get_recursive_returns(const codegen::Function & f)
     return returns;
 }
 
+ast::Expression & get_call_to(ast::Expression & expr, const std::string & f)
+{
+    undefined;
+}
+
 codegen::Variable accumulator_variable(const codegen::Function & f)
 {
     return {f.loc, f.type, "_accumulator"};
 }
 
+void rewrite_returns_to_acc(codegen::Statement & st)
+{
+    ast::Return * ret = boost::get<ast::Return>(&st.statement);
+    if (ret)
+    {
+        ast::Expression & return_value = ret->expr;
+        std::string function_name = undefined_expr(std::string);
+        ast::Expression & rec_call = get_call_to(return_value, function_name);
+        ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));
+        rec_call = ast::Value(accumulator_variable(undefined_expr(codegen::Function)).name);
+        new_return_value.arguments.push_back(return_value);
+        return_value = new_return_value;
+        return;
+    }
+
+    codegen::If * if_st = boost::get<codegen::If>(&st.statement);
+    if (if_st)
+    {
+        for (auto s : if_st->thenBody)
+            rewrite_returns_to_acc(s);
+        for (auto s : if_st->elseBody)
+            rewrite_returns_to_acc(s);
+        return;
+    }
+
+    codegen::While * while_st = boost::get<codegen::While>(&st.statement);
+    if (while_st)
+    {
+        for (auto s : while_st->body)
+            rewrite_returns_to_acc(s);
+        return;
+    }
+}
+
 void rewrite_returns_to_acc(codegen::Function & f)
 {
-    undefined;
+    for (auto st : f.statements)
+        rewrite_returns_to_acc(st);
 }
 
 std::list<codegen::Function> optimise(codegen::Function & f)

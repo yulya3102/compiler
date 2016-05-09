@@ -138,6 +138,8 @@ std::list<codegen::Function> optimise(codegen::Function & f)
         return {};
     if (recursive.size() != 1)
         return {};
+    if (is_name(recursive.front(), f.name))
+        return {};
 
     ast::Expression init_acc = non_recursive.front();
     codegen::Function func_acc(f);

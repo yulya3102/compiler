@@ -100,9 +100,8 @@ std::list<ast::Expression> get_non_recursive_returns(const codegen::Function & f
 {
     std::list<ast::Expression> returns = get_returns(f);
 
-    std::remove_if(returns.begin(), returns.end(),
-                   [f] (const ast::Expression & e)
-                   { return calls_function(e, f.name); });
+    returns.remove_if([f] (const ast::Expression & e)
+                      { return calls_function(e, f.name); });
 
     return returns;
 }
@@ -111,9 +110,8 @@ std::list<ast::Expression> get_recursive_returns(const codegen::Function & f)
 {
     std::list<ast::Expression> returns = get_returns(f);
 
-    std::remove_if(returns.begin(), returns.end(),
-                   [f] (const ast::Expression & e)
-                   { return !calls_function(e, f.name); });
+    returns.remove_if([f] (const ast::Expression & e)
+                      { return !calls_function(e, f.name); });
 
     return returns;
 }

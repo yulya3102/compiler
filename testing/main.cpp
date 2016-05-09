@@ -161,7 +161,7 @@ int fib(int n)
 
 #include "compiled_fact.h"
 
-TEST(compiled, fact)
+TEST(compiled, DISABLED_fact)
 {
     std::string code = to_string(testing::compiled_fact);
     std::vector<int> input, expected_output;
@@ -175,7 +175,7 @@ TEST(compiled, fact)
 
 #include "compiled_fact_accum.h"
 
-TEST(compiled, fact_accum)
+TEST(compiled, DISABLED_fact_accum)
 {
     std::string code = to_string(testing::compiled_fact);
     std::string code_accum = to_string(testing::compiled_fact_accum);
@@ -221,7 +221,7 @@ TEST(semantic, subscope)
 
 #include "compiled_func_pointer.h"
 
-TEST(compiled, func_pointer)
+TEST(compiled, DISABLED_func_pointer)
 {
     std::string code = to_string(testing::compiled_func_pointer);
 

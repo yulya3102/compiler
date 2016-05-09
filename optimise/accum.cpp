@@ -44,18 +44,31 @@ std::list<ast::Expression> get_returns(const codegen::Function & f)
     return result;
 }
 
+bool calls_function(const ast::Expression & expr, const std::string & function_name)
+{
+    undefined;
+}
+
 std::list<ast::Expression> get_non_recursive_returns(const codegen::Function & f)
 {
     std::list<ast::Expression> returns = get_returns(f);
 
-    undefined;
+    std::remove_if(returns.begin(), returns.end(),
+                   [f] (const ast::Expression & e)
+                   { return calls_function(e, f.name); });
+
+    return returns;
 }
 
 std::list<ast::Expression> get_recursive_returns(const codegen::Function & f)
 {
     std::list<ast::Expression> returns = get_returns(f);
 
-    undefined;
+    std::remove_if(returns.begin(), returns.end(),
+                   [f] (const ast::Expression & e)
+                   { return !calls_function(e, f.name); });
+
+    return returns;
 }
 
 void rewrite_returns_to_acc(codegen::Function & f)

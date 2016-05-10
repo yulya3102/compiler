@@ -32,7 +32,9 @@ This will build the `lcc` binary in the build directory.
 * while loop
 * I/O: `read(varname)`, `write(int-expr)`
 * optimisations:
-    * rewrite recursive function to use accumulator
+    * rewrite recursive function to use accumulator - works if function has
+      one non-recursive return (its value used as accumulator initial
+      value) and one recursive return without tail call
     * tail call optimisation
 
 ## Testing

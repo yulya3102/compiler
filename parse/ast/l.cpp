@@ -1,6 +1,7 @@
 #include "l.h"
 
 #include <utils/undefined.h>
+#include <utils/string.h>
 
 namespace ast
 {
@@ -72,20 +73,9 @@ std::string to_string(const VarDeclaration & decl)
     return to_string(decl.type) + " " + decl.name;
 }
 
-template <typename Iterator>
-std::string to_string(Iterator begin, Iterator end, const std::string & separator = "")
-{
-    if (begin == end)
-        return "";
-
-    Iterator head = begin;
-    begin++;
-    return to_string(*head) + separator + to_string(begin, end, separator);
-}
-
 std::string to_string(const FuncType & type)
 {
-    std::string arglist = to_string(type.argtypes.begin(), type.argtypes.end(), ", ");
+    std::string arglist = utils::to_string(type.argtypes.begin(), type.argtypes.end(), ", ");
     return to_string(*type.rettype) + "(" + arglist + ")";
 }
 
@@ -93,7 +83,7 @@ std::string to_string(const FuncDeclaration & decl)
 {
     return to_string(decl.type) + " " + decl.name
         + "("
-        + to_string(decl.arguments.cbegin(), decl.arguments.cend(), ", ")
+        + utils::to_string(decl.arguments.cbegin(), decl.arguments.cend(), ", ")
         + ")";
 }
 
@@ -111,7 +101,7 @@ std::string to_string(const Call & call)
 {
     return to_string(*call.function)
         + "("
-        + to_string(call.arguments.begin(), call.arguments.end(), ",")
+        + utils::to_string(call.arguments.begin(), call.arguments.end(), ",")
         + ")";
 }
 
@@ -186,7 +176,7 @@ std::string to_string(const While & st)
 
 std::string to_string(const Block & block)
 {
-    return "{\n" + to_string(block.statements.begin(), block.statements.end(), ";\n") + "}";
+    return "{\n" + utils::to_string(block.statements.begin(), block.statements.end(), ";\n") + "}";
 }
 
 std::string to_string(const Read & read)
@@ -221,7 +211,7 @@ std::string to_string(const CodeEntry & entry)
 
 std::string to_string(const Code & code)
 {
-    return to_string(code.entries.cbegin(), code.entries.cend(), "\n\n");
+    return utils::to_string(code.entries.cbegin(), code.entries.cend(), "\n\n");
 }
 
 Type int_type(std::shared_ptr<location> loc)

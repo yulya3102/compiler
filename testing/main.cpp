@@ -250,13 +250,18 @@ TEST(compiled, arg_var)
 TEST(compiled, fib)
 {
     std::string code = utils::to_string(testing::compiled_fib);
-    std::vector<int> input, expected_output;
-    for (std::size_t i = 1; i <= 10; ++i)
+    auto compiled_code = [&code] (const std::vector<int> & input)
     {
-        input.push_back(i);
-        expected_output.push_back(fib(i));
-    }
-    EXPECT_EQ(test_compiled(code, input), expected_output);
+        return test_compiled(code, input);
+    };
+    auto expected = [] (const std::vector<int> & input)
+    {
+        std::vector<int> output;
+        std::transform(input.begin(), input.end(), std::back_inserter(output), fib);
+        return output;
+    };
+
+    EXPECT_EQ_RESULTS(10000, 25, compiled_code, expected);
 }
 
 int main(int argc, char ** argv)

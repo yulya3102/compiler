@@ -192,8 +192,21 @@ struct Accum : Recursive
         func_acc.name += "_accumulated";
         func_acc.arguments.push_back(accumulator_variable(f));
         f.statements.clear();
+        std::list<ast::Expression> init_args;
+        for (auto arg : f.arguments)
+            init_args.push_back(ast::Expression(ast::Value(arg.name)));
+        init_args.push_back(init_acc);
+        ast::Expression init_call(ast::Call{
+            f.loc,
+            std::shared_ptr<ast::Expression>(
+                new ast::Expression(
+                    ast::Value(func_acc.name))),
+            init_args
+        });
         f.statements.push_back(
-            codegen::Statement(ast::Return{f.loc, init_acc})
+            codegen::Statement(ast::Return{
+                                   f.loc,
+                                   init_call})
         );
         Accum accum(func_acc);
         accum.rewrite_returns_to_acc();

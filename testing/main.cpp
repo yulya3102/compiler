@@ -14,21 +14,6 @@ std::string to_string(const boost::string_ref & ref)
     return std::string(ref.begin(), ref.end());
 }
 
-void try_compile(const std::string & code)
-{
-    std::stringstream in(code);
-    llvm::raw_null_ostream out;
-    lcc::compile_llvm(in, out, "try_compile");
-}
-
-#define EXPECT_SEMANTIC_ERROR(code) EXPECT_THROW(try_compile(code), sem::semantic_error)
-
-TEST(semantic, assignment_type_mismatch)
-{
-    EXPECT_SEMANTIC_ERROR("int main() { int a; a = true; }");
-    EXPECT_SEMANTIC_ERROR("int main() { _Bool a; a = 1; }");
-}
-
 struct p2open
 {
     p2open(const char * command, int expected_exit_code = 0)
@@ -180,14 +165,6 @@ TEST(compiled, scope)
     std::string code = to_string(testing::compiled_scope);
     std::vector<int> expected_output = {0, 88, 42, 88};
     EXPECT_EQ(test_compiled(code, {}), expected_output);
-}
-
-#include "semantic_subscope.h"
-
-TEST(semantic, subscope)
-{
-    std::string code = to_string(testing::semantic_subscope);
-    EXPECT_NO_THROW(try_compile(code));
 }
 
 #include "compiled_func_pointer.h"

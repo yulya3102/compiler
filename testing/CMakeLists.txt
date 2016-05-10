@@ -29,8 +29,11 @@ BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/compiled_fib.h ${CMAKE_CURRENT_SOURCE_DIR}/c
 
 find_package(GTest REQUIRED)
 
-add_executable(test_compiler main.cpp
+add_executable(test_semantic semantic.cpp
     semantic_subscope.h semantic_subscope.cpp
+)
+
+add_executable(test_compiled main.cpp
     compiled_fact.h compiled_fact.cpp
     compiled_scope.h compiled_scope.cpp
     compiled_func_pointer.h compiled_func_pointer.cpp
@@ -42,6 +45,8 @@ add_executable(test_compiler main.cpp
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS support core)
-target_link_libraries(test_compiler lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthread)
+target_link_libraries(test_semantic lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthread)
+target_link_libraries(test_compiled lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthread)
 
-add_test(all_tests test_compiler)
+add_test(semantic test_semantic)
+add_test(compiled test_compiled)

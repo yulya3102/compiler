@@ -145,7 +145,10 @@ struct Accum : Recursive
             ast::Expression & return_value = ret->expr;
             boost::optional<ast::Expression &> maybe_rec_call = get_call_to(return_value, name());
             if (!maybe_rec_call)
+            {
+                return_value.expression = ast::Value(accumulator_variable(f).name);
                 return;
+            }
 
             ast::Expression & rec_call = *maybe_rec_call;
             ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));

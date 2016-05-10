@@ -100,4 +100,12 @@ struct Code
     std::shared_ptr<ast::location> loc;
     std::list<CodeEntry> entries;
 };
+
+std::string to_string(const Code & code);
+std::string to_string(const CodeEntry & code);
+std::string to_string(const Function & code);
+std::string to_string(const Statement & code);
+std::string to_string(const Continue & code);
+std::string to_string(const While & code);
+std::string to_string(const If & code);
 }

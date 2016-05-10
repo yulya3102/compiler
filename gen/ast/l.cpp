@@ -322,4 +322,39 @@ std::list<Statement> function_statements(const ast::FuncDefinition & func)
     return statements;
 }
 
+std::string to_string(const Code & code)
+{
+    undefined;
+}
+
+std::string to_string(const CodeEntry & code)
+{
+    undefined;
+}
+
+std::string to_string(const Function & code)
+{
+    undefined;
+}
+
+std::string to_string(const Statement & code)
+{
+    undefined;
+}
+
+std::string to_string(const Continue & code)
+{
+    undefined;
+}
+
+std::string to_string(const While & code)
+{
+    undefined;
+}
+
+std::string to_string(const If & code)
+{
+    undefined;
+}
+
 }

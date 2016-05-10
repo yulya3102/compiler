@@ -17,12 +17,25 @@ std::list<std::string> argument_names(const codegen::Function & func)
     return result;
 }
 
+std::list<codegen::Variable> generate_saved_arguments(const std::list<codegen::Variable> & args)
+{
+    std::list<codegen::Variable> result;
+    size_t i = 0;
+    for (auto & arg : args)
+    {
+        result.push_back({arg.loc, arg.type, "saved_arg_" + std::to_string(i)});
+        ++i;
+    }
+    return result;
+}
+
 struct TCO : Recursive
 {
     TCO(codegen::Function & func)
         : Recursive(func)
         , entry_label(func.name + "_entry")
         , arguments(argument_names(func))
+        , saved_arguments(generate_saved_arguments(func.arguments))
     {}
 
     void optimise_statement(const ast::Assignment & st, std::list<codegen::Statement> & statements) const
@@ -96,12 +109,23 @@ struct TCO : Recursive
             return;
         }
 
-        auto formal_arg_it = this->arguments.begin();
+        auto saved_arg_it = this->saved_arguments.begin();
         for (const ast::Expression & arg : tail_call->arguments)
         {
-            ast::Value arg_var(*formal_arg_it);
-            ast::Expression lval(arg_var);
+            ast::Value saved_arg(saved_arg_it->name);
+            ast::Expression lval(saved_arg);
             ast::Assignment statement{arg.loc, lval, arg};
+            statements.push_back(codegen::Statement(statement));
+            ++saved_arg_it;
+        }
+        assert(saved_arg_it == this->saved_arguments.end());
+
+        auto formal_arg_it = this->arguments.begin();
+        for (auto & saved_arg_var : this->saved_arguments)
+        {
+            ast::Value arg(*formal_arg_it), saved_arg(saved_arg_var.name);
+            ast::Expression lval(arg), rval(saved_arg);
+            ast::Assignment statement{tail_call->loc, lval, rval};
             statements.push_back(codegen::Statement(statement));
             ++formal_arg_it;
         }
@@ -114,6 +138,8 @@ struct TCO : Recursive
     codegen::Function optimise() const
     {
         codegen::Function result(f);
+        result.variables.insert(result.variables.end(),
+                                saved_arguments.begin(), saved_arguments.end());
         std::list<codegen::Statement> statements;
 
         for (auto st : f.statements)
@@ -130,6 +156,7 @@ struct TCO : Recursive
 
     std::string entry_label;
     std::list<std::string> arguments;
+    std::list<codegen::Variable> saved_arguments;
 };
 
 void optimise_tail_call(codegen::Function & func)

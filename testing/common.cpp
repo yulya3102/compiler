@@ -118,7 +118,7 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
     lcc::compile_executable(in, compiled, opt);
 
-    p2open proc(compiled.c_str());
+    p2open proc(compiled.c_str(), expected_retcode);
     for (auto i : input)
         proc.write(i);
     return proc.read();

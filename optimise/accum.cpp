@@ -112,6 +112,11 @@ struct Accum : Recursive
         : Recursive(f)
     {}
 
+    std::string accumulated_function_name() const
+    {
+        return name() + "_accumulated";
+    }
+
     std::list<ast::Expression> get_non_recursive_returns() const
     {
         std::list<ast::Expression> returns = get_returns(f);
@@ -189,7 +194,7 @@ struct Accum : Recursive
 
         ast::Expression init_acc = non_recursive.front();
         codegen::Function func_acc(f);
-        func_acc.name += "_accumulated";
+        func_acc.name = accumulated_function_name();
         func_acc.arguments.push_back(accumulator_variable(f));
         f.statements.clear();
         std::list<ast::Expression> init_args;

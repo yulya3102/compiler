@@ -24,9 +24,6 @@ BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/compiled_alloca_while.h ${CMAKE_CURRENT_SOUR
 BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/compiled_arg_var.h ${CMAKE_CURRENT_SOURCE_DIR}/compiled_arg_var.cpp
         testing::compiled_arg_var ${CMAKE_CURRENT_SOURCE_DIR}/../examples/arg_var.lc)
 
-BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/compiled_fact_accum.h ${CMAKE_CURRENT_SOURCE_DIR}/compiled_fact_accum.cpp
-        testing::compiled_fact_accum ${CMAKE_CURRENT_SOURCE_DIR}/../examples/fact_accum.lc)
-
 find_package(GTest REQUIRED)
 
 add_executable(test_compiler main.cpp
@@ -38,7 +35,6 @@ add_executable(test_compiler main.cpp
     compiled_pointer_pointer.h compiled_pointer_pointer.cpp
     compiled_alloca_while.h compiled_alloca_while.cpp
     compiled_arg_var.h compiled_arg_var.cpp
-    compiled_fact_accum.h compiled_fact_accum.cpp
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS support core)

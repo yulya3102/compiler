@@ -251,6 +251,20 @@ TEST(compiled, arg_var)
     EXPECT_EQ(test_compiled(code, {}), expected_output);
 }
 
+#include "compiled_fib.h"
+
+TEST(compiled, fib)
+{
+    std::string code = to_string(testing::compiled_fib);
+    std::vector<int> input, expected_output;
+    for (std::size_t i = 1; i <= 10; ++i)
+    {
+        input.push_back(i);
+        expected_output.push_back(fib(i));
+    }
+    EXPECT_EQ(test_compiled(code, input), expected_output);
+}
+
 int main(int argc, char ** argv)
 {
     testing::InitGoogleTest(&argc, argv);

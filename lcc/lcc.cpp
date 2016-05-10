@@ -10,14 +10,16 @@
 #include <llvm/Support/FileSystem.h>
 #include <cstdlib>
 
-void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::string & module_name)
+void lcc::compile_llvm(std::istream & in, llvm::raw_ostream & out, const std::string & module_name, Optimisations opt)
 {
     ast::parser p;
     ast::Code code = p.parse(in, std::cout);
     sem::verify(code);
     codegen::Code gen_code(code);
-    optimise::optimise_to_accum(gen_code);
-    optimise::optimise_tail_call(gen_code);
+    if (opt >= Optimisations::ACC)
+        optimise::optimise_to_accum(gen_code);
+    if (opt >= Optimisations::TCO)
+        optimise::optimise_tail_call(gen_code);
     std::unique_ptr<llvm::Module> module = codegen::generate(gen_code, module_name.c_str());
 
     module->print(out, nullptr);
@@ -32,13 +34,13 @@ std::string lcc::create_temp_file(const char * pattern, std::size_t suffix_size)
     return filename;
 }
 
-void lcc::compile_executable(std::istream & in, const std::string & output_name)
+void lcc::compile_executable(std::istream & in, const std::string & output_name, Optimisations opt)
 {
     std::string ll_filename = create_temp_file("lcc_XXXXXX.ll", 3);
     {
         std::error_code err;
         llvm::raw_fd_ostream out(ll_filename, err, llvm::sys::fs::OpenFlags::F_None);
-        compile_llvm(in, out, output_name);
+        compile_llvm(in, out, output_name, opt);
     }
 
     std::string object_filename = create_temp_file("lcc_XXXXXX.o", 2);

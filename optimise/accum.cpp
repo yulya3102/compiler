@@ -150,6 +150,8 @@ struct Accum : Recursive
             ast::Expression & rec_call = *maybe_rec_call;
             ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));
             rec_call = ast::Value(accumulator_variable(f).name);
+            assert(is_name(*new_return_value.function, f.name));
+            new_return_value.function.reset(new ast::Expression(ast::Value(accumulated_function_name())));
             new_return_value.arguments.push_back(return_value);
             return_value = new_return_value;
             return;

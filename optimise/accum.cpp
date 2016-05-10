@@ -185,6 +185,15 @@ struct Accum : Recursive
             rewrite_returns_to_acc(st);
     }
 
+    bool is_tail_call(const ast::Expression & expr)
+    {
+        const ast::Call * call = boost::get<ast::Call>(&expr.expression);
+        if (!call)
+            return false;
+
+        return is_name(*call->function, f.name);
+    }
+
     std::list<codegen::Function> optimise()
     {
         std::list<ast::Expression> non_recursive = get_non_recursive_returns();
@@ -194,7 +203,7 @@ struct Accum : Recursive
             return {};
         if (recursive.size() != 1)
             return {};
-        if (is_name(recursive.front(), f.name))
+        if (is_tail_call(recursive.front()))
             return {};
 
         ast::Expression init_acc = non_recursive.front();

@@ -46,9 +46,17 @@ add_executable(test_compiled main.cpp
     compiled_fib.h compiled_fib.cpp
 )
 
+add_executable(test_optimised optimisations.cpp
+    common.h common.cpp
+
+    compiled_fact.h compiled_fact.cpp
+)
+
 llvm_map_components_to_libnames(LLVM_LIBS support core)
 target_link_libraries(test_semantic lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthread)
 target_link_libraries(test_compiled lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthread)
+target_link_libraries(test_optimised lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthread)
 
 add_test(semantic test_semantic)
 add_test(compiled test_compiled)
+add_test(optimisated test_optimised)

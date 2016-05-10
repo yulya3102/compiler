@@ -34,6 +34,8 @@ add_executable(test_semantic semantic.cpp
 )
 
 add_executable(test_compiled main.cpp
+    common.h common.cpp
+
     compiled_fact.h compiled_fact.cpp
     compiled_scope.h compiled_scope.cpp
     compiled_func_pointer.h compiled_func_pointer.cpp

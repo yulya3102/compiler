@@ -189,6 +189,7 @@ struct Accum : Recursive
 
         ast::Expression init_acc = non_recursive.front();
         codegen::Function func_acc(f);
+        func_acc.name += "_accumulated";
         func_acc.arguments.push_back(accumulator_variable(f));
         f.statements.clear();
         f.statements.push_back(

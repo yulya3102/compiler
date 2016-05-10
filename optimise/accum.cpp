@@ -59,52 +59,6 @@ bool is_name(const ast::Expression & expr, const std::string & name)
     return *n == name;
 }
 
-bool calls_function(const ast::Expression & expr, const std::string & function_name);
-
-bool calls_function(const ast::Value & expr, const std::string & function_name)
-{
-    return false;
-}
-
-bool calls_function(const ast::BinOperator & expr, const std::string & function_name)
-{
-    return calls_function(*expr.lhs, function_name)
-        || calls_function(*expr.rhs, function_name);
-}
-
-bool calls_function(const ast::Dereference & expr, const std::string & function_name)
-{
-    return calls_function(*expr.expr, function_name);
-}
-
-bool calls_function(const ast::Address & expr, const std::string & function_name)
-{
-    return calls_function(*expr.expr, function_name);
-}
-
-bool calls_function(const ast::Call & expr, const std::string & function_name)
-{
-    if (is_name(expr.function->expression, function_name))
-        return true;
-
-    for (auto arg : expr.arguments)
-        if (calls_function(arg, function_name))
-            return true;
-
-    return false;
-}
-
-bool calls_function(const ast::Read & expr, const std::string & function_name)
-{
-    return false;
-}
-
-bool calls_function(const ast::Expression & expr, const std::string & function_name)
-{
-    return fmap([&function_name], x, calls_function(x, function_name),
-                expr.expression);
-}
-
 boost::optional<ast::Expression &> get_call_to(ast::Expression & expr, const std::string & f)
 {
     if (boost::get<ast::Value>(&expr.expression)
@@ -140,6 +94,11 @@ boost::optional<ast::Expression &> get_call_to(ast::Expression & expr, const std
     }
 
     return boost::none;
+}
+
+bool calls_function(const ast::Expression & expr, const std::string & function_name)
+{
+    return static_cast<bool>(get_call_to(const_cast<ast::Expression&>(expr), function_name));
 }
 
 codegen::Variable accumulator_variable(const codegen::Function & f)

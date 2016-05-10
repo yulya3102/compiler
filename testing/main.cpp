@@ -1,18 +1,13 @@
 #include <lcc/lcc.h>
 #include <sem/error.h>
 #include <utils/undefined.h>
+#include <utils/string.h>
 
 #include <llvm/Support/raw_ostream.h>
 #include <gtest/gtest.h>
-#include <boost/utility/string_ref.hpp>
 #include <sstream>
 #include <chrono>
 #include <queue>
-
-std::string to_string(const boost::string_ref & ref)
-{
-    return std::string(ref.begin(), ref.end());
-}
 
 struct p2open
 {
@@ -148,7 +143,7 @@ int fib(int n)
 
 TEST(compiled, fact)
 {
-    std::string code = to_string(testing::compiled_fact);
+    std::string code = utils::to_string(testing::compiled_fact);
     std::vector<int> input, expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
     {
@@ -162,7 +157,7 @@ TEST(compiled, fact)
 
 TEST(compiled, scope)
 {
-    std::string code = to_string(testing::compiled_scope);
+    std::string code = utils::to_string(testing::compiled_scope);
     std::vector<int> expected_output = {0, 88, 42, 88};
     EXPECT_EQ(test_compiled(code, {}), expected_output);
 }
@@ -171,7 +166,7 @@ TEST(compiled, scope)
 
 TEST(compiled, func_pointer)
 {
-    std::string code = to_string(testing::compiled_func_pointer);
+    std::string code = utils::to_string(testing::compiled_func_pointer);
 
     std::vector<int> expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
@@ -191,7 +186,7 @@ TEST(compiled, func_pointer)
 
 TEST(compiled, pointer)
 {
-    std::string code = to_string(testing::compiled_pointer);
+    std::string code = utils::to_string(testing::compiled_pointer);
     std::vector<int> expected_output{0, 42};
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
@@ -200,7 +195,7 @@ TEST(compiled, pointer)
 
 TEST(compiled, pointer_pointer)
 {
-    std::string code = to_string(testing::compiled_pointer_pointer);
+    std::string code = utils::to_string(testing::compiled_pointer_pointer);
     std::vector<int> expected_output{0, 42};
     EXPECT_EQ(expected_output, test_compiled(code, {}));
 }
@@ -209,7 +204,7 @@ TEST(compiled, pointer_pointer)
 
 TEST(compiled, alloca_while)
 {
-    std::string code = to_string(testing::compiled_alloca_while);
+    std::string code = utils::to_string(testing::compiled_alloca_while);
     std::vector<int> expected_output;
     for (int i = 0; i < 100000000; ++i)
         expected_output.push_back(i);
@@ -223,7 +218,7 @@ TEST(compiled, alloca_while)
 
 TEST(compiled, arg_var)
 {
-    std::string code = to_string(testing::compiled_arg_var);
+    std::string code = utils::to_string(testing::compiled_arg_var);
     std::vector<int> expected_output = {0, 1, 0};
     EXPECT_EQ(test_compiled(code, {}), expected_output);
 }
@@ -232,7 +227,7 @@ TEST(compiled, arg_var)
 
 TEST(compiled, fib)
 {
-    std::string code = to_string(testing::compiled_fib);
+    std::string code = utils::to_string(testing::compiled_fib);
     std::vector<int> input, expected_output;
     for (std::size_t i = 1; i <= 10; ++i)
     {

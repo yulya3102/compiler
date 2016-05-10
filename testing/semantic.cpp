@@ -1,13 +1,8 @@
 #include <lcc/lcc.h>
 #include <sem/error.h>
+#include <utils/string.h>
 
 #include <gtest/gtest.h>
-#include <boost/utility/string_ref.hpp>
-
-std::string to_string(const boost::string_ref & ref)
-{
-    return std::string(ref.begin(), ref.end());
-}
 
 void try_compile(const std::string & code)
 {
@@ -28,7 +23,7 @@ TEST(semantic, assignment_type_mismatch)
 
 TEST(semantic, subscope)
 {
-    std::string code = to_string(testing::semantic_subscope);
+    std::string code = utils::to_string(testing::semantic_subscope);
     EXPECT_NO_THROW(try_compile(code));
 }
 

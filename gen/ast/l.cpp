@@ -5,6 +5,7 @@
 #include <utils/undefined.h>
 #include <utils/fmap.h>
 #include <utils/top.h>
+#include <utils/string.h>
 
 namespace codegen
 {
@@ -324,22 +325,29 @@ std::list<Statement> function_statements(const ast::FuncDefinition & func)
 
 std::string to_string(const Code & code)
 {
-    undefined;
+    return utils::to_string(code.entries.cbegin(), code.entries.cend(), "\n\n");
 }
 
 std::string to_string(const CodeEntry & code)
 {
-    undefined;
+    return fmap([], x, to_string(x), code.entry);
 }
 
 std::string to_string(const Function & code)
 {
-    undefined;
+    return ast::to_string(code.type) + " " + code.name
+        + "("
+        + utils::to_string(code.arguments.begin(), code.arguments.end(), ", ")
+        + ")\n"
+        + "{\n"
+        + utils::to_string(code.variables.begin(), code.variables.end(), ";\n")
+        + utils::to_string(code.statements.begin(), code.statements.end(), ";\n")
+        + "}\n";
 }
 
 std::string to_string(const Statement & code)
 {
-    undefined;
+    return fmap([], x, to_string(x), code.statement);
 }
 
 std::string to_string(const Continue & code)
@@ -349,12 +357,22 @@ std::string to_string(const Continue & code)
 
 std::string to_string(const While & code)
 {
-    undefined;
+    return "while (" + to_string(code.condition) + ")\n"
+        + "{\n"
+        + utils::to_string(code.body.begin(), code.body.end(), ";\n")
+        + "}\n";
 }
 
 std::string to_string(const If & code)
 {
-    undefined;
+    return "if (" + to_string(code.condition) + ")\n"
+        + "{\n"
+        + utils::to_string(code.thenBody.begin(), code.thenBody.end(), ";\n")
+        + "}\n"
+        + "else\n"
+        + "{\n"
+        + utils::to_string(code.elseBody.begin(), code.elseBody.end(), ";\n")
+        + "}\n";
 }
 
 }

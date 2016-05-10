@@ -105,9 +105,41 @@ bool calls_function(const ast::Expression & expr, const std::string & function_n
                 expr.expression);
 }
 
-ast::Expression & get_call_to(ast::Expression & expr, const std::string & f)
+boost::optional<ast::Expression &> get_call_to(ast::Expression & expr, const std::string & f)
 {
-    undefined;
+    if (boost::get<ast::Value>(&expr.expression)
+        || boost::get<ast::Read>(&expr.expression))
+        return boost::none;
+
+    auto * op = boost::get<ast::BinOperator>(&expr.expression);
+    if (op)
+    {
+        auto lhs_call = get_call_to(*op->lhs, f);
+        if (lhs_call)
+            return lhs_call;
+        return get_call_to(*op->rhs, f);
+    }
+
+    auto * deref = boost::get<ast::Dereference>(&expr.expression);
+    if (deref)
+        return get_call_to(*deref->expr, f);
+
+    auto * addr = boost::get<ast::Address>(&expr.expression);
+    if (addr)
+        return get_call_to(*addr->expr, f);
+
+    ast::Call & call = boost::get<ast::Call>(expr.expression);
+    if (is_name(*call.function, f))
+        return expr;
+
+    for (auto arg : call.arguments)
+    {
+        auto arg_call = get_call_to(arg, f);
+        if (arg_call)
+            return arg_call;
+    }
+
+    return boost::none;
 }
 
 codegen::Variable accumulator_variable(const codegen::Function & f)
@@ -147,7 +179,11 @@ struct Accum : Recursive
         if (ret)
         {
             ast::Expression & return_value = ret->expr;
-            ast::Expression & rec_call = get_call_to(return_value, name());
+            boost::optional<ast::Expression &> maybe_rec_call = get_call_to(return_value, name());
+            if (!maybe_rec_call)
+                return;
+
+            ast::Expression & rec_call = *maybe_rec_call;
             ast::Call new_return_value(boost::get<ast::Call>(rec_call.expression));
             rec_call = ast::Value(accumulator_variable(f).name);
             new_return_value.arguments.push_back(return_value);

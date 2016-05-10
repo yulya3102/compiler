@@ -59,4 +59,4 @@ target_link_libraries(test_optimised lccomp ${GTEST_LIBRARY} ${LLVM_LIBS} pthrea
 
 add_test(semantic test_semantic)
 add_test(compiled test_compiled)
-add_test(optimisated test_optimised)
+add_test(optimised test_optimised)

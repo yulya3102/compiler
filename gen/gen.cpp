@@ -145,6 +145,7 @@ void gen_entry(frame & ctx, const Function & entry)
             llvm::Value * rval = &*arg_it;
             get_builder().CreateStore(rval, lval);
         }
+        assert(proto_it == entry.arguments.end());
     }
     for (auto var : entry.variables)
         inner_scope.gen_local_variable(var);

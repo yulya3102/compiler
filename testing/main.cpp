@@ -27,23 +27,6 @@ int fib(int n)
     return 1;
 }
 
-std::vector<int> random_input(size_t size, int limit = std::numeric_limits<int>::max())
-{
-    static std::mt19937 generator;
-    std::uniform_int_distribution<int> distribution(0, limit);
-
-    std::vector<int> result;
-    for (size_t i = 0; i < size; ++i)
-    {
-        int random = distribution(generator);
-        result.push_back(random);
-    }
-
-    return result;
-}
-
-#define EXPECT_EQ_RESULTS(size, limit, f, g) { auto in = random_input(size, limit); EXPECT_EQ(f(in), g(in)); }
-
 #include "compiled_fact.h"
 
 TEST(compiled, fact)

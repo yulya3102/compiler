@@ -123,3 +123,18 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
         proc.write(i);
     return proc.read();
 }
+
+std::vector<int> random_input(size_t size, int limit)
+{
+    static std::mt19937 generator;
+    std::uniform_int_distribution<int> distribution(0, limit);
+
+    std::vector<int> result;
+    for (size_t i = 0; i < size; ++i)
+    {
+        int random = distribution(generator);
+        result.push_back(random);
+    }
+
+    return result;
+}

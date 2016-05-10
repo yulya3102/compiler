@@ -111,11 +111,12 @@ struct p2open
     std::queue<int> write_buffer;
 };
 
-std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input, int expected_retcode)
+std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input,
+                               lcc::Optimisations opt, int expected_retcode)
 {
     std::stringstream in(code);
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
-    lcc::compile_executable(in, compiled);
+    lcc::compile_executable(in, compiled, opt);
 
     p2open proc(compiled.c_str());
     for (auto i : input)

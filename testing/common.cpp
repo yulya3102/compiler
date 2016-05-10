@@ -8,6 +8,8 @@
 #include <string.h>
 #include <sstream>
 #include <sys/wait.h>
+#include <chrono>
+#include <iostream>
 
 struct p2open
 {
@@ -112,16 +114,23 @@ struct p2open
 };
 
 std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input,
-                               lcc::Optimisations opt, int expected_retcode)
+                               lcc::Optimisations opt, const char * log_message, int expected_retcode)
 {
     std::stringstream in(code);
     std::string compiled = lcc::create_temp_file("test_compiled_XXXXXX");
     lcc::compile_executable(in, compiled, opt);
 
+    auto start = std::chrono::system_clock::now();
     p2open proc(compiled.c_str(), expected_retcode);
     for (auto i : input)
         proc.write(i);
-    return proc.read();
+    auto r = proc.read();
+    auto end = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start);
+    if (log_message)
+        std::cout << log_message << ": " << duration.count() << " ms" << std::endl;
+
+    return r;
 }
 
 std::vector<int> random_input(size_t size, int limit)

@@ -172,7 +172,7 @@ TEST(compiled, fact)
         return output;
     };
 
-    EXPECT_EQ_RESULTS(1000, 12, compiled_code, expected);
+    EXPECT_EQ_RESULTS(10000, 12, compiled_code, expected);
 }
 
 #include "compiled_scope.h"

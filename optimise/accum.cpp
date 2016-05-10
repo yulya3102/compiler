@@ -196,7 +196,6 @@ struct Accum : Recursive
 
         ast::Expression init_acc = non_recursive.front();
         codegen::Function func_acc(f);
-        func_acc.name = accumulated_function_name();
         func_acc.arguments.push_back(accumulator_variable(f));
         f.statements.clear();
         std::list<ast::Expression> init_args;
@@ -207,7 +206,7 @@ struct Accum : Recursive
             f.loc,
             std::shared_ptr<ast::Expression>(
                 new ast::Expression(
-                    ast::Value(func_acc.name))),
+                    ast::Value(accumulated_function_name()))),
             init_args
         });
         f.statements.push_back(
@@ -217,6 +216,7 @@ struct Accum : Recursive
         );
         Accum accum(func_acc);
         accum.rewrite_returns_to_acc();
+        func_acc.name = accumulated_function_name();
         return { func_acc };
     }
 };

@@ -139,18 +139,40 @@ int fib(int n)
     return 1;
 }
 
+std::vector<int> random_input(size_t size, int limit = std::numeric_limits<int>::max())
+{
+    static std::mt19937 generator;
+    std::uniform_int_distribution<int> distribution(0, limit);
+
+    std::vector<int> result;
+    for (size_t i = 0; i < size; ++i)
+    {
+        int random = distribution(generator);
+        result.push_back(random);
+    }
+
+    return result;
+}
+
+#define EXPECT_EQ_RESULTS(size, limit, f, g) { auto in = random_input(size, limit); EXPECT_EQ(f(in), g(in)); }
+
 #include "compiled_fact.h"
 
 TEST(compiled, fact)
 {
     std::string code = utils::to_string(testing::compiled_fact);
-    std::vector<int> input, expected_output;
-    for (std::size_t i = 1; i <= 10; ++i)
+    auto compiled_code = [&code] (const std::vector<int> & input)
     {
-        input.push_back(i);
-        expected_output.push_back(fact(i));
-    }
-    EXPECT_EQ(test_compiled(code, input), expected_output);
+        return test_compiled(code, input);
+    };
+    auto expected = [] (const std::vector<int> & input)
+    {
+        std::vector<int> output;
+        std::transform(input.begin(), input.end(), std::back_inserter(output), fact);
+        return output;
+    };
+
+    EXPECT_EQ_RESULTS(1000, 12, compiled_code, expected);
 }
 
 #include "compiled_scope.h"

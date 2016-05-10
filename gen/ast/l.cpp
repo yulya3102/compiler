@@ -352,12 +352,12 @@ std::string to_string(const Statement & code)
 
 std::string to_string(const Continue & code)
 {
-    undefined;
+    return "continue " + code.label;
 }
 
 std::string to_string(const While & code)
 {
-    return "while (" + to_string(code.condition) + ")\n"
+    return code.label + ":\nwhile (" + to_string(code.condition) + ")\n"
         + "{\n"
         + utils::to_string(code.body.begin(), code.body.end(), ";\n")
         + "}\n";

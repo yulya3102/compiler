@@ -160,9 +160,9 @@ struct Accum : Recursive
         codegen::If * if_st = boost::get<codegen::If>(&st.statement);
         if (if_st)
         {
-            for (auto s : if_st->thenBody)
+            for (codegen::Statement & s : if_st->thenBody)
                 rewrite_returns_to_acc(s);
-            for (auto s : if_st->elseBody)
+            for (codegen::Statement & s : if_st->elseBody)
                 rewrite_returns_to_acc(s);
             return;
         }
@@ -170,7 +170,7 @@ struct Accum : Recursive
         codegen::While * while_st = boost::get<codegen::While>(&st.statement);
         if (while_st)
         {
-            for (auto s : while_st->body)
+            for (codegen::Statement & s : while_st->body)
                 rewrite_returns_to_acc(s);
             return;
         }
@@ -178,7 +178,7 @@ struct Accum : Recursive
 
     void rewrite_returns_to_acc()
     {
-        for (auto st : f.statements)
+        for (codegen::Statement & st : f.statements)
             rewrite_returns_to_acc(st);
     }
 

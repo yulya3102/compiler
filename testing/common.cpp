@@ -95,10 +95,11 @@ struct p2open
         return result;
     }
 
-    ~p2open()
+    void exit()
     {
         int status;
         waitpid(child, &status, 0);
+        exited = true;
         if (WIFEXITED(status) && (WEXITSTATUS(status) != expected_exit_code))
             throw std::runtime_error("Unexpected return code of a program: "
                                      + std::to_string(WEXITSTATUS(status)));
@@ -107,10 +108,17 @@ struct p2open
                                      + std::to_string(WTERMSIG(status)));
     }
 
+    ~p2open()
+    {
+        if (!exited)
+            exit();
+    }
+
     int expected_exit_code;
     pid_t child;
     int inputfd, outputfd;
     std::queue<int> write_buffer;
+    bool exited;
 };
 
 std::vector<int> test_compiled(const std::string & code, const std::vector<int> & input,
@@ -125,6 +133,7 @@ std::vector<int> test_compiled(const std::string & code, const std::vector<int> 
     for (auto i : input)
         proc.write(i);
     auto r = proc.read();
+    proc.exit();
     auto end = std::chrono::system_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start);
     if (log_message)

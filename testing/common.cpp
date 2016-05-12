@@ -101,11 +101,9 @@ struct p2open
         waitpid(child, &status, 0);
         exited = true;
         if (WIFEXITED(status) && (WEXITSTATUS(status) != expected_exit_code))
-            throw std::runtime_error("Unexpected return code of a program: "
-                                     + std::to_string(WEXITSTATUS(status)));
+            throw testing::nonzero_retcode(WEXITSTATUS(status));
         if (WIFSIGNALED(status))
-            throw std::runtime_error("Program was terminated by a signal "
-                                     + std::to_string(WTERMSIG(status)));
+            throw testing::killed_by_signal(WTERMSIG(status));
     }
 
     ~p2open()

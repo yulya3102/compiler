@@ -13,3 +13,12 @@ LCC ?= ../lcc/lcc
 
 %.ir: %.lc
 	$(LCC) $< $@
+
+%.0.ir: %.lc
+	$(LCC) -O0 $< $@
+
+%.1.ir: %.lc
+	$(LCC) -O1 $< $@
+
+%.2.ir: %.lc
+	$(LCC) -O2 $< $@

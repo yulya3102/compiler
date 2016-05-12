@@ -30,6 +30,17 @@ TEST(optimised, fact)
     EXPECT_EQ_RESULTS(40000, 12, compiled_code, optimised_code);
 }
 
+#include "optimised_stack_overflow.h"
+
+TEST(optimised, stack_overflow)
+{
+    std::string code = utils::to_string(testing::optimised_stack_overflow);
+    std::vector<int> expected{0};
+    EXPECT_EQ(expected, test_compiled(code, {}, lcc::Optimisations::ACC));
+    EXPECT_THROW(test_compiled(code, {}, lcc::Optimisations::NONE),
+                 testing::killed_by_signal);
+}
+
 int main(int argc, char ** argv)
 {
     testing::InitGoogleTest(&argc, argv);

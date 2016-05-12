@@ -27,6 +27,11 @@ BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/compiled_arg_var.h ${CMAKE_CURRENT_SOURCE_DI
 BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/compiled_fib.h ${CMAKE_CURRENT_SOURCE_DIR}/compiled_fib.cpp
         testing::compiled_fib ${CMAKE_CURRENT_SOURCE_DIR}/../examples/fib.lc)
 
+BIN2CPP(${CMAKE_CURRENT_SOURCE_DIR}/optimised_stack_overflow.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/optimised_stack_overflow.cpp
+        testing::optimised_stack_overflow
+        ${CMAKE_CURRENT_SOURCE_DIR}/../examples/stack_overflow.lc)
+
 find_package(GTest REQUIRED)
 
 add_executable(test_semantic semantic.cpp
@@ -50,6 +55,7 @@ add_executable(test_optimised optimisations.cpp
     common.h common.cpp
 
     compiled_fact.h compiled_fact.cpp
+    optimised_stack_overflow.h optimised_stack_overflow.cpp
 )
 
 llvm_map_components_to_libnames(LLVM_LIBS support core)

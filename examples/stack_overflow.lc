@@ -1,0 +1,14 @@
+int f(int n)
+{
+    int a; int b; int g; int e;
+    if (n == 0)
+        return 0;
+    else
+        return f(n - 1);
+}
+
+int main()
+{
+    write(f(1000000000));
+    return 0;
+}
